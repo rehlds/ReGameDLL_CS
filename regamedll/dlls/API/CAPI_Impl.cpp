@@ -337,6 +337,8 @@ GAMEHOOK_REGISTRY(CBasePlayer_PlayerDeathThink);
 GAMEHOOK_REGISTRY(CBasePlayer_Observer_Think);
 GAMEHOOK_REGISTRY(CBasePlayer_RemoveAllItems);
 
+GAMEHOOK_REGISTRY(SendSayMessage);
+
 int CReGameApi::GetMajorVersion() {
 	return REGAMEDLL_API_VERSION_MAJOR;
 }

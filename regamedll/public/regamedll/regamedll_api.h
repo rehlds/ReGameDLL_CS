@@ -628,6 +628,10 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChainClass<void, class CBasePlayer, BOOL> IReGameHook_CBasePlayer_RemoveAllItems;
 typedef IHookChainRegistryClass<void, class CBasePlayer, BOOL> IReGameHookRegistry_CBasePlayer_RemoveAllItems;
 
+// SendSayMessage hook
+typedef IHookChain<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> IReGameHook_SendSayMessage;
+typedef IHookChainRegistry<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -790,6 +794,8 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_PlayerDeathThink *CBasePlayer_PlayerDeathThink() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_Observer_Think *CBasePlayer_Observer_Think() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems() = 0;
+
+	virtual IReGameHookRegistry_SendSayMessage *SendSayMessage() = 0;
 };
 
 struct ReGameFuncs_t {

@@ -749,6 +749,10 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, BOOL> CReGameHook_CBasePlayer_RemoveAllItems;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, BOOL> CReGameHookRegistry_CBasePlayer_RemoveAllItems;
 
+// SendSayMessage hook
+typedef IHookChainImpl<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> CReGameHook_SendSayMessage;
+typedef IHookChainRegistryImpl<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> CReGameHookRegistry_SendSayMessage;
+
 class CReGameHookchains: public IReGameHookchains {
 public:
 	// CBasePlayer virtual
@@ -911,6 +915,8 @@ public:
 	CReGameHookRegistry_CBasePlayer_Observer_Think m_CBasePlayer_Observer_Think;
 	CReGameHookRegistry_CBasePlayer_RemoveAllItems m_CBasePlayer_RemoveAllItems;
 
+	CReGameHookRegistry_SendSayMessage m_SendSayMessage;
+
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
 	virtual IReGameHookRegistry_CBasePlayer_Precache *CBasePlayer_Precache();
@@ -1070,6 +1076,8 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_PlayerDeathThink *CBasePlayer_PlayerDeathThink();
 	virtual IReGameHookRegistry_CBasePlayer_Observer_Think *CBasePlayer_Observer_Think();
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
+
+	virtual IReGameHookRegistry_SendSayMessage *SendSayMessage();
 };
 
 extern CReGameHookchains g_ReGameHookchains;

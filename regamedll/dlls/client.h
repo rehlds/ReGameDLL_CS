@@ -109,6 +109,7 @@ extern unsigned short m_usResetDecals;
 extern unsigned short g_iShadowSprite;
 
 #ifdef REGAMEDLL_API
+void SendSayMessage_OrigFunc(CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName);
 void HandleMenu_ChooseAppearance_OrigFunc(CBasePlayer *pPlayer, int slot);
 BOOL HandleMenu_ChooseTeam_OrigFunc(CBasePlayer *pPlayer, int slot);
 bool BuyGunAmmo_OrigFunc(CBasePlayer *pPlayer, CBasePlayerItem *weapon, bool bBlinkMoney);
@@ -136,6 +137,7 @@ void ProcessKickVote(CBasePlayer *pVotingPlayer, CBasePlayer *pKickPlayer);
 void CheckStartMoney();
 void ClientPutInServer(edict_t *pEntity);
 void Host_Say(edict_t *pEntity, BOOL teamonly);
+void SendSayMessage(CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName);
 void DropSecondary(CBasePlayer *pPlayer);
 void DropPrimary(CBasePlayer *pPlayer);
 bool CanBuyThis(CBasePlayer *pPlayer, int iWeapon);

@@ -751,9 +751,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 
 void Host_Say(edict_t *pEntity, BOOL teamonly)
 {
-	int j;
 	char *p;
-	char text[128];
 	char szTemp[256];
 	const char *cpSay = "say";
 	const char *cpSayTeam = "say_team";
@@ -940,6 +938,16 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		}
 	}
 
+	SendSayMessage(pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
+}
+
+LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
+
+void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+{
+	char text[128];
+	int j;
+
 	text[0] = '\0';
 
 	// -3 for /n and null terminator
@@ -973,6 +981,8 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	// so check it, or it will infinite loop
 
 	CBasePlayer *pReceiver = nullptr;
+	edict_t *pEntity = ENT(pPlayer->pev);
+
 	while ((pReceiver = UTIL_FindEntityByClassname(pReceiver, "player")))
 	{
 		if (FNullEnt(pReceiver->edict()))
@@ -1012,15 +1022,15 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
-				WRITE_BYTE(ENTINDEX(pEntity));
-				WRITE_STRING(pszFormat);
-				WRITE_STRING("");
-				WRITE_STRING(text);
+			WRITE_BYTE(ENTINDEX(pEntity));
+			WRITE_STRING(pszFormat);
+			WRITE_STRING("");
+			WRITE_STRING(text);
 
-				if (placeName)
-				{
-					WRITE_STRING(placeName);
-				}
+			if (placeName)
+			{
+				WRITE_STRING(placeName);
+			}
 
 			MESSAGE_END();
 		}
@@ -1028,15 +1038,15 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 
 	// print to the sending client
 	MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, &pEntity->v);
-		WRITE_BYTE(ENTINDEX(pEntity));
-		WRITE_STRING(pszFormat);
-		WRITE_STRING("");
-		WRITE_STRING(text);
+	WRITE_BYTE(ENTINDEX(pEntity));
+	WRITE_STRING(pszFormat);
+	WRITE_STRING("");
+	WRITE_STRING(text);
 
-		if (placeName)
-		{
-			WRITE_STRING(placeName);
-		}
+	if (placeName)
+	{
+		WRITE_STRING(placeName);
+	}
 
 	MESSAGE_END();
 
