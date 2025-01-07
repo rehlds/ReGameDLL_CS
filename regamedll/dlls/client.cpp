@@ -938,6 +938,17 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		}
 	}
 
+	for (char *pAmpersand = p; pAmpersand && *pAmpersand != '\0'; pAmpersand++)
+	{
+		if (pAmpersand[0] == '%')
+		{
+			if (pAmpersand[1] != 'l' && pAmpersand[1] != ' ' && pAmpersand[1] != '\0')
+			{
+				pAmpersand[0] = ' ';
+			}
+		}
+	}
+
 	SendSayMessage(pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 }
 
@@ -960,17 +971,6 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, ch
 
 	if ((signed int)Q_strlen(p) > j)
 		p[j] = 0;
-
-	for (char *pAmpersand = p; pAmpersand && *pAmpersand != '\0'; pAmpersand++)
-	{
-		if (pAmpersand[0] == '%')
-		{
-			if (pAmpersand[1] != 'l' && pAmpersand[1] != ' ' && pAmpersand[1] != '\0')
-			{
-				pAmpersand[0] = ' ';
-			}
-		}
-	}
 
 	Q_strlcat(text, p);
 	Q_strlcat(text, "\n");
