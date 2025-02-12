@@ -8115,8 +8115,10 @@ void CBasePlayer::UpdateStatusBar()
 						Q_strlcpy(sbuf0, " ");
 #ifdef	REGAMEDLL_ADD
 					if (static_cast<int>(playerid_showhealth.value) != 0)
-						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
 #endif
+					{
+						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
+					}
 
 					if (!(m_flDisplayHistory & DHF_FRIEND_SEEN) && !(pev->flags & FL_SPECTATOR))
 					{
