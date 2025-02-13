@@ -32,7 +32,10 @@ set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 set(COMPILE_FLAGS "-m32 -U_FORTIFY_SOURCE")
-set(LINK_FLAGS "-m32 -s")
+# do not strip debuginfo during link
+if (NOT DEBUG)
+	set(LINK_FLAGS "-s")
+endif()
 set(LINK_LIBS dl aelf32)
 
 set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -fno-exceptions -fno-builtin -Wno-unknown-pragmas")
