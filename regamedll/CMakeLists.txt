@@ -20,6 +20,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(regamedll CXX)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 option(DEBUG "Build with debug information." OFF)
 option(USE_STATIC_LIBSTDC "Enables static linking libstdc++." OFF)
 option(USE_LEGACY_LIBC "Enables linking against legacy libc (<= 2.15) for compat with older distros (Debian 8/Ubuntu 16.04/Centos 7)." OFF)
@@ -52,6 +54,12 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 		list(APPEND LINK_LIBS aelf32)
 		set(CMAKE_SIZEOF_VOID_P 4)
 	endif()
+endif()
+
+if(XASH_COMPAT)
+	# Xash3D FWGS Library Naming Scheme compliance
+	# see documentation: https://github.com/FWGS/xash3d-fwgs/blob/master/Documentation/extensions/library-naming.md
+	include(LibraryNaming)
 endif()
 
 set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -fno-exceptions -fno-builtin -Wno-unknown-pragmas")
@@ -95,10 +103,14 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 		set(LINK_FLAGS "${LINK_FLAGS} -ipo")
 	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
-	# As new processors are deployed in the marketplace, the behavior of this option will change.
+	if (NOT XASH_COMPAT OR XASH_AMD64 OR XASH_X86)
+		# Produce code optimized for the most common IA32/AMD64/EM64T processors.
+		# As new processors are deployed in the marketplace, the behavior of this option will change.
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} \
+			-mtune=generic -msse3")
+	endif()
+
 	set(COMPILE_FLAGS "${COMPILE_FLAGS} \
-		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-delete-non-virtual-dtor -Wno-invalid-offsetof\
 		-Wno-unused-variable -Wno-unused-value -Wno-unused-result -Wno-unused-function\
@@ -410,7 +422,7 @@ if (XASH_COMPAT)
 	else()
 		set_target_properties(regamedll PROPERTIES
 			PREFIX ""
-			OUTPUT_NAME cs)
+			OUTPUT_NAME cs${POSTFIX})
 	endif()
 else()
 	set_target_properties(regamedll PROPERTIES
