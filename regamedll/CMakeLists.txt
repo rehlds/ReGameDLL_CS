@@ -50,7 +50,7 @@ else()
 endif()
 
 # Check Intel C++ compiler
-if ("$ENV{CXX}" MATCHES "icpc")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	#
 	# -fp-model=precise
 	# ICC uses -fp-model fast=1 by default for more aggressive optimizations on floating-point calculations
@@ -78,7 +78,7 @@ if ("$ENV{CXX}" MATCHES "icpc")
 		set(COMPILE_FLAGS "${COMPILE_FLAGS} -ipo")
 		set(LINK_FLAGS "${LINK_FLAGS} -ipo")
 	endif()
-else()
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
 	# As new processors are deployed in the marketplace, the behavior of this option will change.
 	set(COMPILE_FLAGS "${COMPILE_FLAGS} \
@@ -90,7 +90,7 @@ else()
 		-Wno-sign-compare -Wno-format -Wno-ignored-attributes -Wno-strict-aliasing")
 
 	# Check Clang compiler
-	if ("$ENV{CXX}" MATCHES "clang")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(COMPILE_FLAGS "${COMPILE_FLAGS} \
 			-Wno-unused-local-typedef\
 			-Wno-unused-private-field\
@@ -105,14 +105,9 @@ else()
 
 		# GCC >= 8.3
 		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
+			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess -fcf-protection=none")
 		endif()
 	endif()
-endif()
-
-# GCC >= 8.3
-if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fcf-protection=none")
 endif()
 
 if (NOT DEBUG)
