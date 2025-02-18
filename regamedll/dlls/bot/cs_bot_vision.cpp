@@ -797,7 +797,7 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 			float distSq = d.LengthSquared();
 
 #ifdef REGAMEDLL_ADD
-			if (IsUsingSniperRifle()) {
+			if (isSniperRifle(pPlayer->m_pActiveItem)) {
 				m_isEnemySniperVisible = true;
 				if (sniperThreat)
 				{
