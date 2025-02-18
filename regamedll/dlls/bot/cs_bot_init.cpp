@@ -194,6 +194,11 @@ void CCSBot::ResetValues()
 	m_currentArea = nullptr;
 	m_lastKnownArea = nullptr;
 
+#ifdef REGAMEDLL_ADD
+	m_isEnemySniperVisible = false;
+	m_sawEnemySniperTimer.Invalidate();
+#endif
+
 	m_avoidFriendTimer.Invalidate();
 	m_isFriendInTheWay = false;
 	m_isWaitingBehindFriend = false;

@@ -140,6 +140,14 @@ public:
 	virtual void Interpret(CCSBot *pSender, CCSBot *pReceiver) const;			// cause the given bot to act on this meme
 };
 
+#ifdef REGAMEDLL_ADD
+class BotWarnSniperMeme : public BotMeme
+{
+public:
+	virtual void Interpret(CCSBot* sender, CCSBot* receiver) const;		///< cause the given bot to act on this meme
+};
+#endif
+
 enum BotStatementType
 {
 	REPORT_VISIBLE_ENEMIES,
@@ -531,6 +539,10 @@ public:
 	void KilledFriend();
 	void FriendlyFire();
 
+#ifdef REGAMEDLL_ADD
+	void SpottedSniper(void);
+	void FriendSpottedSniper(void);
+#endif
 	bool SeesAtLeastOneEnemy() const { return m_seeAtLeastOneEnemy; }
 
 private:
@@ -557,6 +569,9 @@ private:
 	CountdownTimer m_spottedLooseBombTimer;
 	CountdownTimer m_heardNoiseTimer;
 	CountdownTimer m_escortingHostageTimer;
+#ifdef REGAMEDLL_ADD
+	CountdownTimer m_warnSniperTimer;
+#endif
 };
 
 inline BotChatterInterface::VerbosityType BotChatterInterface::GetVerbosity() const
