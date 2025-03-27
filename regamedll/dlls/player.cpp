@@ -116,34 +116,52 @@ void CBasePlayer::SendItemStatus()
 }
 
 #ifdef REGAMEDLL_ADD
+
 inline const char *GetPlayerIdString(bool sameTeam)
 {
-	switch (static_cast<int>(playerid_showhealth.value))
+	enum PlayerIdShowHealth
 	{
-	case 1: // show health teammate only (cs default)
+		PLAYERID_HIDE      = 0, // Don't show health
+		PLAYERID_TEAMMATES = 1, // Show health for teammates only (default CS)
+		PLAYERID_ALL       = 2  // Show health for all players
+	};
+
+	enum PlayerIdField
 	{
-		switch (static_cast<int>(playerid_field.value))
+		PLAYERID_FIELD_NONE   = 0, // No extra info
+		PLAYERID_FIELD_TEAM   = 1, // Show team name
+		PLAYERID_FIELD_HEALTH = 2, // Show health percentage
+		PLAYERID_FIELD_BOTH   = 3  // Show both team name and health
+	};
+
+	PlayerIdShowHealth showHealth = static_cast<PlayerIdShowHealth>(mp_playerid_showhealth.value);
+	PlayerIdField fieldType = static_cast<PlayerIdField>(mp_playerid_field.value);
+
+	// Don't show health
+	if (showHealth == PLAYERID_HIDE)
+	{
+		return (fieldType == PLAYERID_FIELD_NONE) ? "1 %p2" : "1 %c1: %p2";
+	}
+
+	// Health only for teammates
+	if (showHealth == PLAYERID_TEAMMATES && !sameTeam)
+	{
+		switch (fieldType)
 		{
-		case 1: return sameTeam ? "1 %c1: %p2\n2 : %i3%%" : "1 %c1: %p2"; 	// show team text only
-		case 2: return sameTeam ? "1 %p2\n2  %h: %i3%%" : "1 %p2"; 			// show health text only
-		case 3: return sameTeam ? "1 %c1: %p2\n2  %h: %i3%%" : "1 %c1: %p2"; // show team text & health text (cs default)
-		default: return sameTeam ? "1 %p2\n2  : %i3%%" : "1 %p2"; 			// don't show text
+		case PLAYERID_FIELD_TEAM:   return "1 %c1: %p2";
+		case PLAYERID_FIELD_HEALTH: return "1 %p2";
+		case PLAYERID_FIELD_BOTH:   return "1 %c1: %p2";
+		default:                    return "1 %p2";
 		}
 	}
-	case 2: // show health all
+
+	// Show health to everyone
+	switch (fieldType)
 	{
-		switch (static_cast<int>(playerid_field.value))
-		{
-		case 1: return "1 %c1: %p2\n2 : %i3%%"; 		// show team text only
-		case 2: return "1 %p2\n2  %h: %i3%%"; 			// show health text only
-		case 3: return "1 %c1: %p2\n2  %h: %i3%%"; 		// show team text & health text
-		default: return "1 %p2\n2  : %i3%%"; 			// don't show text
-		}
-	}
-	default: // don't show health
-	{
-		return (static_cast<int>(playerid_field.value) == 0) ? "1 %p2" : "1 %c1: %p2";
-	}
+	case PLAYERID_FIELD_TEAM:   return "1 %c1: %p2\n2 : %i3%%";
+	case PLAYERID_FIELD_HEALTH: return "1 %p2\n2  %h: %i3%%";
+	case PLAYERID_FIELD_BOTH:   return "1 %c1: %p2\n2  %h: %i3%%";
+	default:                    return "1 %p2\n2  : %i3%%";
 	}
 }
 #endif
