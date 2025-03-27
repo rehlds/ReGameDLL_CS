@@ -533,6 +533,11 @@ public:
 	bool IsAwareOfEnemyDeath() const;							// return true if we *noticed* that our enemy died
 	int GetLastVictimID() const;								// return the ID (entindex) of the last victim we killed, or zero
 
+#ifdef REGAMEDLL_ADD
+	bool CanSeeSniper(void) const;							///< return true if we can see an enemy sniper
+	bool HasSeenSniperRecently(void) const;					///< return true if we have seen a sniper recently
+#endif
+
 	// navigation
 	bool HasPath() const;
 	void DestroyPath();
@@ -921,6 +926,11 @@ private:
 
 	float m_fireWeaponTimestamp;
 
+#ifdef REGAMEDLL_ADD
+	bool m_isEnemySniperVisible;									///< do we see an enemy sniper right now
+	CountdownTimer m_sawEnemySniperTimer;							///< tracking time since saw enemy sniper
+#endif
+
 	// reaction time system
 	enum { MAX_ENEMY_QUEUE = 20 };
 	struct ReactionState
@@ -1109,6 +1119,11 @@ inline bool CCSBot::IsAtBombsite()
 
 inline CCSBot::MoraleType CCSBot::GetMorale() const
 {
+#ifdef REGAMEDLL_ADD
+	if (cv_bot_excellent_morale.value != 0.0f)
+		return EXCELLENT;
+#endif
+
 	return m_morale;
 }
 
@@ -1249,6 +1264,18 @@ inline int CCSBot::GetLastVictimID() const
 {
 	return m_lastVictimID;
 }
+
+#ifdef REGAMEDLL_ADD
+inline bool CCSBot::CanSeeSniper(void) const
+{
+	return m_isEnemySniperVisible;
+}
+
+inline bool CCSBot::HasSeenSniperRecently(void) const
+{
+	return !m_sawEnemySniperTimer.IsElapsed();
+}
+#endif
 
 inline bool CCSBot::HasPath() const
 {

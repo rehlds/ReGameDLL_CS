@@ -85,7 +85,8 @@ public:
 		SCENARIO_DEATHMATCH,
 		SCENARIO_DEFUSE_BOMB,
 		SCENARIO_RESCUE_HOSTAGES,
-		SCENARIO_ESCORT_VIP
+		SCENARIO_ESCORT_VIP,
+		SCENARIO_ESCAPE
 	};
 
 	GameScenarioType GetScenario() const
@@ -268,3 +269,6 @@ inline bool AreBotsAllowed()
 }
 
 void PrintAllEntities();
+#ifdef REGAMEDLL_ADD
+void GetSpawnPositions();
+#endif

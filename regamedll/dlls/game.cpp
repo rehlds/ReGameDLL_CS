@@ -160,6 +160,7 @@ cvar_t t_default_grenades                = { "mp_t_default_grenades", "", 0, 0.0
 cvar_t t_give_player_knife               = { "mp_t_give_player_knife", "1", 0, 1.0f, nullptr };
 cvar_t t_default_weapons_secondary       = { "mp_t_default_weapons_secondary", "glock18", 0, 0.0f, nullptr };
 cvar_t t_default_weapons_primary         = { "mp_t_default_weapons_primary", "", 0, 0.0f, nullptr };
+cvar_t default_weapons_random            = { "mp_default_weapons_random", "", 0, 0.0f, nullptr };
 cvar_t free_armor                        = { "mp_free_armor", "0", 0, 0.0f, nullptr };
 cvar_t teamflash                         = { "mp_team_flash", "1", 0, 1.0f, nullptr };
 cvar_t allchat                           = { "sv_allchat", "0", 0, 0.0f, nullptr };
@@ -171,6 +172,7 @@ cvar_t deathmsg_flags                    = { "mp_deathmsg_flags", "abc", 0, 0.0f
 cvar_t assist_damage_threshold           = { "mp_assist_damage_threshold", "40", 0, 40.0f, nullptr };
 cvar_t freezetime_duck                   = { "mp_freezetime_duck", "1", 0, 1.0f, nullptr };
 cvar_t freezetime_jump                   = { "mp_freezetime_jump", "1", 0, 1.0f, nullptr };
+cvar_t jump_height                       = { "mp_jump_height", "45", FCVAR_SERVER, 45.0f, nullptr };
 
 cvar_t hostages_rescued_ratio = { "mp_hostages_rescued_ratio", "1.0", 0, 1.0f, nullptr };
 
@@ -179,7 +181,7 @@ cvar_t legacy_vehicle_block               = { "mp_legacy_vehicle_block", "1", 0,
 cvar_t dying_time              = { "mp_dying_time", "3.0", 0, 3.0f, nullptr };
 cvar_t defuser_allocation      = { "mp_defuser_allocation", "0", 0, 0.0f, nullptr };
 cvar_t location_area_info      = { "mp_location_area_info", "0", 0, 0.0f, nullptr };
-cvar_t chat_loc_fallback       = { "mp_chat_loc_fallback", "1", 1, 0.0f, nullptr };
+cvar_t chat_loc_fallback       = { "mp_chat_loc_fallback", "1", 0, 1.0f, nullptr };
 
 cvar_t item_respawn_time       = { "mp_item_respawn_time", "30", FCVAR_SERVER, 30.0f, nullptr };
 cvar_t weapon_respawn_time     = { "mp_weapon_respawn_time", "20", FCVAR_SERVER, 20.0f, nullptr };
@@ -189,6 +191,13 @@ cvar_t vote_flags              = { "mp_vote_flags", "km", 0, 0.0f, nullptr };
 cvar_t votemap_min_time        = { "mp_votemap_min_time", "180", 0, 180.0f, nullptr };
 
 cvar_t flymove_method          = { "mp_flymove_method", "0", 0, 0.0f, nullptr };
+cvar_t stamina_restore_rate    = { "mp_stamina_restore_rate", "0", 0, 0.f, nullptr };
+
+cvar_t logkills                = { "mp_logkills", "1", FCVAR_SERVER, 0.0f, nullptr };
+cvar_t randomspawn             = { "mp_randomspawn", "0", FCVAR_SERVER, 0.0f, nullptr };
+
+cvar_t playerid_showhealth     = { "mp_playerid_showhealth", "1", 0, 1.0f, nullptr };
+cvar_t playerid_field          = { "mp_playerid_field", "3", 0, 3.0f, nullptr };
 
 void GameDLL_Version_f()
 {
@@ -433,6 +442,7 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&t_give_player_knife);
 	CVAR_REGISTER(&t_default_weapons_secondary);
 	CVAR_REGISTER(&t_default_weapons_primary);
+	CVAR_REGISTER(&default_weapons_random);
 	CVAR_REGISTER(&free_armor);
 	CVAR_REGISTER(&teamflash);
 	CVAR_REGISTER(&allchat);
@@ -451,6 +461,7 @@ void EXT_FUNC GameDLLInit()
 
 	CVAR_REGISTER(&freezetime_duck);
 	CVAR_REGISTER(&freezetime_jump);
+	CVAR_REGISTER(&jump_height);
 	CVAR_REGISTER(&defuser_allocation);
 	CVAR_REGISTER(&location_area_info);
 	CVAR_REGISTER(&chat_loc_fallback);
@@ -461,13 +472,29 @@ void EXT_FUNC GameDLLInit()
 
 	CVAR_REGISTER(&vote_flags);
 	CVAR_REGISTER(&votemap_min_time);
+	CVAR_REGISTER(&randomspawn);
+
+	CVAR_REGISTER(&cv_bot_enable);
+	CVAR_REGISTER(&cv_hostage_ai_enable);
+	CVAR_REGISTER(&logkills);
+
+	CVAR_REGISTER(&playerid_showhealth);
+	CVAR_REGISTER(&playerid_field);
+
+	CVAR_REGISTER(&stamina_restore_rate);
 
 	CVAR_REGISTER(&flymove_method);
 
 	// print version
 	CONSOLE_ECHO("ReGameDLL version: " APP_VERSION "\n");
 
+	// execute initial pre-configurations
+	SERVER_COMMAND("exec game_init.cfg\n");
+	SERVER_EXECUTE();
+
 #endif // REGAMEDLL_ADD
+
+	Regamedll_Game_Init();
 
 	Bot_RegisterCVars();
 	Tutor_RegisterCVars();
@@ -475,12 +502,6 @@ void EXT_FUNC GameDLLInit()
 
 #ifdef REGAMEDLL_FIXES
 	VoiceGameMgr_RegisterCVars();
-#endif
-
-#ifdef REGAMEDLL_ADD
-	// execute initial pre-configurations
-	SERVER_COMMAND("exec game_init.cfg\n");
-	SERVER_EXECUTE();
 #endif
 
 }

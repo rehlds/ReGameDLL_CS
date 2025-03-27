@@ -28,6 +28,7 @@
 
 #pragma once
 
+extern cvar_t cv_bot_enable;
 extern cvar_t cv_bot_traceview;
 extern cvar_t cv_bot_stop;
 extern cvar_t cv_bot_show_nav;
@@ -64,6 +65,7 @@ extern cvar_t cv_bot_join_delay;
 extern cvar_t cv_bot_freeze;
 extern cvar_t cv_bot_mimic;
 extern cvar_t cv_bot_mimic_yaw_offset;
+extern cvar_t cv_bot_excellent_morale;
 #else
 extern cvar_t cv_bot_quota_match;
 #endif
