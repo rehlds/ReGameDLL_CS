@@ -2462,8 +2462,16 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 			break;
 		}
 
+		// UNDO: This code was intended to set the victim's angle with the throw direction
+		// For bots, it works correctly because they do not send angle updates to the server,
+		// However, for players, the client overrides the angle with its own view direction in the next frame,
+		// causing a visual glitch where the model rotates excessively
+		// The issue is more noticeable with high cmdrate values (e.g., cl_cmdrate >100)
+		// Disabled to avoid this artifact
+#ifndef REGAMEDLL_FIXES
 		pev->angles.y = UTIL_VecToAngles(-pev->velocity).y;
 		pev->v_angle.y = pev->angles.y;
+#endif
 
 		m_iThrowDirection = THROW_NONE;
 	}
@@ -2952,10 +2960,8 @@ void EXT_FUNC CBasePlayer::__API_HOOK(SetAnimation)(PLAYER_ANIM playerAnim)
 						break;
 					case 3:
 					case 4:
-#ifndef REGAMEDLL_FIXES
 						m_iThrowDirection = THROW_FORWARD;
 						break;
-#endif
 					case 5:
 					case 6:
 						m_iThrowDirection = THROW_HITVEL;
@@ -4167,7 +4173,7 @@ void CBasePlayer::PlayerUse()
 		}
 	}
 
-	bool useNewHostages = !TheNavAreaList.empty() && AreImprovAllowed();
+	bool useNewHostages = !TheNavAreaList.empty() && cv_hostage_ai_enable.value;
 	CBaseEntity *pObject = nullptr;
 	CBaseEntity *pClosest = nullptr;
 	Vector vecLOS;
@@ -5152,12 +5158,9 @@ void CBasePlayer::UpdatePlayerSound()
 		m_iExtraSoundTypes = 0;
 	}
 
-	if (pSound)
-	{
-		pSound->m_vecOrigin = pev->origin;
-		pSound->m_iVolume = iVolume;
-		pSound->m_iType |= (bits_SOUND_PLAYER | m_iExtraSoundTypes);
-	}
+	pSound->m_vecOrigin = pev->origin;
+	pSound->m_iVolume = iVolume;
+	pSound->m_iType |= (bits_SOUND_PLAYER | m_iExtraSoundTypes);
 
 	// keep track of virtual muzzle flash
 	m_iWeaponFlash -= 256 * gpGlobals->frametime;
@@ -5950,7 +5953,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Spawn)()
 		TheBots->OnEvent(EVENT_PLAYER_SPAWNED, this);
 	}
 
-	m_allowAutoFollowTime = false;
+	m_allowAutoFollowTime = 0.0f;
 
 	for (i = 0; i < COMMANDS_TO_TRACK; i++)
 		m_flLastCommandTime[i] = -1;
@@ -8507,7 +8510,7 @@ void CBasePlayer::__API_HOOK(SwitchTeam)()
 
 	UpdateLocation(true);
 
-	if (m_iTeam)
+	if (m_iTeam != UNASSIGNED)
 	{
 		SetScoreboardAttributes();
 	}
@@ -9719,7 +9722,7 @@ void CBasePlayer::PrioritizeAutoBuyString(char (&autobuyString)[MAX_AUTOBUY_LENG
 	int newStringPos = 0;
 	char priorityToken[32];
 
-	if (!priorityString || !autobuyString)
+	if (!priorityString)
 		return;
 
 	const char *priorityChar = priorityString;
@@ -10156,7 +10159,11 @@ bool CBasePlayer::IsObservingPlayer(CBasePlayer *pPlayer)
 
 void CBasePlayer::UpdateLocation(bool forceUpdate)
 {
+#ifdef REGAMEDLL_FIXES
+	if (!forceUpdate && m_flLastUpdateTime > gpGlobals->time - 2.0f)
+#else
 	if (!forceUpdate && m_flLastUpdateTime >= gpGlobals->time + 2.0f)
+#endif
 		return;
 
 	const char *placeName = nullptr;
