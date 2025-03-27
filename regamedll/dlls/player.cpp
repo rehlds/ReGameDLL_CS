@@ -117,25 +117,25 @@ void CBasePlayer::SendItemStatus()
 
 #ifdef REGAMEDLL_ADD
 
+enum PlayerIdShowHealth
+{
+	PLAYERID_HIDE      = 0, // Don't show health
+	PLAYERID_TEAMMATES = 1, // Show health for teammates only (default CS)
+	PLAYERID_ALL       = 2  // Show health for all players
+};
+
+enum PlayerIdField
+{
+	PLAYERID_FIELD_NONE   = 0, // No extra info
+	PLAYERID_FIELD_TEAM   = 1, // Show team name
+	PLAYERID_FIELD_HEALTH = 2, // Show health percentage
+	PLAYERID_FIELD_BOTH   = 3  // Show both team name and health
+};
+
 inline const char *GetPlayerIdString(bool sameTeam)
 {
-	enum PlayerIdShowHealth
-	{
-		PLAYERID_HIDE      = 0, // Don't show health
-		PLAYERID_TEAMMATES = 1, // Show health for teammates only (default CS)
-		PLAYERID_ALL       = 2  // Show health for all players
-	};
-
-	enum PlayerIdField
-	{
-		PLAYERID_FIELD_NONE   = 0, // No extra info
-		PLAYERID_FIELD_TEAM   = 1, // Show team name
-		PLAYERID_FIELD_HEALTH = 2, // Show health percentage
-		PLAYERID_FIELD_BOTH   = 3  // Show both team name and health
-	};
-
-	PlayerIdShowHealth showHealth = static_cast<PlayerIdShowHealth>(mp_playerid_showhealth.value);
-	PlayerIdField fieldType = static_cast<PlayerIdField>(mp_playerid_field.value);
+	int showHealth = static_cast<int>(playerid_showhealth.value);
+	int fieldType = static_cast<int>(playerid_field.value);
 
 	// Don't show health
 	if (showHealth == PLAYERID_HIDE)
@@ -8208,7 +8208,7 @@ void CBasePlayer::UpdateStatusBar()
 					else
 						Q_strlcpy(sbuf0, " ");
 #ifdef	REGAMEDLL_ADD
-					if (static_cast<int>(playerid_showhealth.value) != 0)
+					if (static_cast<int>(playerid_showhealth.value) != PLAYERID_FIELD_NONE)
 #endif
 					{
 						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
@@ -8232,7 +8232,7 @@ void CBasePlayer::UpdateStatusBar()
 						Q_strlcpy(sbuf0, " ");
 
 #ifdef	REGAMEDLL_ADD
-					if (static_cast<int>(playerid_showhealth.value) == 2)
+					if (static_cast<int>(playerid_showhealth.value) == PLAYERID_ALL)
 						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
 #endif
 					if (!(m_flDisplayHistory & DHF_ENEMY_SEEN))
