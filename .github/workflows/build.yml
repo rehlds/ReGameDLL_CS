@@ -24,6 +24,9 @@ jobs:
       buildTests: 'Tests'
 
     steps:
+      - name: Configure
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -105,11 +108,6 @@ jobs:
     container: debian:11-slim
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Install dependencies
         run: |
           dpkg --add-architecture i386
@@ -120,6 +118,15 @@ jobs:
             libc6-dev libc6-dev-i386 \
             git cmake rsync \
             g++ gcc
+
+      - name: Configure
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
       - name: Build and Run unittests
         run: |
