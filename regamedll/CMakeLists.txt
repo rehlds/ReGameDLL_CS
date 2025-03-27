@@ -20,20 +20,47 @@
 cmake_minimum_required(VERSION 3.1)
 project(regamedll CXX)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 option(DEBUG "Build with debug information." OFF)
 option(USE_STATIC_LIBSTDC "Enables static linking libstdc++." OFF)
 option(USE_LEGACY_LIBC "Enables linking against legacy libc (<= 2.15) for compat with older distros (Debian 8/Ubuntu 16.04/Centos 7)." OFF)
+option(XASH_COMPAT "Enable Xash3D FWGS compatiblity (support for it's 64-bit ABI support and crossplatform library suffix)")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Avoid -rdynamic -fPIC options
-set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+if (NOT XASH_COMPAT)
+	set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
+	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+endif()
 
-set(COMPILE_FLAGS "-m32 -U_FORTIFY_SOURCE")
-set(LINK_FLAGS "-m32 -s")
-set(LINK_LIBS dl aelf32)
+set(COMPILE_FLAGS "-U_FORTIFY_SOURCE")
+set(LINK_LIBS dl)
+
+# do not strip debuginfo during link
+if (NOT DEBUG)
+	set(LINK_FLAGS "-s")
+endif()
+
+# add -m32 flag only on 64-bit systems, if building for 64-bit wasn't enabled with XASH_COMPAT
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+	if (XASH_COMPAT)
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -DXASH_64BIT")
+	else()
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} -m32")
+		set(LINK_FLAGS "${LINK_FLAGS} -m32")
+		list(APPEND LINK_LIBS aelf32)
+		set(CMAKE_SIZEOF_VOID_P 4)
+	endif()
+endif()
+
+if(XASH_COMPAT)
+	# Xash3D FWGS Library Naming Scheme compliance
+	# see documentation: https://github.com/FWGS/xash3d-fwgs/blob/master/Documentation/extensions/library-naming.md
+	include(LibraryNaming)
+endif()
 
 set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall -fno-exceptions -fno-builtin -Wno-unknown-pragmas")
 
@@ -47,7 +74,7 @@ else()
 endif()
 
 # Check Intel C++ compiler
-if ("$ENV{CXX}" MATCHES "icpc")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 	#
 	# -fp-model=precise
 	# ICC uses -fp-model fast=1 by default for more aggressive optimizations on floating-point calculations
@@ -75,11 +102,15 @@ if ("$ENV{CXX}" MATCHES "icpc")
 		set(COMPILE_FLAGS "${COMPILE_FLAGS} -ipo")
 		set(LINK_FLAGS "${LINK_FLAGS} -ipo")
 	endif()
-else()
-	# Produce code optimized for the most common IA32/AMD64/EM64T processors.
-	# As new processors are deployed in the marketplace, the behavior of this option will change.
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	if (NOT XASH_COMPAT OR XASH_AMD64 OR XASH_X86)
+		# Produce code optimized for the most common IA32/AMD64/EM64T processors.
+		# As new processors are deployed in the marketplace, the behavior of this option will change.
+		set(COMPILE_FLAGS "${COMPILE_FLAGS} \
+			-mtune=generic -msse3")
+	endif()
+
 	set(COMPILE_FLAGS "${COMPILE_FLAGS} \
-		-mtune=generic -msse3\
 		-fpermissive -fno-sized-deallocation\
 		-Wno-delete-non-virtual-dtor -Wno-invalid-offsetof\
 		-Wno-unused-variable -Wno-unused-value -Wno-unused-result -Wno-unused-function\
@@ -87,7 +118,7 @@ else()
 		-Wno-sign-compare -Wno-format -Wno-ignored-attributes -Wno-strict-aliasing")
 
 	# Check Clang compiler
-	if ("$ENV{CXX}" MATCHES "clang")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(COMPILE_FLAGS "${COMPILE_FLAGS} \
 			-Wno-unused-local-typedef\
 			-Wno-unused-private-field\
@@ -102,14 +133,9 @@ else()
 
 		# GCC >= 8.3
 		if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess")
+			set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-stringop-truncation -Wno-format-truncation -Wno-class-memaccess -fcf-protection=none")
 		endif()
 	endif()
-endif()
-
-# GCC >= 8.3
-if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.0)
-	set(COMPILE_FLAGS "${COMPILE_FLAGS} -fcf-protection=none")
 endif()
 
 if (NOT DEBUG)
@@ -378,14 +404,36 @@ if (USE_STATIC_LIBSTDC)
 	set(LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
 endif()
 
-set(LINK_FLAGS "${LINK_FLAGS} \
-	-Wl,-rpath,'$ORIGIN/.' \
-	-L${PROJECT_SOURCE_DIR}/lib/linux32")
+set(LINK_FLAGS "${LINK_FLAGS} -Wl,-rpath,'$ORIGIN/.'")
+
+if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(LINK_FLAGS "${LINK_FLAGS} -L${PROJECT_SOURCE_DIR}/lib/linux32")
+endif()
 
 set_target_properties(regamedll PROPERTIES
-	OUTPUT_NAME cs
-	PREFIX ""
 	COMPILE_FLAGS ${COMPILE_FLAGS}
 	LINK_FLAGS ${LINK_FLAGS}
-	POSITION_INDEPENDENT_CODE OFF
 )
+
+if (XASH_COMPAT)
+	if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+		set_target_properties(regamedll PROPERTIES
+			OUTPUT_NAME server)
+	else()
+		set_target_properties(regamedll PROPERTIES
+			PREFIX ""
+			OUTPUT_NAME cs${POSTFIX})
+	endif()
+else()
+	set_target_properties(regamedll PROPERTIES
+		OUTPUT_NAME cs
+		PREFIX ""
+		POSITION_INDEPENDENT_CODE OFF)
+endif()
+
+install(TARGETS regamedll
+	RUNTIME DESTINATION "cstrike/dlls/"
+	LIBRARY DESTINATION "cstrike/dlls/"
+	PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+		GROUP_READ GROUP_EXECUTE
+		WORLD_READ WORLD_EXECUTE)

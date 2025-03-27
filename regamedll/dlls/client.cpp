@@ -811,7 +811,9 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	if (*p == '"')
 	{
 		p++;
-		p[Q_strlen(p) - 1] = '\0';
+		size_t len = Q_strlen(p);
+		if (len > 0)
+			p[len - 1] = '\0';
 	}
 
 	// Check if buffer contains an invalid unicode sequence
@@ -838,6 +840,12 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	const char *pszFormat = nullptr;
 	char *pszConsoleFormat = nullptr;
 	bool consoleUsesPlaceName = false;
+
+#ifdef REGAMEDLL_ADD
+	// there's no team on FFA mode
+	if (teamonly && CSGameRules()->IsFreeForAll() && (pPlayer->m_iTeam == CT || pPlayer->m_iTeam == TERRORIST))
+		teamonly = FALSE; 
+#endif
 
 	// team only
 	if (teamonly)
@@ -993,7 +1001,13 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		if (gpGlobals->deathmatch != 0.0f && CSGameRules()->m_VoiceGameMgr.PlayerHasBlockedPlayer(pReceiver, pPlayer))
 			continue;
 
-		if (teamonly && pReceiver->m_iTeam != pPlayer->m_iTeam)
+		if (teamonly 
+#ifdef REGAMEDLL_FIXES
+			&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) != GR_TEAMMATE
+#else
+			&& pReceiver->m_iTeam != pPlayer->m_iTeam
+#endif
+			)
 			continue;
 
 		if (
@@ -1006,7 +1020,13 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 				continue;
 		}
 
-		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY && pReceiver->m_iTeam == pPlayer->m_iTeam)
+		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY 
+#ifdef REGAMEDLL_FIXES
+				&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) == GR_TEAMMATE
+#else
+				&& pReceiver->m_iTeam == pPlayer->m_iTeam
+#endif
+				)
 			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
@@ -3814,8 +3834,10 @@ void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 #ifdef REGAMEDLL_ADD
 	CSGameRules()->ServerActivate();
 
-	if (location_area_info.value)
-		LoadNavigationMap();
+	if (LoadNavigationMap() == NAV_OK)
+	{
+		GetSpawnPositions();
+	}
 #endif
 }
 

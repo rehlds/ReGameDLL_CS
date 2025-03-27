@@ -585,7 +585,6 @@ void CTriggerCDAudio::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	PlayTrack(pCaller->edict());
 }
 
-#ifdef REGAMEDLL_FIXES
 const char *g_szMP3trackFileMap[] =
 {
 	"", "",
@@ -617,7 +616,6 @@ const char *g_szMP3trackFileMap[] =
 	"media/Suspense05.mp3",
 	"media/Suspense07.mp3"
 };
-#endif
 
 void PlayCDTrack(edict_t *pClient, int iTrack)
 {
@@ -625,7 +623,7 @@ void PlayCDTrack(edict_t *pClient, int iTrack)
 	if (!pClient)
 		return;
 
-	if (iTrack < -1 || iTrack > 30)
+	if (iTrack < -1 || iTrack >= (int)ARRAYSIZE(g_szMP3trackFileMap))
 	{
 		ALERT(at_console, "TriggerCDAudio - Track %d out of range\n", iTrack);
 		return;
