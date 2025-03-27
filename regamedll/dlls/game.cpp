@@ -191,8 +191,8 @@ cvar_t votemap_min_time        = { "mp_votemap_min_time", "180", 0, 180.0f, null
 
 cvar_t randomspawn             = { "mp_randomspawn", "0", FCVAR_SERVER, 0.0f, nullptr };
 
-cvar_t playerid_showhealth     = { "mp_playerid_showhealth", "1", FCVAR_SERVER, 1.0f, nullptr };
-cvar_t playerid_field          = { "mp_playerid_field", "3", FCVAR_SERVER, 3.0f, nullptr };
+cvar_t playerid_showhealth     = { "mp_playerid_showhealth", "1", 0, 1.0f, nullptr };
+cvar_t playerid_field          = { "mp_playerid_field", "3", 0, 3.0f, nullptr };
 
 void GameDLL_Version_f()
 {
