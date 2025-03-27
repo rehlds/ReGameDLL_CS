@@ -186,6 +186,7 @@ extern cvar_t t_default_grenades;
 extern cvar_t t_give_player_knife;
 extern cvar_t t_default_weapons_secondary;
 extern cvar_t t_default_weapons_primary;
+extern cvar_t default_weapons_random;
 extern cvar_t free_armor;
 extern cvar_t teamflash;
 extern cvar_t allchat;
@@ -208,6 +209,7 @@ extern cvar_t weapon_respawn_time;
 extern cvar_t ammo_respawn_time;
 extern cvar_t vote_flags;
 extern cvar_t votemap_min_time;
+extern cvar_t randomspawn;
 extern cvar_t playerid_showhealth;
 extern cvar_t playerid_field;
 

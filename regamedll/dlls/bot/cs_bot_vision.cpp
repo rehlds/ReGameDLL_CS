@@ -697,6 +697,13 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 	m_closestVisibleFriend = nullptr;
 	m_closestVisibleHumanFriend = nullptr;
 
+#ifdef REGAMEDLL_ADD
+	m_isEnemySniperVisible = false;
+	CBasePlayer* sniperThreat = NULL;
+	float sniperThreatRange = 99999999999.9f;
+	bool sniperThreatIsFacingMe = false;
+#endif
+
 	float closeFriendRange = 99999999999.9f;
 	float closeHumanFriendRange = 99999999999.9f;
 
@@ -788,6 +795,51 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 			// keep track of all visible threats
 			Vector d = pev->origin - pPlayer->pev->origin;
 			float distSq = d.LengthSquared();
+
+#ifdef REGAMEDLL_ADD
+			if (isSniperRifle(pPlayer->m_pActiveItem)) {
+				m_isEnemySniperVisible = true;
+				if (sniperThreat)
+				{
+					if (IsPlayerLookingAtMe(pPlayer))
+					{
+						if (sniperThreatIsFacingMe)
+						{
+							// several snipers are facing us - keep closest
+							if (distSq < sniperThreatRange)
+							{
+								sniperThreat = pPlayer;
+								sniperThreatRange = distSq;
+								sniperThreatIsFacingMe = true;
+							}
+						}
+						else
+						{
+							// even if this sniper is farther away, keep it because he's aiming at us
+							sniperThreat = pPlayer;
+							sniperThreatRange = distSq;
+							sniperThreatIsFacingMe = true;
+						}
+					}
+					else
+					{
+						// this sniper is not looking at us, only consider it if we dont have a sniper facing us
+						if (!sniperThreatIsFacingMe && distSq < sniperThreatRange)
+						{
+							sniperThreat = pPlayer;
+							sniperThreatRange = distSq;
+						}
+					}
+				}
+				else
+				{
+					// first sniper we see
+					sniperThreat = pPlayer;
+					sniperThreatRange = distSq;
+					sniperThreatIsFacingMe = IsPlayerLookingAtMe(pPlayer);
+				}
+			}
+#endif
 
 			// maintain set of visible threats, sorted by increasing distance
 			if (threatCount == 0)
@@ -949,6 +1001,23 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 		if (sawCurrentThreat && !sawCloserThreat)
 		{
 			return currentThreat;
+		}
+
+		// if we are a sniper and we see a sniper threat, attack it unless 
+		// there are other close enemies facing me
+		if (IsSniper() && sniperThreat)
+		{
+			const float closeCombatRange = 500.0f;
+
+			for (t = 0; t < threatCount; ++t)
+			{
+				if (threat[t].range < closeCombatRange && IsPlayerLookingAtMe(threat[t].enemy))
+				{
+					return threat[t].enemy;
+				}
+			}
+
+			return sniperThreat;
 		}
 #endif
 
