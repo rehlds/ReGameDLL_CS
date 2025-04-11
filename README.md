@@ -1,42 +1,42 @@
 # ReGameDLL_CS [![GitHub release (by tag)](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/latest/total)](https://github.com/s1lentq/ReGameDLL_CS/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/total) [![Percentage of issues still open](http://isitmaintained.com/badge/open/s1lentq/ReGameDLL_CS.svg)](http://isitmaintained.com/project/s1lentq/ReGameDLL_CS "Percentage of issues still open") [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/20008568/b3623150-a2d3-11e6-85f3-0d6571045fc9.png" alt="Counter-Strike 1.6 GameDLL" />
-Reverse-engineered gamedll (mp.dll / Counter-Strike)
+逆向工程开发的游戏动态库 (mp.dll / Counter-Strike)
 
-## What is this?
-Regamedll_CS is a result of reverse engineering of original library mod HLDS (build 6153beta) using DWARF debug info embedded into linux version of HLDS, cs.so
+## 项目简介
+Regamedll_CS是通过对HLDS（版本6153beta）原版库进行逆向工程的成果，利用了嵌入在Linux版HLDS（cs.so ）中的DWARF调试信息.
 
-## Goals of the project
-* Provide more stable (than official) version of Counter-Strike game with extended API for mods and plugins
+## 项目目标
+* 提供比官方版更稳定的Counter-Strike游戏版本，并为模组和插件扩展API接口
 
-## How can use it?
-ReGameDLL_CS is fully compatible with official mod CS 1.6 / CZero by Valve. All you have to do is to download binaries and replace original mp.dll/cs.so
+## 如何使用
+ReGameDLL_CS完全兼容Valve官方的CS1.6/CZero模组，只需下载二进制文件替换原版mp.dll/cs.so 即可
 
-## Downloads
-* [Release builds](https://github.com/s1lentq/ReGameDLL_CS/releases)
-* [Dev builds](https://github.com/s1lentq/ReGameDLL_CS/actions/workflows/build.yml)
+## 下载
+* [正式发布版](https://github.com/s1lentq/ReGameDLL_CS/releases)
+* [开发预览版](https://github.com/s1lentq/ReGameDLL_CS/actions/workflows/build.yml)
 
-<b>Warning!</b> ReGameDLL_CS is not binary compatible with original hlds since it's compiled with compilers other than ones used for original mod CS.
-This means that plugins that do binary code analysis (Orpheu for example) probably will not work with ReGameDLL_CS.
+<b>警告!</b> 由于使用不同编译器构建，ReGameDLL_CS与原版HLDS不兼容二进制.
+这意味着依赖二进制代码分析的插件（如Orpheu）可能无法正常工作.
 
-## How can use beta?
-<pre>ReGameDLL_CS also have beta version with latest changes from official version of Counter-Strike.</pre>
-* Enter `-beta` option at the command line HLDS.
+## 如何使用测试版
+<pre>ReGameDLL_CS包含官方Counter-Strike最新更改的测试版本.</pre>
+* 在HLDS命令行添加 `-beta` 参数.
 
-## Commands
-| Command                             | Description                                     |
+## 命令
+| 命令                                | 命令释义                                        |
 | :---------------------------------- | :---------------------------------------------- |
-| game version                        | Will show GameDLL build version, date & URL. |
-| endround                            | Args:<br/>`T` force round end with Terrorists win. <br/>`CT` force round end with Counter-Terrorists win. <br/> or terminate round draw when called without arguments. |
-| swapteams                           | Swap the teams and restart the game (1 sec delay to restart by default).<br/> Args: <br/>`0` - swap teams without restart. <br/> `>0.001` - time delay in seconds to restart the round after swap. |
-| give                                | Give weapon command.<br/> Args:<br/><weapon_name><br/>Usage:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>NOTE: `sv_cheats 1` required. |
-| impulse 255                         | Give all weapons.<br/><br/>NOTE: `sv_cheats 1` required. |
-| impulse 200                         | Noclip with air acceleration.<br/><br/>NOTE: `sv_cheats 1` required. |
+| game version                        | 显示GameDLL构建版本、日期和URL. |
+| endround                            | 参数:<br/>`T` 强制恐怖分子获胜. <br/>`CT` 强制反恐精英获胜<br/> 无参数则平局结束回合. |
+| swapteams                           | 交换队伍并重启对局（默认延迟1秒）.<br/> 参数: <br/>`0` - 不重启直接交换. <br/> `>0.001` - 重启延迟秒数.|
+| give                                | 获取武器命令.<br/> 参数:<br/><weapon_name><br/>示例:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>注意：需开启 `sv_cheats 1`. |
+| impulse 255                         | 获取所有武器.<br/><br/>注意：需开启 `sv_cheats 1`.|
+| impulse 200                         | 开启带加速的穿墙模式.<br/><br/>注意：需开启 `sv_cheats 1`. |
 
-## Configuration (cvars)
+## 配置参数（CVars） - 具体详见dist\game.cfg
 <details>
-<summary>Click to expand</summary>
+<summary>点击展开</summary>
 
-| CVar                               | Default | Min | Max          | Description                                    |
-| :--------------------------------- | :-----: | :-: | :----------: | :--------------------------------------------- |
+| 参数                               |  默认值 | 最小值 | 最大值   |          参数释义                              |
+| :--------------------------------- | :-----: | :----: | :------: | :--------------------------------------------- |
 | mp_freeforall                      | 0       | 0   | 1            | The style of gameplay where there aren't any teams (FFA mode)<br/>`0` disabled <br/>`1` enabled |
 | mp_autoteambalance                 | 1       | 0   | 2            | Auto balancing of teams.<br/>`0` disabled <br/>`1` on after next round<br/>`2` on next round |
 | mp_buytime                         | 1.5     | 0.0 | -            | Designate the desired amount of buy time for each round. (in minutes)<br />`-1` means no time limit<br />`0` disable buy |
@@ -105,7 +105,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_team_flash                      | 1       | -1  | 1            | Sets the behaviour for Flashbangs on teammates.<br/>`-1` Don't affect teammates neither flash owner <br/>`0` Don't affect teammates <br/>`1` Affects teammates |
 | mp_fadetoblack                     | 0       | 0   | 2            | Observer's screen will fade to black on kill event or permanent.<br/> `0` No fade.<br/>`1` Fade to black and won't be able to watch anybody.<br/>`2` fade to black only on kill moment. |
 | mp_falldamage                      | 1       | 0   | 1            | Damage from falling.<br/>`0` disabled <br/>`1` enabled |
-| sv_allchat                         | 1       | 0   | 1            | Players can receive all other players text chat, team restrictions apply<br/>`0` disabled <br/>`1` enabled |
+| sv_allchat                         | 1       | 0   | 2            | Players can receive all other players text chat, team restrictions apply<br/>`0` disabled <br/>`1` enabled <br/> `2` enabled, but only dead player can see spectator's message|
 | sv_autobunnyhopping                | 0       | 0   | 1            | Players automatically re-jump while holding jump button.<br/>`0` disabled <br/>`1` enabled |
 | sv_enablebunnyhopping              | 0       | 0   | 1            | Allow player speed to exceed maximum running speed.<br/>`0` disabled <br/>`1` enabled |
 | mp_plant_c4_anywhere               | 0       | 0   | 1            | When set, players can plant anywhere, not only in bombsites.<br/>`0` disabled <br/>`1` enabled |
@@ -132,65 +132,65 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_randomspawn                     | 0       | 0   | 1            | Random player spawns<br/>`0` disabled <br/>`1` enabled<br/>`NOTE`: Navigation `maps/.nav` file required |
 | mp_playerid_showhealth             | 1       | 0   | 2            | Player ID display mode.<br/>`0` don't show health<br/>`1` show health for teammates only (default CS behaviour)<br/>`2` show health for all players |
 | mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
-
+| mp_show_c4_defkit                  | 0       | 0   | 1            | Enable ReGameDLL scoreboard bug fix(Dead players could see the bomb or defuse kit).<br/> `0` Can see C4 and KIT<br/>`1` Cannot see C4 and KIT|
 </details>
 
-## How to install zBot for CS 1.6?
-* Extract all the files from an [archive](regamedll/extra/zBot/bot_profiles.zip?raw=true)
-* Enable CVar `bot_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
+## zBot机器人安装指南
+* 解压压缩包的所有文件 [archive](regamedll/extra/zBot/bot_profiles.zip?raw=true)
+* 在`cstrike/game_init.cfg`中设置 `bot_enable 1`  (如无此文件请创建文件)
 
-## How to install CS:CZ hostage AI for CS 1.6?
-* Extract all the files from an [archive](regamedll/extra/HostageImprov/host_improv.zip?raw=true)
-* Enable CVar `hostage_ai_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
+## CS:CZ人质AI安装指南
+* 解压压缩包的所有文件 [archive](regamedll/extra/HostageImprov/host_improv.zip?raw=true)
+* 在`cstrike/game_init.cfg`中设置 `hostage_ai_enable 1` (如无此文件请创建文件)
 
-## Build instructions
-### Checking requirements
-There are several software requirements for building ReGameDLL_CS:
+## 构建说明
+### 环境要求
+构建ReGameDLL_CS需要满足以下软件要求:
 
-#### Windows
+#### Windows环境
 <pre>
-Visual Studio 2015 (C++14 standard) and later
+Visual Studio 2015 (C++14标准) 或更高版本
 </pre>
 
-#### Linux
+#### Linux环境
 <pre>
 git >= 1.8.5
 cmake >= 3.10
-GCC >= 4.9.2 (Optional)
-ICC >= 15.0.1 20141023 (Optional)
-LLVM (Clang) >= 6.0 (Optional)
+GCC >= 4.9.2 (可选)
+ICC >= 15.0.1 20141023 (可选)
+LLVM (Clang) >= 6.0 (可选)
 </pre>
 
-### Building
+### 构建方法
 
-#### Windows
-Use `Visual Studio` to build, open `msvc/ReGameDLL.sln` and just select from the solution configurations list `Release` or `Debug`
+#### Windows环境
+使用Visual Studio打开 `msvc/ReGameDLL.sln` 选择 `Release` 或 `Debug` 配置
 
-#### Linux
+#### Linux环境
 
-* Optional options using `build.sh --compiler=[gcc] --jobs=[N] -D[option]=[ON or OFF]` (without square brackets)
+* 使用构建脚本 `build.sh --compiler=[gcc] --jobs=[N] -D[option]=[ON or OFF]` (不带方括号)
 
 <pre>
--c=|--compiler=[icc|gcc|clang]  - Select preferred C/C++ compiler to build
--j=|--jobs=[N]                  - Specifies the number of jobs (commands) to run simultaneously (For faster building)
+-c=|--compiler=[icc|gcc|clang]  - 选择用于构建的C/C++编译器
+-j=|--jobs=[N]                  - 指定并行运行的任务（命令）数量（可加快构建速度）
 
-<sub>Definitions (-D)</sub>
-DEBUG                           - Enables debugging mode
-USE_STATIC_LIBSTDC              - Enables static linking library libstdc++
+<sub>定义参数 (-D)</sub>
+DEBUG                           - 启用调试模式
+USE_STATIC_LIBSTDC              - 启用静态链接 libstdc++
 </pre>
 
 * ICC          <pre>./build.sh --compiler=intel</pre>
 * LLVM (Clang) <pre>./build.sh --compiler=clang</pre>
 * GCC          <pre>./build.sh --compiler=gcc</pre>
 
-##### Checking build environment (Debian / Ubuntu)
+##### 检查构建环境（Debian/Ubuntu系统）
 
 <details>
-<summary>Click to expand</summary>
+<summary>点击展开</summary>
 
 <ul>
 <li>
-Installing required packages
+安装必备软件包
 <pre>
 sudo dpkg --add-architecture i386
 sudo apt-get update
@@ -201,7 +201,7 @@ sudo apt-get install -y libc6-dev libc6-dev-i386
 </li>
 
 <li>
-Select the preferred C/C++ Compiler installation
+选择C/C++编译器安装方案
 <pre>
 1) sudo apt-get install -y gcc g++
 2) sudo apt-get install -y clang
@@ -211,9 +211,9 @@ Select the preferred C/C++ Compiler installation
 
 </details>
 
-### Credits
-Thanks to the project [ReHLDS](https://github.com/dreamstalker/rehlds) ( ReGameDLL_CS was created on the basis of ReHLDS )
+### 致谢
+感谢[ReHLDS](https://github.com/dreamstalker/rehlds)项目( ReGameDLL_CS基于ReHLDS开发 )
 
-## How can I help the project?
-Just install it on your game server and report problems you faced.<br />
-Merge requests are also welcome :shipit:
+## 如何对项目提供支持
+只需在您的游戏服务器上安装并反馈遇到的问题.<br />
+也欢迎提交合并请求 :shipit:

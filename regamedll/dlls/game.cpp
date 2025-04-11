@@ -199,6 +199,8 @@ cvar_t randomspawn             = { "mp_randomspawn", "0", FCVAR_SERVER, 0.0f, nu
 cvar_t playerid_showhealth     = { "mp_playerid_showhealth", "1", 0, 1.0f, nullptr };
 cvar_t playerid_field          = { "mp_playerid_field", "3", 0, 3.0f, nullptr };
 
+cvar_t show_c4_defkit          = { "mp_show_c4_defkit", "0", FCVAR_SERVER, 0.0f, nullptr };
+
 void GameDLL_Version_f()
 {
 	if (Q_stricmp(CMD_ARGV(1), "version") != 0)
@@ -484,6 +486,8 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&stamina_restore_rate);
 
 	CVAR_REGISTER(&flymove_method);
+
+	CVAR_REGISTER(&show_c4_defkit);
 
 	// print version
 	CONSOLE_ECHO("ReGameDLL version: " APP_VERSION "\n");
