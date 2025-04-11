@@ -5661,7 +5661,6 @@ void CBasePlayer::SetScoreAttrib(CBasePlayer *dest)
 #endif
 
 #ifdef REGAMEDLL_FIXES
-	
 	if (
      #ifdef REGAMEDLL_ADD
      show_c4_defkit.value
