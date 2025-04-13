@@ -539,6 +539,11 @@ EXT_FUNC bool CCSPlayer::CheckActivityInGame()
 	return (fabs(deltaYaw) >= 0.1f && fabs(deltaPitch) >= 0.1f);
 }
 
+EXT_FUNC void CCSPlayer::Knockback(CBaseEntity *pAttacker, float flModifier)
+{
+	BasePlayer()->Knockback(pAttacker, flModifier);
+}
+
 void CCSPlayer::ResetVars()
 {
 	m_szModel[0] = '\0';
