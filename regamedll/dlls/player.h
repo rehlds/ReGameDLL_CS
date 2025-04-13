@@ -451,7 +451,7 @@ public:
 	void Observer_Think_OrigFunc();
 	void RemoveAllItems_OrigFunc(BOOL removeSuit);
 	void UpdateStatusBar_OrigFunc();
-	void Knockback_OrigFunc(CBasePlayer *pAttacker, float flModifier);
+	void Knockback_OrigFunc(CBaseEntity *pAttacker, float flModifier);
 
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
