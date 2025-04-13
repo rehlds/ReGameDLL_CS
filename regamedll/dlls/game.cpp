@@ -487,6 +487,8 @@ void EXT_FUNC GameDLLInit()
 
 	CVAR_REGISTER(&flymove_method);
 
+	CVAR_REGISTER(&knockback);
+
 	// print version
 	CONSOLE_ECHO("ReGameDLL version: " APP_VERSION "\n");
 
