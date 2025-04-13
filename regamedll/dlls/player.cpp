@@ -1246,8 +1246,16 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 		{
 			if (pev->velocity.Length() < 300)
 			{
+#ifdef REGAMEDLL_ADD
+				if (knockback.value)
+				{
+					CBaseEntity *temp = CBaseEntity::Instance(pevAttacker);
+					Knockback(temp, 170);
+				}
+#else
 				Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
 				pev->velocity = pev->velocity + attack_velocity;
+#endif
 
 				m_flVelocityModifier = 0.65f;
 			}
@@ -10865,6 +10873,14 @@ bool CBasePlayer::Kill()
 		CSGameRules()->m_iConsecutiveVIP = 10;
 
 	return true;
+}
+
+LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, Knockback, (CBaseEntity *pAttacker, float flModifier), pAttacker, flModifier)
+
+void EXT_FUNC CBasePlayer::__API_HOOK(Knockback)(CBaseEntity *pAttacker, float flModifier)
+{
+	Vector attack_velocity = (pev->origin - pAttacker->pev->origin).Normalize() * flModifier;
+	pev->velocity = pev->velocity + attack_velocity;
 }
 
 const usercmd_t *CBasePlayer::GetLastUserCommand() const
