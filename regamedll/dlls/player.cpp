@@ -1247,10 +1247,10 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 			if (pev->velocity.Length() < 300)
 			{
 #ifdef REGAMEDLL_ADD
-				if (knockback.value)
+				if (knockback.value != 0.0f)
 				{
 					CBaseEntity *temp = CBaseEntity::Instance(pevAttacker);
-					Knockback(temp, 170);
+					Knockback(temp, knockback.value);
 				}
 #else
 				Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
