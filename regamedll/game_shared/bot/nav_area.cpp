@@ -1793,6 +1793,13 @@ void GenerateNavigationAreaMesh()
 			break;
 	}
 
+	if (!TheNavAreaList.size())
+	{
+		// If we somehow have no areas, don't try to create an impossibly-large grid
+		TheNavAreaGrid.Initialize(0, 0, 0, 0);
+		return;
+	}
+
 	Extent extent;
 	extent.lo.x = 9999999999.9f;
 	extent.lo.y = 9999999999.9f;
@@ -4674,6 +4681,12 @@ void CNavAreaGrid::Initialize(float minX, float maxX, float minY, float maxY)
 // Add an area to the grid
 void CNavAreaGrid::AddNavArea(CNavArea *area)
 {
+	if (!m_grid)
+	{
+		// If we somehow have no grid (manually creating a nav area without loading or generating a mesh), don't crash
+		TheNavAreaGrid.Initialize(0, 0, 0, 0);
+	}
+
 	// add to grid
 	const Extent *extent = area->GetExtent();
 

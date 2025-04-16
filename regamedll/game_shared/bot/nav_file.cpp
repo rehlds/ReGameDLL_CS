@@ -846,6 +846,11 @@ NavErrorType LoadNavigationMap()
 	unsigned int count;
 	result = navFile.Read(&count, sizeof(unsigned int));
 
+	if (count == 0)
+	{
+		return NAV_INVALID_FILE;
+	}
+
 	Extent extent;
 	extent.lo.x = 9999999999.9f;
 	extent.lo.y = 9999999999.9f;
