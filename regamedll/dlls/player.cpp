@@ -10874,7 +10874,7 @@ LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, TakeDamageImpulse, (CBasePlayer *pAttack
 
 void EXT_FUNC CBasePlayer::__API_HOOK(TakeDamageImpulse)(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier)
 {
-	if (flKnockbackFactor != 0.0f && pev->velocity.Length() < 300)
+	if (flKnockbackFactor != 0.0f)
 		pev->velocity += (pev->origin - pAttacker->pev->origin).Normalize() * flKnockbackFactor;
 
 	if (flVelModifier != 0.0f)
