@@ -118,7 +118,7 @@ public:
 	virtual void OnSpawnEquip(bool addDefault = true, bool equipGame = true);
 	virtual void SetScoreboardAttributes(CBasePlayer *destination = nullptr);
 	virtual void Observer_FindNextPlayer(bool bReverse, const char *name = nullptr);
-	virtual void Knockback(CBaseEntity *pAttacker, float flModifier);
+	virtual void TakeDamageImpulse(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier);
 
 	bool IsPlayerDominated(int iPlayerIndex) const;
 	void SetPlayerDominated(CBasePlayer *pPlayer, bool bDominated);

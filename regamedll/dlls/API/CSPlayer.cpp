@@ -539,9 +539,9 @@ EXT_FUNC bool CCSPlayer::CheckActivityInGame()
 	return (fabs(deltaYaw) >= 0.1f && fabs(deltaPitch) >= 0.1f);
 }
 
-EXT_FUNC void CCSPlayer::Knockback(CBaseEntity *pAttacker, float flModifier)
+EXT_FUNC void CCSPlayer::TakeDamageImpulse(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier)
 {
-	BasePlayer()->Knockback(pAttacker, flModifier);
+	BasePlayer()->TakeDamageImpulse(pAttacker, flKnockbackFactor, flVelModifier);
 }
 
 void CCSPlayer::ResetVars()

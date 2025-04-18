@@ -1233,7 +1233,7 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 
 		if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
-			m_flVelocityModifier = 0.5f;
+			TakeDamageImpulse(pAttack, 0.0f, 0.5f);
 
 			if (m_LastHitGroup == HITGROUP_HEAD)
 				m_bHighDamage = (flDamage > 60);
@@ -1247,17 +1247,12 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 			if (pev->velocity.Length() < 300)
 			{
 #ifdef REGAMEDLL_ADD
-				if (knockback.value != 0.0f)
-				{
-					CBaseEntity *temp = CBaseEntity::Instance(pevAttacker);
-					Knockback(temp, knockback.value);
-				}
+				float knockbackValue = knockback.value;
 #else
-				Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
-				pev->velocity = pev->velocity + attack_velocity;
+				float knockbackValue = 170;
 #endif
 
-				m_flVelocityModifier = 0.65f;
+				TakeDamageImpulse(pAttack, knockbackValue, 0.65f);
 			}
 
 			SetAnimation(PLAYER_LARGE_FLINCH);
@@ -10875,12 +10870,15 @@ bool CBasePlayer::Kill()
 	return true;
 }
 
-LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, Knockback, (CBaseEntity *pAttacker, float flModifier), pAttacker, flModifier)
+LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, TakeDamageImpulse, (CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier), pAttacker, flKnockbackFactor, flVelModifier)
 
-void EXT_FUNC CBasePlayer::__API_HOOK(Knockback)(CBaseEntity *pAttacker, float flModifier)
+void EXT_FUNC CBasePlayer::__API_HOOK(TakeDamageImpulse)(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier)
 {
-	Vector attack_velocity = (pev->origin - pAttacker->pev->origin).Normalize() * flModifier;
-	pev->velocity = pev->velocity + attack_velocity;
+	if (flKnockbackFactor != 0.0f && pev->velocity.Length() < 300)
+		pev->velocity += (pev->origin - pAttacker->pev->origin).Normalize() * flKnockbackFactor;
+
+	if (flVelModifier != 0.0f)
+		m_flVelocityModifier = flVelModifier;
 }
 
 const usercmd_t *CBasePlayer::GetLastUserCommand() const

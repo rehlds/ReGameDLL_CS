@@ -451,7 +451,7 @@ public:
 	void Observer_Think_OrigFunc();
 	void RemoveAllItems_OrigFunc(BOOL removeSuit);
 	void UpdateStatusBar_OrigFunc();
-	void Knockback_OrigFunc(CBaseEntity *pAttacker, float flModifier);
+	void TakeDamageImpulse_OrigFunc(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier);
 
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
@@ -660,7 +660,7 @@ public:
 	void UseEmpty();
 	void DropIdlePlayer(const char *reason);
 	bool Kill();
-	void Knockback(CBaseEntity *pAttacker, float flModifier);
+	void TakeDamageImpulse(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier);
 
 	// templates
 	template<typename T = CBasePlayerItem, typename Functor>
