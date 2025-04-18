@@ -10870,12 +10870,12 @@ bool CBasePlayer::Kill()
 	return true;
 }
 
-LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, TakeDamageImpulse, (CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier), pAttacker, flKnockbackFactor, flVelModifier)
+LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, TakeDamageImpulse, (CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier), pAttacker, flKnockbackForce, flVelModifier)
 
-void EXT_FUNC CBasePlayer::__API_HOOK(TakeDamageImpulse)(CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier)
+void EXT_FUNC CBasePlayer::__API_HOOK(TakeDamageImpulse)(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier)
 {
-	if (flKnockbackFactor != 0.0f)
-		pev->velocity += (pev->origin - pAttacker->pev->origin).Normalize() * flKnockbackFactor;
+	if (flKnockbackForce != 0.0f)
+		pev->velocity += (pev->origin - pAttacker->pev->origin).Normalize() * flKnockbackForce;
 
 	if (flVelModifier != 0.0f)
 		m_flVelocityModifier = flVelModifier;
