@@ -754,8 +754,8 @@ typedef IHookChainClassImpl<void, CBasePlayer> CReGameHook_CBasePlayer_UpdateSta
 typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBasePlayer_UpdateStatusBar;
 
 // CBasePlayer::TakeDamageImpulse hook
-typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
-typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
+typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
+typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
 class CReGameHookchains: public IReGameHookchains {
 public:
