@@ -656,8 +656,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(CleanUpMap)()
 #endif
 
 	// Remove grenades and C4
-	const int grenadesRemoveCount = 20;
-	UTIL_RemoveOther("grenade", grenadesRemoveCount);
+	UTIL_RemoveOther("grenade");
 
 #ifndef REGAMEDLL_FIXES
 	// Remove defuse kit
