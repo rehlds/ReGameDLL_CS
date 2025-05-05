@@ -4697,7 +4697,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(PreThink)()
 
 	if (
 #ifdef REGAMEDLL_FIXES
-		IsAlive() &&
+		IsAlive() || (m_iTeam == UNASSIGNED || m_iTeam == SPECTATOR) &&
 #endif
 		(m_flIdleCheckTime <= (double)gpGlobals->time || m_flIdleCheckTime == 0.0f))
 	{
