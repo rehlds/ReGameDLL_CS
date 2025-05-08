@@ -250,10 +250,10 @@ edict_t *CSaveRestoreBuffer::EntityFromIndex(int entityIndex)
 
 int CSaveRestoreBuffer::EntityFlagsSet(int entityIndex, int flags)
 {
-	if (!m_pData || entityIndex < 0)
+	if (!m_pData)
 		return 0;
 
-	if (!m_pData || entityIndex < 0 || entityIndex > m_pData->tableCount)
+	if (entityIndex < 0 || entityIndex > m_pData->tableCount)
 		return 0;
 
 	m_pData->pTable[entityIndex].flags |= flags;
@@ -962,8 +962,8 @@ void CGlobalState::EntityAdd(string_t globalname, string_t mapName, GLOBALESTATE
 
 	pNewEntity->pNext = m_pList;
 	m_pList = pNewEntity;
-	Q_strcpy(pNewEntity->name, STRING(globalname));
-	Q_strcpy(pNewEntity->levelName, STRING(mapName));
+	Q_strlcpy(pNewEntity->name, STRING(globalname));
+	Q_strlcpy(pNewEntity->levelName, STRING(mapName));
 	pNewEntity->state = state;
 
 	m_listCount++;
@@ -1068,7 +1068,7 @@ void CGlobalState::EntityUpdate(string_t globalname, string_t mapname)
 	globalentity_t *pEnt = Find(globalname);
 	if (pEnt)
 	{
-		Q_strcpy(pEnt->levelName, STRING(mapname));
+		Q_strlcpy(pEnt->levelName, STRING(mapname));
 	}
 }
 

@@ -246,6 +246,17 @@ void BotHostageBeingTakenMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) con
 	pReceiver->GetChatter()->Say("Affirmative");
 }
 
+#ifdef REGAMEDLL_ADD
+//---------------------------------------------------------------------------------------------------------------
+/**
+ * A teammate warned about snipers, so we shouldn't warn again for awhile
+ */
+void BotWarnSniperMeme::Interpret(CCSBot* sender, CCSBot* receiver) const
+{
+	receiver->GetChatter()->FriendSpottedSniper();
+}
+#endif
+
 BotSpeakable::BotSpeakable()
 {
 	m_phrase = nullptr;
@@ -464,6 +475,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 			phraseData = SharedParse(phraseData);
 			if (!phraseData)
 			{
+				if (phrase) delete phrase;
 				CONSOLE_ECHO("Error parsing '%s' - expected identifier\n", filename);
 				FREE_FILE(phraseDataFile);
 				return false;
@@ -1269,6 +1281,9 @@ void BotChatterInterface::Reset()
 	m_planInterval.Invalidate();
 	m_encourageTimer.Invalidate();
 	m_escortingHostageTimer.Invalidate();
+#ifdef REGAMEDLL_ADD
+	m_warnSniperTimer.Invalidate();
+#endif
 }
 
 // Register a statement for speaking
@@ -1624,6 +1639,42 @@ void BotChatterInterface::EnemySpotted()
 
 	AddStatement(say);
 }
+
+#ifdef REGAMEDLL_ADD
+//---------------------------------------------------------------------------------------------------------------
+/**
+ * If a friend warned of snipers, don't warn again for awhile
+ */
+void BotChatterInterface::FriendSpottedSniper(void)
+{
+	m_warnSniperTimer.Start(60.0f);
+}
+
+//---------------------------------------------------------------------------------------------------------------
+/**
+ * Warn of an enemy sniper
+ */
+void BotChatterInterface::SpottedSniper(void)
+{
+	if (!m_warnSniperTimer.IsElapsed())
+	{
+		return;
+	}
+
+	if (m_me->GetFriendsRemaining() == 0)
+	{
+		// no-one to warn
+		return;
+	}
+
+	BotStatement* say = new BotStatement(this, REPORT_INFORMATION, 10.0f);
+
+	say->AppendPhrase(TheBotPhrases->GetPhrase("SniperWarning"));
+	say->AttachMeme(new BotWarnSniperMeme());
+
+	AddStatement(say);
+}
+#endif
 
 NOXREF void BotChatterInterface::Clear(Place place)
 {

@@ -1335,7 +1335,6 @@ private:
 
 const float M3_MAX_SPEED   = 230.0f;
 const float M3_DAMAGE      = 20.0f;
-const Vector M3_CONE_VECTOR = Vector(0.0675, 0.0675, 0.0); // special shotgun spreads
 
 enum m3_e
 {
@@ -1766,7 +1765,6 @@ private:
 
 const float XM1014_MAX_SPEED   = 240.0f;
 const float XM1014_DAMAGE      = 20.0f;
-const Vector XM1014_CONE_VECTOR = Vector(0.0725, 0.0725, 0.0); // special shotgun spreads
 
 enum xm1014_e
 {

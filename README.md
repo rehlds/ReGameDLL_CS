@@ -29,6 +29,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | swapteams                           | Swap the teams and restart the game (1 sec delay to restart by default).<br/> Args: <br/>`0` - swap teams without restart. <br/> `>0.001` - time delay in seconds to restart the round after swap. |
 | give                                | Give weapon command.<br/> Args:<br/><weapon_name><br/>Usage:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 255                         | Give all weapons.<br/><br/>NOTE: `sv_cheats 1` required. |
+| impulse 200                         | Noclip with air acceleration.<br/><br/>NOTE: `sv_cheats 1` required. |
 
 ## Configuration (cvars)
 <details>
@@ -97,6 +98,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_ct_give_player_knife            | 1         | 0  | 1           | Whether Counter-Terrorist player spawn with knife. |
 | mp_ct_default_weapons_primary      | ""        | "" | -           | The default primary (rifle) weapon that the CTs will spawn with. |
 | mp_ct_default_weapons_secondary    | "usp"     | "" | -           | The default secondary (pistol) weapon that the CTs will spawn with. |
+| mp_default_weapons_random          | 0       | 0   | 1            | Randomize default weapons (if there are multiple).<br/> `0` disabled<br/>`1` enabled |
 | mp_give_player_c4                  | 1       | 0   | 1            | Whether this map should spawn a C4 bomb for a player or not.<br/> `0` disabled<br/>`1` enabled |
 | mp_weapons_allow_map_placed        | 1       | 0   | 1            | When set, map weapons (located on the floor by map) will be shown.<br/> `0` hide all map weapons.<br/>`1` enabled<br/>`NOTE`: Effect will work after round restart. |
 | mp_free_armor                      | 0       | 0   | 2            | Give free armor on player spawn.<br/>`0` disabled <br/>`1` Give Kevlar <br/>`2` Give Kevlar + Helmet |
@@ -120,15 +122,27 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_item_respawn_time               | 30      | 0.0 | -            | The respawn time for items (such as health packs, armor, etc.). |
 | mp_weapon_respawn_time             | 20      | 0.0 | -            | The respawn time for weapons. |
 | mp_ammo_respawn_time               | 20      | 0.0 | -            | The respawn time for ammunition. |
+| mp_vote_flags                      | km      | 0   | -            | Vote systems enabled in server.<br/>`0` voting disabled<br/>`k` votekick enabled via `vote` command<br/>`m` votemap enabled via `votemap` command |
+| mp_votemap_min_time                | 180     | 0.0 | -            | Minimum seconds that must elapse on map before `votemap` command can be used. |
+| mp_flymove_method                  | 0       | 0   | 1            | Set the method used for flymove calculations.<br/> `0` default method<br/>`1` alternative method (more accurate) |
+| mp_stamina_restore_rate            | 0       | 0.0 | -            | Framerate (FPS), that used as reference when restoring stamina (fuser2) after jump. |
+| mp_logkills                        | 1       | 0   | 1            | Log kills.<br/>`0` disabled <br/>`1` enabled |
+| mp_jump_height                     | 45      | 0.0 | -            | Player jump height. |
+| bot_excellent_morale               | 0       | 0   | 1            | Bots always have great morale regardless of defeat or victory. |
+| mp_randomspawn                     | 0       | 0   | 1            | Random player spawns<br/>`0` disabled <br/>`1` enabled<br/>`NOTE`: Navigation `maps/.nav` file required |
+| mp_playerid_showhealth             | 1       | 0   | 2            | Player ID display mode.<br/>`0` don't show health<br/>`1` show health for teammates only (default CS behaviour)<br/>`2` show health for all players |
+| mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
+| mp_knockback                       | 170     | -   | -            | Knockback force applied to the victim when damaged by strong weapons (e.g. `AWP`, `AK47`).<br/>Works only if not crouching, and not hit in the legs.<br/>Set to `0` to disable. |
+
 </details>
 
 ## How to install zBot for CS 1.6?
 * Extract all the files from an [archive](regamedll/extra/zBot/bot_profiles.zip?raw=true)
-* Enter `-bots` option at the command line HLDS
+* Enable CVar `bot_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
 
-## How to install CSCZ hostage AI for CS 1.6?
+## How to install CS:CZ hostage AI for CS 1.6?
 * Extract all the files from an [archive](regamedll/extra/HostageImprov/host_improv.zip?raw=true)
-* Enter `-host-improv` option at the command line HLDS
+* Enable CVar `hostage_ai_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
 
 ## Build instructions
 ### Checking requirements

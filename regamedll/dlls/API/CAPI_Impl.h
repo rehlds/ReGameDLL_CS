@@ -749,6 +749,14 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, BOOL> CReGameHook_CBasePlayer_RemoveAllItems;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, BOOL> CReGameHookRegistry_CBasePlayer_RemoveAllItems;
 
+// CBasePlayer::UpdateStatusBar hook
+typedef IHookChainClassImpl<void, CBasePlayer> CReGameHook_CBasePlayer_UpdateStatusBar;
+typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBasePlayer_UpdateStatusBar;
+
+// CBasePlayer::TakeDamageImpulse hook
+typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
+typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
+
 // CBasePlayerItem::Materialize hook
 typedef IHookChainClassImpl<void, CBasePlayerItem> CReGameHook_CBasePlayerItem_Materialize;
 typedef IHookChainRegistryClassImpl<void, CBasePlayerItem> CReGameHookRegistry_CBasePlayerItem_Materialize;
@@ -918,6 +926,8 @@ public:
 	CReGameHookRegistry_CBasePlayer_PlayerDeathThink m_CBasePlayer_PlayerDeathThink;
 	CReGameHookRegistry_CBasePlayer_Observer_Think m_CBasePlayer_Observer_Think;
 	CReGameHookRegistry_CBasePlayer_RemoveAllItems m_CBasePlayer_RemoveAllItems;
+	CReGameHookRegistry_CBasePlayer_UpdateStatusBar m_CBasePlayer_UpdateStatusBar;
+	CReGameHookRegistry_CBasePlayer_TakeDamageImpulse m_CBasePlayer_TakeDamageImpulse;
 
 	CReGameHookRegistry_CBasePlayerItem_Materialize m_CBasePlayerItem_Materialize;
 	CReGameHookRegistry_CBasePlayerItem_CheckRespawn m_CBasePlayerItem_CheckRespawn;
@@ -1082,8 +1092,12 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_Observer_Think *CBasePlayer_Observer_Think();
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
 
+	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar();
+	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse();
+
 	virtual IReGameHookRegistry_CBasePlayerItem_Materialize *CBasePlayerItem_Materialize();
 	virtual IReGameHookRegistry_CBasePlayerItem_CheckRespawn *CBasePlayerItem_CheckRespawn();
+
 };
 
 extern CReGameHookchains g_ReGameHookchains;
