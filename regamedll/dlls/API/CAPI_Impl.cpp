@@ -168,11 +168,6 @@ int EXT_FUNC UTIL_EntitiesInBox_api(CBaseEntity **pList, int listMax, const Vect
 	return UTIL_EntitiesInBox(pList, listMax, mins, maxs, flagMask);
 }
 
-CBaseEntity* EXT_FUNC UTIL_FindEntityInSphere_api(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius)
-{
-	return UTIL_FindEntityInSphere(pStartEntity, vecCenter, flRadius);
-}
-
 void EXT_FUNC UTIL_ScreenShake_api(const Vector &center, float amplitude, float frequency, float duration, float radius)
 {
 	UTIL_ScreenShake(center, amplitude, frequency, duration, radius);
@@ -186,21 +181,6 @@ void EXT_FUNC UTIL_ScreenFadeAll_api(const Vector &color, float fadeTime, float 
 void EXT_FUNC UTIL_ScreenFade_api(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
 {
 	UTIL_ScreenFade(pEntity, color, fadeTime, fadeHold, alpha, flags);
-}
-
-void EXT_FUNC UTIL_SetSize_api(entvars_t *pev, const Vector &vecMin, const Vector &vecMax)
-{
-	UTIL_SetSize(pev, vecMin, vecMax);
-}
-
-void EXT_FUNC UTIL_SetOrigin_api(entvars_t *pev, const Vector &vecOrigin)
-{
-	UTIL_SetOrigin(pev, vecOrigin);
-}
-
-int EXT_FUNC UTIL_PointContents_api(const Vector &vec)
-{
-	return UTIL_PointContents(vec);
 }
 
 float EXT_FUNC UTIL_WaterLevel_api(const Vector &position, float minz, float maxz)
@@ -221,16 +201,6 @@ void EXT_FUNC UTIL_BubbleTrail_api(Vector from, Vector to, int count)
 char EXT_FUNC UTIL_TextureHit_api(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 {
 	return UTIL_TextureHit(ptr, vecSrc, vecEnd);
-}
-
-int EXT_FUNC UTIL_CountEntities_api(const char *szName)
-{
-	return UTIL_CountEntities(szName);
-}
-
-bool EXT_FUNC UTIL_IsSpawnPointOccupied_api(CBaseEntity *pSpot)
-{
-	return UTIL_IsSpawnPointOccupied(pSpot);
 }
 
 ReGameFuncs_t g_ReGameApiFuncs = {
@@ -272,19 +242,13 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	UTIL_SetGroupTrace_api,
 	UTIL_UnsetGroupTrace_api,
 	UTIL_EntitiesInBox_api,
-	UTIL_FindEntityInSphere_api,
 	UTIL_ScreenShake_api,
 	UTIL_ScreenFadeAll_api,
 	UTIL_ScreenFade_api,
-	UTIL_SetSize_api,
-	UTIL_SetOrigin_api,
-	UTIL_PointContents_api,
 	UTIL_WaterLevel_api,
 	UTIL_Bubbles_api,
 	UTIL_BubbleTrail_api,
 	UTIL_TextureHit_api,
-	UTIL_CountEntities_api,
-	UTIL_IsSpawnPointOccupied_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
