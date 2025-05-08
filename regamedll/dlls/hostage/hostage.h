@@ -77,6 +77,7 @@ enum HostageChatterType
 extern CHostageManager *g_pHostages;
 extern int g_iHostageNumber;
 
+extern cvar_t cv_hostage_ai_enable;
 extern cvar_t cv_hostage_debug;
 extern cvar_t cv_hostage_stop;
 
@@ -283,12 +284,6 @@ private:
 	int m_hostageCount;
 	SimpleChatter m_chatter;
 };
-
-// Determine whether hostage improv can be used or not
-inline bool AreImprovAllowed()
-{
-	return g_bHostageImprov;
-}
 
 void Hostage_RegisterCVars();
 void InstallHostageManager();

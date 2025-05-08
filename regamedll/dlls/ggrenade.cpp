@@ -1170,6 +1170,12 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	if (!m_bIsC4)
 		return;
 
+#ifdef REGAMEDLL_FIXES
+	// block the start of defuse if the bomb timer has expired
+	if (m_flC4Blow > 0 && gpGlobals->time >= m_flC4Blow)
+		return;
+#endif
+
 	// TODO: We must be sure that the activator is a player.
 	CBasePlayer *pPlayer = GetClassPtr<CCSPlayer>((CBasePlayer *)pActivator->pev);
 
@@ -1503,6 +1509,13 @@ void CGrenade::C4Think()
 			{
 				DefuseBombEnd(pPlayer, false);
 			}
+#ifdef REGAMEDLL_FIXES
+			// if the bomb timer has expired and defuse is still ongoing, stop the defuse
+			else if (gpGlobals->time >= m_flC4Blow)
+			{
+				DefuseBombEnd(pPlayer, false);
+			}
+#endif
 		}
 		else
 		{
