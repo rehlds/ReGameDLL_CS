@@ -900,3 +900,129 @@ float CCSBot::GetRangeToFarthestEscortedHostage() const
 
 	return away.m_farRange;
 }
+
+// Remove all occurrences of a given area from the path list
+void CCSBot::RemovePath(CNavArea *area)
+{
+	int i = 0;
+	while (i < m_pathLength)
+	{
+		if (m_path[i].area == area)
+		{
+			// If this area is linked to a ladder, clear the reference
+			if (m_path[i].ladder == m_pathLadder)
+				m_pathLadder = nullptr;
+
+			m_pathLength--;
+
+			// adjust the current path index if the removed element is being used
+			if (i == m_pathIndex)
+			{
+				if (i > 0)
+					m_pathIndex = i - 1;
+				else
+					m_pathIndex = 0;
+			}
+
+			if (m_pathLength != i)
+				Q_memmove(&m_path[i], &m_path[i + 1], (m_pathLength - i) * sizeof(m_path[0]));
+
+			// clear the slot
+			Q_memset(&m_path[m_pathLength], 0, sizeof(m_path[m_pathLength]));
+		}
+		else
+		{
+			i++;
+		}
+	}
+}
+
+// Remove a hiding spot from the checked spots list
+void CCSBot::RemoveHidingSpot(HidingSpot *spot)
+{
+	int i = 0;
+	while (i < m_checkedHidingSpotCount)
+	{
+		if (m_checkedHidingSpot[i].spot == spot)
+		{
+			m_checkedHidingSpotCount--;
+
+			if (m_checkedHidingSpotCount != i)
+				Q_memmove(&m_checkedHidingSpot[i], &m_checkedHidingSpot[i + 1], (m_checkedHidingSpotCount - i) * sizeof(m_checkedHidingSpot[0]));
+
+			// clear the slot
+			Q_memset(&m_checkedHidingSpot[m_checkedHidingSpotCount], 0, sizeof(m_checkedHidingSpot[m_checkedHidingSpotCount]));
+		}
+		else
+		{
+			i++;
+		}
+	}
+}
+
+// Handle navigation-related cleanup when a nav area, spot, or encounter is destroyed
+void CCSBot::OnDestroyNavDataNotify(NavNotifyDestroyType navNotifyType, void *dead)
+{
+	switch (navNotifyType)
+	{
+	case NAV_NOTIFY_DESTROY_AREA:
+	{
+		CNavArea *area = static_cast<CNavArea *>(dead);
+
+		// If the destroyed area was linked to a spot encounter, clear it
+		if (m_spotEncounter)
+		{
+			if (m_spotEncounter->from.area == area || m_spotEncounter->to.area == area)
+				m_spotEncounter = nullptr;
+		}
+
+		RemovePath(area);
+
+		// Invalidate any references to the destroyed area
+
+		if (m_noiseArea == area)
+			m_noiseArea = nullptr;
+
+		if (m_currentArea == area)
+			m_currentArea = nullptr;
+
+		if (m_lastKnownArea == area)
+			m_lastKnownArea = nullptr;
+
+		if (m_hideState.GetSearchArea() == area)
+			m_hideState.SetSearchArea(nullptr);
+
+		if (m_huntState.GetHuntArea() == area)
+			m_huntState.ClearHuntArea();
+
+		break;
+	}
+	case NAV_NOTIFY_DESTROY_SPOT_ENCOUNTER:
+	{
+		CNavArea *area = static_cast<CNavArea *>(dead);
+
+		// Remove the encounter if it references the destroyed area
+		if (m_spotEncounter && area->HasSpotEncounter(m_spotEncounter))
+			m_spotEncounter = nullptr;
+
+		break;
+	}
+	case NAV_NOTIFY_DESTROY_SPOT:
+	{
+		HidingSpot *spot = static_cast<HidingSpot *>(dead);
+
+		// Remove the destroyed hiding spot from the spot order list
+		if (m_spotEncounter)
+		{
+			SpotOrderList &spotOrderList = m_spotEncounter->spotList;
+			spotOrderList.erase(std::remove_if(spotOrderList.begin(), spotOrderList.end(), [&](SpotOrder &spotOrder) {
+					return spotOrder.spot == spot;
+				}
+			), spotOrderList.end());
+		}
+
+		RemoveHidingSpot(spot);
+		break;
+	}
+	}
+}

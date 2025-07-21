@@ -656,8 +656,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(CleanUpMap)()
 #endif
 
 	// Remove grenades and C4
-	const int grenadesRemoveCount = 20;
-	UTIL_RemoveOther("grenade", grenadesRemoveCount);
+	UTIL_RemoveOther("grenade");
 
 #ifndef REGAMEDLL_FIXES
 	// Remove defuse kit
@@ -1816,6 +1815,11 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(RestartRound)()
 
 			if (!UTIL_IsValidPlayer(pPlayer))
 				continue;
+
+#ifdef REGAMEDLL_FIXES
+			if (!pPlayer->IsBot())
+				pPlayer->ForceClientDllUpdate();
+#endif
 
 			pPlayer->Reset();
 		}
@@ -3246,19 +3250,6 @@ void CHalfLifeMultiplay::CareerRestart()
 	}
 
 	m_bSkipSpawn = false;
-
-	for (int i = 1; i <= gpGlobals->maxClients; i++)
-	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
-
-		if (!UTIL_IsValidPlayer(pPlayer))
-			continue;
-
-		if (!pPlayer->IsBot())
-		{
-			pPlayer->ForceClientDllUpdate();
-		}
-	}
 }
 
 BOOL CHalfLifeMultiplay::IsMultiplayer()
@@ -4160,29 +4151,33 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(DeathNotice)(CBasePlayer *pVictim, 
 			pVictim->CSPlayer()->m_iNumKilledByUnanswered[iPlayerIndexKiller - 1]++;
 		}
 	}
+#ifdef REGAMEDLL_ADD
+	if (static_cast<int>(logkills.value))
+#endif
+	{
+		// Did he kill himself?
+		if (pVictim->pev == pevKiller)
+		{
+			// killed self
+			char *team = GetTeam(pVictim->m_iTeam);
+			UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\"\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
+				GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
+		}
+		else if (pevKiller->flags & FL_CLIENT)
+		{
+			const char *VictimTeam = GetTeam(pVictim->m_iTeam);
+			const char *KillerTeam = (pKiller && pKiller->IsPlayer()) ? GetTeam(pKiller->m_iTeam) : "";
 
-	// Did he kill himself?
-	if (pVictim->pev == pevKiller)
-	{
-		// killed self
-		char *team = GetTeam(pVictim->m_iTeam);
-		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\"\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
-			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
-	}
-	else if (pevKiller->flags & FL_CLIENT)
-	{
-		const char *VictimTeam = GetTeam(pVictim->m_iTeam);
-		const char *KillerTeam = (pKiller && pKiller->IsPlayer()) ? GetTeam(pKiller->m_iTeam) : "";
-
-		UTIL_LogPrintf("\"%s<%i><%s><%s>\" killed \"%s<%i><%s><%s>\" with \"%s\"\n", STRING(pevKiller->netname), GETPLAYERUSERID(ENT(pevKiller)), GETPLAYERAUTHID(ENT(pevKiller)),
-			KillerTeam, STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()), GETPLAYERAUTHID(pVictim->edict()), VictimTeam, killer_weapon_name);
-	}
-	else
-	{
-		// killed by the world
-		char *team = GetTeam(pVictim->m_iTeam);
-		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\" (world)\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
-			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
+			UTIL_LogPrintf("\"%s<%i><%s><%s>\" killed \"%s<%i><%s><%s>\" with \"%s\"\n", STRING(pevKiller->netname), GETPLAYERUSERID(ENT(pevKiller)), GETPLAYERAUTHID(ENT(pevKiller)),
+				KillerTeam, STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()), GETPLAYERAUTHID(pVictim->edict()), VictimTeam, killer_weapon_name);
+		}
+		else
+		{
+			// killed by the world
+			char *team = GetTeam(pVictim->m_iTeam);
+			UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\" (world)\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
+				GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
+		}
 	}
 
 	// TODO: It is called in CBasePlayer::Killed too, most likely,

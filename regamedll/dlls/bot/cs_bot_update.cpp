@@ -255,7 +255,7 @@ void CCSBot::Update()
 			Vector dir = m_spotEncounter->path.to - m_spotEncounter->path.from;
 			float length = dir.NormalizeInPlace();
 
-			for (auto &order : m_spotEncounter->spotList) {
+			for (auto& order : m_spotEncounter->spotList) {
 				UTIL_DrawBeamPoints(m_spotEncounter->path.from + order.t * length * dir, *order.spot->GetPosition(), 3, 0, 255, 255);
 			}
 		}
@@ -339,7 +339,7 @@ void CCSBot::Update()
 	UpdateReactionQueue();
 
 	// "threat" may be the same as our current enemy
-	CBasePlayer *threat = GetRecognizedEnemy();
+	CBasePlayer* threat = GetRecognizedEnemy();
 	if (threat)
 	{
 		// adjust our personal "safe" time
@@ -592,6 +592,10 @@ void CCSBot::Update()
 		SecondaryAttack();
 	}
 
+#ifdef REGAMEDLL_ADD
+	if (!IsBlind())
+	{
+#endif
 	// check encounter spots
 	UpdatePeripheralVision();
 
@@ -601,11 +605,24 @@ void CCSBot::Update()
 		GetChatter()->SpottedBomber(GetBomber());
 	}
 
+#ifdef REGAMEDLL_ADD
+	// watch for snipers
+	if (CanSeeSniper() && !HasSeenSniperRecently())
+	{
+		GetChatter()->SpottedSniper();
+
+		const float sniperRecentInterval = 20.0f;
+		m_sawEnemySniperTimer.Start(sniperRecentInterval);
+	}
+#endif
+
 	if (CanSeeLooseBomb())
 	{
 		GetChatter()->SpottedLooseBomb(TheCSBots()->GetLooseBomb());
 	}
-
+#ifdef REGAMEDLL_ADD
+}
+#endif
 	// Scenario interrupts
 	switch (TheCSBots()->GetScenario())
 	{

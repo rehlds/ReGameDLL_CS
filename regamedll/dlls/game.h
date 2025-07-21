@@ -186,6 +186,7 @@ extern cvar_t t_default_grenades;
 extern cvar_t t_give_player_knife;
 extern cvar_t t_default_weapons_secondary;
 extern cvar_t t_default_weapons_primary;
+extern cvar_t default_weapons_random;
 extern cvar_t free_armor;
 extern cvar_t teamflash;
 extern cvar_t allchat;
@@ -200,6 +201,7 @@ extern cvar_t deathmsg_flags;
 extern cvar_t assist_damage_threshold;
 extern cvar_t freezetime_duck;
 extern cvar_t freezetime_jump;
+extern cvar_t jump_height;
 extern cvar_t defuser_allocation;
 extern cvar_t location_area_info;
 extern cvar_t chat_loc_fallback;
@@ -208,11 +210,20 @@ extern cvar_t weapon_respawn_time;
 extern cvar_t ammo_respawn_time;
 extern cvar_t vote_flags;
 extern cvar_t votemap_min_time;
+extern cvar_t flymove_method;
+extern cvar_t stamina_restore_rate;
+extern cvar_t logkills;
+extern cvar_t randomspawn;
+extern cvar_t playerid_showhealth;
+extern cvar_t playerid_field;
+extern cvar_t knockback;
 
 #endif
 
 extern cvar_t scoreboard_showmoney;
 extern cvar_t scoreboard_showhealth;
 extern cvar_t scoreboard_showdefkit;
+
+
 
 void GameDLLInit();

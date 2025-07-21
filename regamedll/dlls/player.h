@@ -450,6 +450,8 @@ public:
 	void PlayerDeathThink_OrigFunc();
 	void Observer_Think_OrigFunc();
 	void RemoveAllItems_OrigFunc(BOOL removeSuit);
+	void UpdateStatusBar_OrigFunc();
+	void TakeDamageImpulse_OrigFunc(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
@@ -658,6 +660,7 @@ public:
 	void UseEmpty();
 	void DropIdlePlayer(const char *reason);
 	bool Kill();
+	void TakeDamageImpulse(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 
 	// templates
 	template<typename T = CBasePlayerItem, typename Functor>
@@ -1044,7 +1047,7 @@ int TrainSpeed(int iSpeed, int iMax);
 void LogAttack(CBasePlayer *pAttacker, CBasePlayer *pVictim, int teamAttack, int healthHit, int armorHit, int newHealth, int newArmor, const char *killer_weapon_name);
 bool CanSeeUseable(CBasePlayer *me, CBaseEntity *pEntity);
 void FixPlayerCrouchStuck(edict_t *pPlayer);
-BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot);
+BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot, float fRadius);
 CBaseEntity *FindEntityForward(CBaseEntity *pMe);
 real_t GetPlayerPitch(const edict_t *pEdict);
 real_t GetPlayerYaw(const edict_t *pEdict);

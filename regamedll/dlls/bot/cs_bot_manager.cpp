@@ -231,13 +231,12 @@ bool CCSBotManager::IsOnOffense(CBasePlayer *pPlayer) const
 // Invoked when a map has just been loaded
 void CCSBotManager::ServerActivate()
 {
-	DestroyNavigationMap();
 	m_isMapDataLoaded = false;
 
 	m_zoneCount = 0;
 	m_gameScenario = SCENARIO_DEATHMATCH;
 
-	ValidateMapData();
+	LoadNavigationMap();
 	RestartRound();
 
 	m_isLearningMap = false;
@@ -591,7 +590,8 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 	}
 	else if (FStrEq(pcmd, "bot_nav_load"))
 	{
-		ValidateMapData();
+		m_isMapDataLoaded = false; // force nav reload
+		LoadNavigationMap();
 	}
 	else if (FStrEq(pcmd, "bot_nav_use_place"))
 	{
@@ -1144,22 +1144,232 @@ private:
 	CCSBotManager::Zone *m_zone;
 };
 
-// Search the map entities to determine the game scenario and define important zones.
-void CCSBotManager::ValidateMapData()
+LINK_ENTITY_TO_CLASS(info_spawn_point, CPointEntity, CCSPointEntity)
+
+inline bool IsFreeSpace(Vector vecOrigin, int iHullNumber, edict_t *pSkipEnt = nullptr)
 {
+	if (UTIL_PointContents(vecOrigin) != CONTENTS_EMPTY)
+		return false;
+
+	TraceResult trace;
+	UTIL_TraceHull(vecOrigin, vecOrigin, dont_ignore_monsters, iHullNumber, pSkipEnt, &trace);
+
+	return (!trace.fStartSolid && !trace.fAllSolid && trace.fInOpen);
+}
+
+inline bool pointInRadius(Vector vecOrigin, float radius)
+{
+	CBaseEntity *pEntity = nullptr;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecOrigin, radius)))
+	{
+		if (!UTIL_IsValidEntity(pEntity->edict()))
+			continue; // ignore the entity marked for deletion
+
+		if (FClassnameIs(pEntity->edict(), "info_spawn_point"))
+			return true;
+	}
+
+	return false;
+}
+
+// a simple algorithm that searches for the farthest point (so that the player does not look at the wall)
+inline bool GetIdealLookYawForSpawnPoint(const Vector &vecStart, float &flIdealLookYaw)
+{
+	const float ANGLE_STEP = 30.0f;
+	float bestDistance = 0.0f;
+
+	for (float angleYaw = 0.0f; angleYaw <= 360.0f; angleYaw += ANGLE_STEP)
+	{
+		TraceResult tr;
+		UTIL_MakeVectors(Vector(0, angleYaw, 0));
+
+		Vector vecEnd(vecStart + gpGlobals->v_forward * 8192);
+		UTIL_TraceLine(vecStart, vecEnd, ignore_monsters, nullptr, &tr);
+
+		float distance = (vecStart - tr.vecEndPos).Length();
+		if (distance > bestDistance)
+		{
+			bestDistance = distance;
+			flIdealLookYaw = angleYaw;
+		}
+	}
+
+	return bestDistance > 0.0f;
+}
+
+// this function from leaked csgo sources 2020y
+inline bool IsValidArea(CNavArea *area)
+{
+	ShortestPathCost cost;
+	bool bNotOrphaned;
+
+	// check that we can path from the nav area to a ct spawner to confirm it isn't orphaned.
+	CBaseEntity *CTSpawn = UTIL_FindEntityByClassname(nullptr, "info_player_start");
+
+	if (CTSpawn)
+	{
+		CNavArea *CTSpawnArea = TheNavAreaGrid.GetNearestNavArea(&CTSpawn->pev->origin);
+		bNotOrphaned = NavAreaBuildPath(area, CTSpawnArea, nullptr, cost);
+
+		if (bNotOrphaned)
+			return true;
+	}
+
+	// double check that we can path from the nav area to a t spawner to confirm it isn't orphaned.
+	CBaseEntity *TSpawn = UTIL_FindEntityByClassname(nullptr, "info_player_deathmatch");
+
+	if (TSpawn)
+	{
+		CNavArea *TSpawnArea = TheNavAreaGrid.GetNearestNavArea(&TSpawn->pev->origin);
+		bNotOrphaned = NavAreaBuildPath(area, TSpawnArea, nullptr, cost);
+
+		if (bNotOrphaned)
+			return true;
+	}
+
+	return false;
+}
+
+#ifdef REGAMEDLL_ADD
+
+// Generates spawn points (info_spawn_point entities) for players and bots based on the navigation map data
+// It uses the navigation areas to find valid spots for spawn points considering factors like area size, slope,
+// available free space, and distance from other spawn points.
+void GenerateSpawnPointsFromNavData()
+{
+	// Remove any existing spawn points
+	UTIL_RemoveOther("info_spawn_point");
+
+	const int MAX_SPAWNS_POINTS       = 128;    // Max allowed spawn points
+
+	const float MAX_SLOPE             = 0.85f;  // Maximum slope allowed for a spawn point
+	const float MIN_AREA_SIZE         = 32.0f;  // Minimum area size for a valid spawn point
+	const float MIN_NEARBY_SPAWNPOINT = 128.0f; // Minimum distance between spawn point
+
+	// Total number of spawn points generated
+	int totalSpawns = 0;
+
+	for (CNavArea *area : TheNavAreaList)
+	{
+		if (totalSpawns >= MAX_SPAWNS_POINTS)
+			break;
+
+		if (!area)
+			continue;
+
+		// Skip areas that are too small
+		if (area->GetSizeX() < MIN_AREA_SIZE || area->GetSizeY() < MIN_AREA_SIZE)
+			continue;
+
+		// Skip areas with unwanted attributes (jump, crouch, etc.)
+		if (area->GetAttributes() != 0)
+			continue;
+
+		// Skip areas with steep slopes
+		if (area->GetAreaSlope() < MAX_SLOPE)
+		{
+			//CONSOLE_ECHO("Skip area slope: %0.3f\n", area->GetAreaSlope());
+			continue;
+		}
+
+		// Calculate the spawn point position above the area center
+		Vector vecOrigin = *area->GetCenter() + Vector(0, 0, HalfHumanHeight + 5);
+
+		// Ensure there is free space at the calculated position
+		if (!IsFreeSpace(vecOrigin, human_hull))
+		{
+			//CONSOLE_ECHO("No free space!\n");
+			continue;
+		}
+
+		if (pointInRadius(vecOrigin, MIN_NEARBY_SPAWNPOINT))
+			continue; // spawn point is too close to others
+
+		if (!IsValidArea(area))
+			continue;
+
+		// Calculate ideal spawn point yaw angle
+		float flIdealSpawnPointYaw = 0.0f;
+		if (GetIdealLookYawForSpawnPoint(vecOrigin, flIdealSpawnPointYaw))
+		{
+			CBaseEntity *pPoint = CBaseEntity::Create("info_spawn_point", vecOrigin, Vector(0, flIdealSpawnPointYaw, 0), nullptr);
+			if (pPoint)
+			{
+				totalSpawns++;
+				//CONSOLE_ECHO("Add spawn at x:%f y:%f z:%f with angle %0.1f slope %0.3f \n", vecOrigin.x, vecOrigin.y, vecOrigin.z, bestAngle.y, area->GetAreaSlope());
+
+				// use only for debugging
+				if (randomspawn.value > 1.0f)
+				{
+					SET_MODEL(ENT(pPoint->pev), "models/player.mdl");
+					pPoint->pev->sequence = ACT_IDLE;
+					pPoint->pev->rendermode = kRenderTransAdd;
+					pPoint->pev->renderamt = 150.0f;
+				}
+			}
+		}
+	}
+
+	CONSOLE_ECHO("Total spawns points: %i\n", totalSpawns);
+}
+
+#endif
+
+// Load the map's navigation data
+bool CCSBotManager::LoadNavigationMap()
+{
+	// check if the map data is already loaded or if bots are not allowed
 	if (m_isMapDataLoaded || !AreBotsAllowed())
-		return;
+		return false;
 
 	m_isMapDataLoaded = true;
 
-	if (LoadNavigationMap())
+	// Clear navigation map data from previous map
+	DestroyNavigationMap();
+
+	// Try to load the map's navigation file
+	NavErrorType navStatus = ::LoadNavigationMap();
+	if (navStatus != NAV_OK)
 	{
-		CONSOLE_ECHO("Failed to load navigation map.\n");
-		return;
+		CONSOLE_ECHO("ERROR: Failed to load 'maps/%s.nav' file navigation map!\n", STRING(gpGlobals->mapname));
+
+		switch (navStatus)
+		{
+		case NAV_CANT_ACCESS_FILE:
+			CONSOLE_ECHO("\tNavigation file not found or access denied.\n");
+			break;
+		case NAV_INVALID_FILE:
+			CONSOLE_ECHO("\tInvalid navigation file format.\n");
+			break;
+		case NAV_BAD_FILE_VERSION:
+			CONSOLE_ECHO("\tBad navigation file version.\n");
+			break;
+		case NAV_CORRUPT_DATA:
+			CONSOLE_ECHO("\tCorrupted navigation data detected.\n");
+			break;
+		default:
+			break;
+		}
+
+		if (navStatus != NAV_CANT_ACCESS_FILE)
+			CONSOLE_ECHO("\tTry regenerating it using the command: bot_nav_analyze\n");
+
+		return false;
 	}
 
-	CONSOLE_ECHO("Navigation map loaded.\n");
+	// Determine the scenario for the current map (e.g., bomb defuse, hostage rescue etc)
+	DetermineMapScenario();
 
+#ifdef REGAMEDLL_ADD
+	GenerateSpawnPointsFromNavData();
+#endif
+
+	return true;
+}
+
+// Search the map entities to determine the game scenario and define important zones.
+void CCSBotManager::DetermineMapScenario()
+{
 	m_zoneCount = 0;
 	m_gameScenario = SCENARIO_DEATHMATCH;
 
@@ -1296,6 +1506,59 @@ void CCSBotManager::ValidateMapData()
 		// build a list of nav areas that overlap this zone
 		CollectOverlappingAreas collector(zone);
 		ForAllAreas(collector);
+	}
+}
+
+// Tell all bots that the given nav data no longer exists
+// This function is called when a part of the map or the nav data is destroyed
+void CCSBotManager::OnDestroyNavDataNotify(NavNotifyDestroyType navNotifyType, void *dead)
+{
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+
+		if (!UTIL_IsValidPlayer(pPlayer))
+			continue;
+
+		if (!pPlayer->IsBot())
+			continue;
+
+		// Notify the bot about the destroyed nav data
+		CCSBot *pBot = static_cast<CCSBot *>(pPlayer);
+		pBot->OnDestroyNavDataNotify(navNotifyType, dead);
+	}
+}
+
+// Called when the map analysis process has completed
+// This function makes sure all bots are removed from the map analysis process
+// and are reset to normal bot behavior. It also reloads the navigation map
+// and triggers a game restart after the analysis is completed
+void CCSBotManager::AnalysisCompleted()
+{
+	// Ensure that all bots are no longer involved in map analysis and start their normal process
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+
+		if (!UTIL_IsValidPlayer(pPlayer))
+			continue;
+
+		if (!pPlayer->IsBot())
+			continue;
+
+		CCSBot *pBot = static_cast<CCSBot *>(pPlayer);
+		pBot->StartNormalProcess();
+	}
+
+	m_isLearningMap = false;
+	m_isMapDataLoaded = false;
+	m_isAnalysisRequested = false;
+
+	// Try to reload the navigation map from the file
+	if (LoadNavigationMap())
+	{
+		// Initiate a game restart in 3 seconds
+		CVAR_SET_FLOAT("sv_restart", 3);
 	}
 }
 

@@ -33,7 +33,7 @@ main()
 	case "$C" in
 		("intel"|"icc")	CC=icc CXX=icpc ;;
 		("gcc"|"g++")	CC=gcc CXX=g++ ;;
-		("clang|llvm")	CC=clang CXX=clang++ ;;
+		("clang"|"llvm")	CC=clang CXX=clang++ ;;
 		*)
 		;;
 	esac

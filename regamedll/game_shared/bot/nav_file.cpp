@@ -623,6 +623,13 @@ bool SaveNavigationMap(const char *filename)
 		area->Save(fd, version);
 	}
 
+	// Ensure that all data is flushed to disk
+#ifdef WIN32
+	_commit(fd);
+#else
+	fsync(fd);
+#endif
+
 	_close(fd);
 	return true;
 }
@@ -838,6 +845,11 @@ NavErrorType LoadNavigationMap()
 	// get number of areas
 	unsigned int count;
 	result = navFile.Read(&count, sizeof(unsigned int));
+
+	if (count == 0)
+	{
+		return NAV_INVALID_FILE;
+	}
 
 	Extent extent;
 	extent.lo.x = 9999999999.9f;

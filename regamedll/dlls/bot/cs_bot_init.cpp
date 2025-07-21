@@ -65,6 +65,7 @@ cvar_t cv_bot_join_delay             = { "bot_join_delay", "0", FCVAR_SERVER, 0.
 cvar_t cv_bot_freeze                 = { "bot_freeze", "0", 0, 0.0f, nullptr };
 cvar_t cv_bot_mimic                  = { "bot_mimic", "0", 0, 0.0f, nullptr };
 cvar_t cv_bot_mimic_yaw_offset       = { "bot_mimic_yaw_offset", "0", 0, 0.0f, nullptr };
+cvar_t cv_bot_excellent_morale       = { "bot_excellent_morale", "0", 0, 0.0f, nullptr };
 #else
 // Migrated to bot_quota_mode, use "match"
 cvar_t cv_bot_quota_match            = { "bot_quota_match", "0", FCVAR_SERVER, 0.0f, nullptr };
@@ -136,6 +137,7 @@ void Bot_RegisterCVars()
 	CVAR_REGISTER(&cv_bot_freeze);
 	CVAR_REGISTER(&cv_bot_mimic);
 	CVAR_REGISTER(&cv_bot_mimic_yaw_offset);
+	CVAR_REGISTER(&cv_bot_excellent_morale);
 #endif
 
 }
@@ -193,6 +195,11 @@ void CCSBot::ResetValues()
 	m_areaEnteredTimestamp = 0.0f;
 	m_currentArea = nullptr;
 	m_lastKnownArea = nullptr;
+
+#ifdef REGAMEDLL_ADD
+	m_isEnemySniperVisible = false;
+	m_sawEnemySniperTimer.Invalidate();
+#endif
 
 	m_avoidFriendTimer.Invalidate();
 	m_isFriendInTheWay = false;
@@ -330,7 +337,7 @@ void CCSBot::ResetValues()
 // NOTE: For some reason, this can be called twice when a bot is added.
 void CCSBot::SpawnBot()
 {
-	TheCSBots()->ValidateMapData();
+	TheCSBots()->LoadNavigationMap();
 	ResetValues();
 
 	Q_strlcpy(m_name, STRING(pev->netname));
