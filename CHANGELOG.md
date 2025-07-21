@@ -1,5 +1,355 @@
 # [ReGameDLL_CS](https://github.com/rehlds/ReGameDLL_CS) Changelog
 
+## [`5.28.0.756`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.28.0.756) - 2025-03-27
+
+## What's Changed
+* New ConVar: `mp_defuser_allocation` by @wopox1337 in https://github.com/rehlds/ReGameDLL_CS/pull/908
+* Support for secondary ammo and extra EF_ flags by @Rafflesian in https://github.com/rehlds/ReGameDLL_CS/pull/934
+* Fix excessive punchangle when getting shield shot by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/919
+* don't send radio message to teammate (if freeforall 1) by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/958
+* API: Implement `RemoveAllItems` hook by @Javekson in https://github.com/rehlds/ReGameDLL_CS/pull/960
+* Implement `game_round_end` and `game_round_freeze_end` triggers by @overl4y in https://github.com/rehlds/ReGameDLL_CS/pull/949
+* Add trigger_teleport landmark by @khanghugo in https://github.com/rehlds/ReGameDLL_CS/pull/952
+* FIX: `trigger_multiple` restart by @overl4y in https://github.com/rehlds/ReGameDLL_CS/pull/935
+* Fix ApplyMultiDamage duplicated call on MultiDamage routine by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/946
+* Fix `SendDeathMessage` kill rarity flags and transform to VFUNC by @FEDERICOMB96 in https://github.com/rehlds/ReGameDLL_CS/pull/943
+* FIX: `NavArea::ComputeApproachAreas()` hang during `*.nav` file generation by @wopox1337 in https://github.com/rehlds/ReGameDLL_CS/pull/913
+* Fix bot_kill command by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/974
+* Fix: `ammo`/`weapons` respawn behavior by @wopox1337 in https://github.com/rehlds/ReGameDLL_CS/pull/982
+* New ConVars: `mp_item_respawn_time`, `mp_weapon_respawn_time`, `mp_ammo_respawn_time` by @wopox1337 in https://github.com/rehlds/ReGameDLL_CS/pull/983
+* API: KickBack function extension by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/980
+* Fix Shotguns reload flag not getting reset on weapon changing by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/993
+* Cache ObjectCaps call inside PlayerUse by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/991
+* New ConVars: `mp_vote_flags`, `mp_votemap_min_time` by @dystopm in https://github.com/rehlds/ReGameDLL_CS/pull/990
+* FIX: ConVar `mp_kill_filled_spawn`  by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/1011
+* Add `Escape` Scenario for Bot AI with Dynamic Behavior by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/1012
+* add desc to readme by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/1014
+* client.cpp: Use macros for pfnPrecacheEvent by @Nord1cWarr1or in https://github.com/rehlds/ReGameDLL_CS/pull/1019
+* CI Workflow Refactor and Fixes by @wopox1337 in https://github.com/rehlds/ReGameDLL_CS/pull/1016
+* Reset bot morale on new match(game) by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/1025
+
+## New Contributors
+* @Rafflesian made their first contribution in https://github.com/rehlds/ReGameDLL_CS/pull/934
+* @khanghugo made their first contribution in https://github.com/rehlds/ReGameDLL_CS/pull/952
+
+**Full Changelog**: https://github.com/rehlds/ReGameDLL_CS/compare/5.26.0.668...5.28.0.756
+
+## [`5.26.0.668`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.26.0.668) - 2023-12-31
+## What's Changed
+* Adjust gib's velocity limit according to sv_maxvelocity by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/846
+* `API`: Implement `PM_LadderMove` hook by @ShadowsAdi in https://github.com/s1lentq/ReGameDLL_CS/pull/740
+* `mp_fadetoblack` fade timings now depends from `mp_dying_time` CVar by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/845
+* `API`: CSPlayerWeapon integration + new members and functions by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/850
+* `API`: Added new API funcs (6) and new Hookchains (21) by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/849
+* `API`: CSPlayer new members (physics related) by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/851
+* Ensure m_pDriver assignation on func_vehicle only by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/853
+* Various defuser fixes and code refactory by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/848
+* Fixed crash sometimes occurring while map analyzing for zbot navigation by @s1lentq in https://github.com/s1lentq/ReGameDLL_CS/pull/844
+* Fixed of m_lastDamageAmount  recording during armor calculation by @Javekson in https://github.com/s1lentq/ReGameDLL_CS/pull/857
+* Fix: Grenade weaponbox not deploying on unarmed player by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/847
+* New CVar: `mp_team_flash` by @aleeperezz16 in https://github.com/s1lentq/ReGameDLL_CS/pull/693
+* Refactored RemovePlayerItemEx and Extended DestroyItem in CBasePlayerItem by @Javekson in https://github.com/s1lentq/ReGameDLL_CS/pull/864
+* `API`: CSPlayer methods enhancement by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/862
+* `FIX`: Reloading animation bug while holding weapon with altered Maxclip by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/861
+* Add an extended player's DeathMsg message by @s1lentq in https://github.com/s1lentq/ReGameDLL_CS/pull/858
+* SG_Detonate: make event realible by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/875
+* Updated the GiveC4 to return a player pointer by @Javekson in https://github.com/s1lentq/ReGameDLL_CS/pull/876
+* Small defuser refactory by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/871
+* Observer_SetMode: Use Observer_IsValidPlayer function inside by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/872
+* DropPlayerItem: Ensure HasPrimary flag assignation on successful weapon removal by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/866
+* Ammo type hardcode fix by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/882
+* Added updating more game info to the player who started recording the demo by @s1lentq in https://github.com/s1lentq/ReGameDLL_CS/pull/881
+* Implement PlayerDeathThink hook by @fl0werD in https://github.com/s1lentq/ReGameDLL_CS/pull/885
+* New CVars: `mp_freezetime_duck` and `mp_freezetime_jump`  by @FEDERICOMB96 in https://github.com/s1lentq/ReGameDLL_CS/pull/886
+* Use CSEntity member to hold last inflictor from TakeDamage by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/896
+* Changed the order of setting pev->body for the correct value in SetBo… by @Javekson in https://github.com/s1lentq/ReGameDLL_CS/pull/893
+* Fixed grenades disappearing when speed exceeds 2000 fixed units ignoring sv_maxvelocity by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/888
+* Avoid intro camera switching when only 1 trigger_camera available by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/873
+* Implements Observer_Think Hook by @Mythlogic in https://github.com/s1lentq/ReGameDLL_CS/pull/894
+* Tiny API code clean by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/897
+* Allow null player pointer in CreateWeaponBox by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/899
+* Update studio.h constants by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/898
+* Initialize m_pevLastInflictor to nullptr to avoid garbage memory by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/901
+* Add member m_iGibDamageThreshold to control GIB damage threshold by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/904
+
+## New Contributors
+* @Javekson made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/857
+* @Mythlogic made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/894
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.22.0.593...5.25.0.627
+
+
+## [`5.22.0.593`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.22.0.593) - 2023-07-11
+## What's Changed
+* Add FreeGameRules hook, api util functions, player api functions by @fl0werD in https://github.com/s1lentq/ReGameDLL_CS/pull/808
+* Fix incorrect 3rd camera player death animations when frozen. by @deprale in https://github.com/s1lentq/ReGameDLL_CS/pull/815
+* Add new trace flags by @justgo97 in https://github.com/s1lentq/ReGameDLL_CS/pull/813
+* Missing friendlyfire after previous  commit by @UnrealKaraulov in https://github.com/s1lentq/ReGameDLL_CS/pull/805
+* Grenade weaponbox ammo pickup fix by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/669
+* Weaponbox ammopack hardcode by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/533
+* Add Visual Studio 2022 (17.0) Platform Toolset by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/820
+* Disable BotPrecache whether game is CS 1.6 by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/839
+* Make Knife back stab multiplier customizable by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/834
+* `CZero`: Fix broken Career Tasks by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/836
+* New CVars: `mp_weapondrop` and `mp_ammodrop` and fixes by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/840
+* Fix: Glock18 and Famas undesired ammo decreasing on burst mode by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/832
+* Little code cleaning: g_vecAttackDir by @dystopm in https://github.com/s1lentq/ReGameDLL_CS/pull/831
+* fix: `bot_profile_db` CVar use by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/827
+* add FTRACE_KNIFE flag by @justgo97 in https://github.com/s1lentq/ReGameDLL_CS/pull/817
+
+## New Contributors
+* @deprale made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/815
+* @dystopm made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/839
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.576...5.21.0.593
+
+## [`5.21.0.576`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.576) - 2023-03-11
+## What's Changed
+* fix: update scoreboard attributes on defuser pickup by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/770
+* Add an argument to `swapteams` command by @ShadowsAdi in https://github.com/s1lentq/ReGameDLL_CS/pull/739
+* Correcting code style and config by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/783
+* New CVar: `mp_give_c4_frags` by @JulioBarker in https://github.com/s1lentq/ReGameDLL_CS/pull/776
+* New CVar: `mp_hostages_rescued_ratio` by @fl0werD in https://github.com/s1lentq/ReGameDLL_CS/pull/786
+* Update CI by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/787
+* Update func_vehicle for multiplayer by @UnrealKaraulov in https://github.com/s1lentq/ReGameDLL_CS/pull/792
+* fix: Reset immunity effects always by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/788
+* little code fixes by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/798
+* CI: `ubuntu-latest` -> `ubuntu-20.04` by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/799
+* Fix: `TimeBasedDamage` Paralyze typo by @RauliTop in https://github.com/s1lentq/ReGameDLL_CS/pull/748
+* Implement `game_round_start` & `game_entity_restart` triggers by @ShadowsAdi in https://github.com/s1lentq/ReGameDLL_CS/pull/754
+* FIX: Unexpected behavior with `mp_forcerespawn` by @FEDERICOMB96 in https://github.com/s1lentq/ReGameDLL_CS/pull/653
+* Fix: 'fast fire glitch' at AUG/SG552 by @RauliTop in https://github.com/s1lentq/ReGameDLL_CS/pull/734
+* CI: Keep the `ICC` build for releases only by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/800
+* **Revert** (fix): New entity `trigger_bomb_reset` by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/796
+
+## New Contributors
+* @ShadowsAdi made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/739
+* @JulioBarker made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/776
+* @UnrealKaraulov made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/792
+* @RauliTop made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/748
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.547...5.21.0.575
+
+## [`5.21.0.575`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.575) - 2022-12-18
+> [!WARNING]
+> @wopox1337: This is not a stable release! It is not recommended for use.
+
+## What's Changed
+* fix: update scoreboard attributes on defuser pickup by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/770
+* Add an argument to `swapteams` command by @ShadowsAdi in https://github.com/s1lentq/ReGameDLL_CS/pull/739
+* Correcting code style and config by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/783
+* New CVar: `mp_give_c4_frags` by @JulioBarker in https://github.com/s1lentq/ReGameDLL_CS/pull/776
+* New CVar: `mp_hostages_rescued_ratio` by @fl0werD in https://github.com/s1lentq/ReGameDLL_CS/pull/786
+* Update CI by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/787
+* Update func_vehicle for multiplayer by @UnrealKaraulov in https://github.com/s1lentq/ReGameDLL_CS/pull/792
+* fix: Reset immunity effects always by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/788
+* little code fixes by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/798
+* CI: `ubuntu-latest` -> `ubuntu-20.04` by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/799
+* Fix: `TimeBasedDamage` Paralyze typo by @RauliTop in https://github.com/s1lentq/ReGameDLL_CS/pull/748
+* Implement `game_round_start` & `game_entity_restart` triggers by @ShadowsAdi in https://github.com/s1lentq/ReGameDLL_CS/pull/754
+* FIX: Unexpected behavior with `mp_forcerespawn` by @FEDERICOMB96 in https://github.com/s1lentq/ReGameDLL_CS/pull/653
+* Fix: 'fast fire glitch' at AUG/SG552 by @RauliTop in https://github.com/s1lentq/ReGameDLL_CS/pull/734
+* New entity `trigger_bomb_reset` by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/796
+* CI: Keep the `ICC` build for releases only by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/800
+
+## New Contributors
+* @ShadowsAdi made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/739
+* @JulioBarker made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/776
+* @UnrealKaraulov made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/792
+* @RauliTop made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/748
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.547...5.21.0.575
+
+
+## [`5.21.0.556`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.556) - 2022-07-22
+## What's Changed
+* fix observer crosshair bug by @Nord1cWarr1or in https://github.com/s1lentq/ReGameDLL_CS/pull/672
+* README.md: Note about `impulse 255` command by @UnkwUsr in https://github.com/s1lentq/ReGameDLL_CS/pull/714
+* update WeaponBuyAliasInfo by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/729
+* g3sg1 animation duration fix by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/670
+* `RemoveSpawnProtection()` little fix by @aleeperezz16 in https://github.com/s1lentq/ReGameDLL_CS/pull/695
+* Clamp moving entities' sounds volume by @etojuice in https://github.com/s1lentq/ReGameDLL_CS/pull/751
+* Fix player_weaponstrip by @Vaqtincha in https://github.com/s1lentq/ReGameDLL_CS/pull/735
+* Added spawnflags for keep player angles & velocity in trigger_teleport by @SmileyAG in https://github.com/s1lentq/ReGameDLL_CS/pull/747
+
+## New Contributors
+* @UnkwUsr made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/714
+* @SmileyAG made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/747
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.546...5.21.0.556
+
+
+## [`5.21.0.547`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.547) - 2022-07-22
+## What's Changed
+* fix observer crosshair bug by @Nord1cWarr1or in https://github.com/rehlds/ReGameDLL_CS/pull/672
+* README.md: Note about `impulse 255` command by @UnkwUsr in https://github.com/rehlds/ReGameDLL_CS/pull/714
+* update WeaponBuyAliasInfo by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/729
+* g3sg1 animation duration fix by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/670
+* `RemoveSpawnProtection()` little fix by @aleeperezz16 in https://github.com/rehlds/ReGameDLL_CS/pull/695
+* Clamp moving entities' sounds volume by @etojuice in https://github.com/rehlds/ReGameDLL_CS/pull/751
+* Fix player_weaponstrip by @Vaqtincha in https://github.com/rehlds/ReGameDLL_CS/pull/735
+* Added spawnflags for keep player angles & velocity in trigger_teleport by @SmileyAG in https://github.com/rehlds/ReGameDLL_CS/pull/747
+
+## New Contributors
+* @UnkwUsr made their first contribution in https://github.com/rehlds/ReGameDLL_CS/pull/714
+* @SmileyAG made their first contribution in https://github.com/rehlds/ReGameDLL_CS/pull/747
+
+**Full Changelog**: https://github.com/rehlds/ReGameDLL_CS/compare/5.21.0.546...5.21.0.547
+
+
+## [`5.21.0.546`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.546) - 2021-12-28
+## What's Changed
+* CItemAirBox: Fix flight to the moon by @StevenKal in https://github.com/s1lentq/ReGameDLL_CS/pull/697
+* New CVar: `mp_plant_c4_anywhere` by @aleeperezz16 in https://github.com/s1lentq/ReGameDLL_CS/pull/692
+* update score status constants by @Nord1cWarr1or in https://github.com/s1lentq/ReGameDLL_CS/pull/674
+* Reset `m_flNextFollowTime` before trying to find next target after previous target death by @etojuice in https://github.com/s1lentq/ReGameDLL_CS/pull/712
+
+## New Contributors
+* @Nord1cWarr1or made their first contribution in https://github.com/s1lentq/ReGameDLL_CS/pull/674
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.540...5.21.0.546
+
+
+## [`5.21.0.540`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.540) - 2021-10-25
+## What's Changed
+* Disable thread-safe initialization for static local variables by @jeefo in https://github.com/s1lentq/ReGameDLL_CS/pull/673
+* Fix `m_flAccuracy` calculation by @wopox1337 in https://github.com/s1lentq/ReGameDLL_CS/pull/677
+* Update player counts by @etojuice in https://github.com/s1lentq/ReGameDLL_CS/pull/684
+* `mp_free_armor` small fix by @aleeperezz16 in https://github.com/s1lentq/ReGameDLL_CS/pull/685
+* New CVars: `sv_autobunnyhopping` and `sv_enablebunnyhopping` by @aleeperezz16 in https://github.com/s1lentq/ReGameDLL_CS/pull/686
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.21.0.534...5.21.0.540
+
+## [`5.21.0.534`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.21.0.534) - 2021-09-21
+- Fix "use accuracy from last bullet fired earlier" glitch @Vaqtincha ([#662](https://github.com/rehlds/ReGameDLL_CS/pull/662));
+- Bot fixes @Vaqtincha ([#659](https://github.com/rehlds/ReGameDLL_CS/pull/659));
+- Add new CVar `sv_allchat` @wopox1337 ([#665](https://github.com/rehlds/ReGameDLL_CS/pull/665));
+- API:
+  - Implement `CBasePlayer::Observer_SetMode()` hook @lopol2010 ([#663](https://github.com/rehlds/ReGameDLL_CS/pull/663));
+  - Implement player `Pain`, `DeathSound` and `JoiningThink` hooks @fl0werD ([#607](https://github.com/rehlds/ReGameDLL_CS/pull/607));
+  - Implement `CBasePlayer::Observer_FindNextPlayer()` hook @francoromaniello ([#667](https://github.com/rehlds/ReGameDLL_CS/pull/667));
+  - Implement `CGib::SpawnHeadGib()` and `CGib::SpawnRandomGibs()` @FEDERICOMB96 ([#650](https://github.com/rehlds/ReGameDLL_CS/pull/650));
+  - Implement `CCSEntity::FireBuckshots()` @FEDERICOMB96 ([#651](https://github.com/rehlds/ReGameDLL_CS/pull/651));
+
+**Full Changelog**: https://github.com/s1lentq/ReGameDLL_CS/compare/5.20.0.525...5.21.0.534
+
+## [`5.20.0.525`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.525) - 2021-07-25
+- Add new type `sv_alltalk 5` ([#644](https://github.com/rehlds/ReGameDLL_CS/pull/644));
+- Add new CVar `mp_free_armor` ([#609](https://github.com/rehlds/ReGameDLL_CS/pull/609));
+- Allow observe for dying player with `EF_NODRAW` effect ([#647](https://github.com/rehlds/ReGameDLL_CS/pull/647))
+  * Observer_IsValidTarget: checks refactoring.
+- Implement `CBasePlayer::HasTimePassedSinceDeath()` for `m_fDeadTime` ([#648](https://github.com/rehlds/ReGameDLL_CS/pull/648))
+- Add `give` cmd to readme ([#649](https://github.com/rehlds/ReGameDLL_CS/pull/649))
+
+## [`5.20.0.516`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.516) - 2021-06-15
+- regamedll-cs.fgd: Added lost spawnflags SF_DOOR_ROTATE_Z, SF_DOOR_ROTATE_X func_rot_button ([#637](https://github.com/rehlds/ReGameDLL_CS/pull/637))
+- func_bomb_target: new feature "strict touch" ([#636](https://github.com/rehlds/ReGameDLL_CS/pull/636))
+- enhance "player_weaponstrip" entity ([#634](https://github.com/rehlds/ReGameDLL_CS/pull/634))
+- Forcerespawn fix ([#623](https://github.com/rehlds/ReGameDLL_CS/pull/623))
+  * Dead players now respawn after enabling the mp_forcerespawn
+  * use timer instead of instant spawn
+- FGD updates ([#632](https://github.com/rehlds/ReGameDLL_CS/pull/632))
+  * game_player_equip fixes
+  * enhance cycler/cycler_sprite
+- Bots can switch weapons underwater ([#631](https://github.com/rehlds/ReGameDLL_CS/pull/631))
+- game_player_equip fixes/enhancement ([#618](https://github.com/rehlds/ReGameDLL_CS/pull/618))
+  * New flag SF_PLAYEREQUIP_REMOVEWEAPONS
+- Add weapon flag ITEM_FLAG_NOFIREUNDERWATER ([#628](https://github.com/rehlds/ReGameDLL_CS/pull/628))
+  * Implement weapon flag ITEM_FLAG_NOFIREUNDERWATER to allow user to changes behavior firing underwater\
+- Immunity enhance ([#621](https://github.com/rehlds/ReGameDLL_CS/pull/621))
+  * CVar 'mp_respawn_immunity_force_unset' new value (2)
+  * Send StatusIcon to player (for visual information) works with mp_respawn_immunity_effects 1
+- FIX: crash in UTIL_AreHostagesImprov ([#626](https://github.com/rehlds/ReGameDLL_CS/pull/626))
+- FIX: weapon_sg550 ([#624](https://github.com/rehlds/ReGameDLL_CS/pull/624))
+  * fix first shot weapon_sg550
+
+## [`5.20.0.505`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.505) - 2021-04-17
+* Fixed flag 'k' `mp_round_infinite`
+
+## [`5.20.0.498`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.498) - 2021-04-13
+* Enhance CVar `mp_roundover`
+* Update `README.md`
+* Update `C++ Intel Compiler` version `17.0` > `19.0`
+
+## [`5.20.0.496`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.496) - 2021-04-12
+* Rename CMD `mp_swapteams`
+* Remove unused CVar `mp_mirrordamage`
+* Refactoring checks
+* Refactoring ([#540](https://github.com/rehlds/ReGameDLL_CS/pull/540))
+
+## [`5.20.0.492`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.20.0.492) - 2021-01-04
+* CHalfLifeMultiplay::SwapAllPlayers: Ignore HLTV
+
+## [`5.19.0.486`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.19.0.486) - 2020-12-05
+* Add newest feature of `_cl_autowepswitch` ([#568](https://github.com/rehlds/ReGameDLL_CS/pull/568))
+
+## [`5.19.0.485`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.19.0.485) - 2020-12-02
+* Fix compatibility with`rg_hint_message` ([#583](https://github.com/rehlds/ReGameDLL_CS/pull/583))
+  When used reapi native `rg_hint_message` not work because tries to access to one pointer who not longer exists in `CHintMessage::Send`
+
+## [`5.19.0.484`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.19.0.484) - 2020-12-02
+* Reset client `m_signals` on fullupdate ([#588](https://github.com/rehlds/ReGameDLL_CS/pull/588))
+
+## [`5.18.0.482`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.482) - 2020-11-28
+* Reset observer's `m_flNextFollowTime` before trying to find next target if previous target disconnected ([#584](https://github.com/rehlds/ReGameDLL_CS/pull/584))
+
+## [`5.18.0.481`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.481) - 2020-11-28
+* **API:** Add `CBaseEntity::Fire<Bullets[3]|Buckshots>` hooks. ([#587](https://github.com/rehlds/ReGameDLL_CS/pull/587))
+
+## [`5.18.0.480`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.480) - 2020-11-21
+* Fixed memory leak with hintmessage.
+
+## [`5.18.0.479`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.479) - 2020-11-13
+* Fix crash caused by `ReloadMapCycleFile` function ([#576](https://github.com/rehlds/ReGameDLL_CS/pull/576))
+
+## [`5.18.0.475`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.475) - 2020-10-26
+* Revert `mp_refill_bpammo_weapons 3`
+
+## [`5.18.0.474`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.474) - 2020-07-16
+* Fixed bug when the client reconnects, his body doesn't disappear.
+
+## [`5.18.0.473`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.473) - 2020-07-03
+* Fix a crash when func_breakable signals it for `CCSBot::OnEvent`
+
+## [`5.18.0.472`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.472) - 2020-06-25
+* Don't call HasRestrictItem with type touch when that item is buying
+
+## [`5.18.0.470`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.470) - 2020-06-17
+* Add new CVar's for default weapons ([#470](https://github.com/rehlds/ReGameDLL_CS/pull/470))
+
+## [`5.18.0.469`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.469) - 2020-06-13
+* Add more flags for round time expired to CVar `mp_round_infinite`
+
+## [`5.18.0.468`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.468) - 2020-06-10
+* Bot fix ([#544](https://github.com/rehlds/ReGameDLL_CS/pull/544))
+
+## [`5.18.0.467`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.18.0.467) - 2020-06-10
+* Bot fix ([#544](https://github.com/rehlds/ReGameDLL_CS/pull/544))
+* Fix flood `All bot profiles at this difficulty level are in use.` in console
+
+## [`5.17.0.466`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.17.0.466) - 2020-05-27
+* **API:** Implement `CGib` hooks ([#536](https://github.com/rehlds/ReGameDLL_CS/pull/536))
+* Move code part from `basemonster.cpp` to `gib.cpp`
+* Link entity to class (can hookable by HamSandwich amxx module)
+
+## [`5.16.0.465`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.16.0.465) - 2020-05-27
+* Player reset zoom & speed. ([#541](https://github.com/rehlds/ReGameDLL_CS/pull/541))
+   `RemoveAllItems` reset (update) player speed
+   `RemoveAllItems` reset player zoom
+   `RemovePlayerItem` reset player zoom & speed
+   `CFuncTank->StartControl` fully reset zoom
+
+## [`5.16.0.460`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.16.0.460) - 2020-05-02
+* **API:** Add `m_bCanShootOverride` member ([#527](https://github.com/rehlds/ReGameDLL_CS/pull/527))
+   Allow to override `m_bCanShoot`, for example able to fire at freeze time
+
+## [`5.15.0.459`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.15.0.459) - 2020-05-02
+* Fixed format buffer size in `UTIL_dtosX` functions ([#528](https://github.com/rehlds/ReGameDLL_CS/pull/528))
+
+## [`5.15.0.457`](https://github.com/rehlds/ReGameDLL_CS/releases/tag/5.15.0.457) - 2020-03-27
+* **API:** Add weaponbox hook ([#521](https://github.com/rehlds/ReGameDLL_CS/pull/521))
+
+-------------------------------
 
 > [!CAUTION]
 >
