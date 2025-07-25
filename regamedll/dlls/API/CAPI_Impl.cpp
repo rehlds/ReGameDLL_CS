@@ -143,6 +143,10 @@ CGrenade *EXT_FUNC SpawnGrenade_api(WeaponIdType weaponId, entvars_t *pevOwner, 
 	return nullptr;
 }
 
+void EXT_FUNC CheckWinConditions_api() {
+	CSGameRules()->CheckWinConditions();
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -176,6 +180,7 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	TextureTypePlaySound_api,
 	CreateWeaponBox_api,
 	SpawnGrenade_api,
+	CheckWinConditions_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);

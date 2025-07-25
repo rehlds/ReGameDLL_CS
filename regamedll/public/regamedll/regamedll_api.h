@@ -38,7 +38,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 30
+#define REGAMEDLL_API_VERSION_MINOR 31
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -826,6 +826,7 @@ struct ReGameFuncs_t {
 	void (*TextureTypePlaySound)(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType);
 	class CWeaponBox *(*CreateWeaponBox)(CBasePlayerItem *pItem, CBasePlayer *pPlayerOwner, const char *modelName, Vector &origin, Vector &angles, Vector &velocity, float lifeTime, bool packAmmo);
 	class CGrenade *(*SpawnGrenade)(WeaponIdType weaponId, entvars_t *pevOwner, Vector &vecSrc, Vector &vecThrow, float time, int iTeam, unsigned short usEvent);
+	void (*CheckWinConditions)();
 };
 
 class IReGameApi {
