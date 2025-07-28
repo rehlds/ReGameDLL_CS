@@ -628,6 +628,7 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 #else
 		!IsSecondaryWeapon(m_iId)
 #endif
+
 		)
 	{
 		return;
@@ -1130,7 +1131,11 @@ void EXT_FUNC CBasePlayerWeapon::__API_HOOK(ItemPostFrame)()
 		m_fFireOnEmpty = FALSE;
 
 		// if it's a pistol then set the shots fired to 0 after the player releases a button
+#ifdef REGAMEDLL_FIXES
+		if (IsPistol())
+#else
 		if (IsSecondaryWeapon(m_iId))
+#endif
 		{
 			m_iShotsFired = 0;
 		}
