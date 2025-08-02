@@ -636,6 +636,26 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CHalfLifeMultiplay::CheckGameOver hook
+typedef IHookChain<bool> IReGameHook_CSGameRules_CheckGameOver;
+typedef IHookChainRegistry<bool> IReGameHookRegistry_CSGameRules_CheckGameOver;
+
+// CHalfLifeMultiplay::CheckTimeLimit hook
+typedef IHookChain<bool> IReGameHook_CSGameRules_CheckTimeLimit;
+typedef IHookChainRegistry<bool> IReGameHookRegistry_CSGameRules_CheckTimeLimit;
+
+// CHalfLifeMultiplay::CheckFragLimit hook
+typedef IHookChain<bool> IReGameHook_CSGameRules_CheckFragLimit;
+typedef IHookChainRegistry<bool> IReGameHookRegistry_CSGameRules_CheckFragLimit;
+
+// CHalfLifeMultiplay::CheckMaxRounds hook
+typedef IHookChain<bool> IReGameHook_CSGameRules_CheckMaxRounds;
+typedef IHookChainRegistry<bool> IReGameHookRegistry_CSGameRules_CheckMaxRounds;
+
+// CHalfLifeMultiplay::CheckWinLimit hook
+typedef IHookChain<bool> IReGameHook_CSGameRules_CheckWinLimit;
+typedef IHookChainRegistry<bool> IReGameHookRegistry_CSGameRules_CheckWinLimit;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -800,6 +820,12 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
+
+	virtual IReGameHookRegistry_CSGameRules_CheckGameOver *CSGameRules_CheckGameOver() = 0;
+	virtual IReGameHookRegistry_CSGameRules_CheckTimeLimit *CSGameRules_CheckTimeLimit() = 0;
+	virtual IReGameHookRegistry_CSGameRules_CheckFragLimit *CSGameRules_CheckFragLimit() = 0;
+	virtual IReGameHookRegistry_CSGameRules_CheckMaxRounds *CSGameRules_CheckMaxRounds() = 0;
+	virtual IReGameHookRegistry_CSGameRules_CheckWinLimit *CSGameRules_CheckWinLimit() = 0;
 };
 
 struct ReGameFuncs_t {

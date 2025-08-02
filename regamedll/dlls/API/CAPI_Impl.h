@@ -757,6 +757,26 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CHalfLifeMultiplay::CheckGameOver hook
+typedef IHookChainClassImpl<bool, class CHalfLifeMultiplay> CReGameHook_CSGameRules_CheckGameOver;
+typedef IHookChainRegistryClassEmptyImpl<bool, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_CheckGameOver;
+
+// CHalfLifeMultiplay::CheckTimeLimit hook
+typedef IHookChainClassImpl<bool, class CHalfLifeMultiplay> CReGameHook_CSGameRules_CheckTimeLimit;
+typedef IHookChainRegistryClassEmptyImpl<bool, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_CheckTimeLimit;
+
+// CHalfLifeMultiplay::CheckFragLimit hook
+typedef IHookChainClassImpl<bool, class CHalfLifeMultiplay> CReGameHook_CSGameRules_CheckFragLimit;
+typedef IHookChainRegistryClassEmptyImpl<bool, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_CheckFragLimit;
+
+// CHalfLifeMultiplay::CheckMaxRounds hook
+typedef IHookChainClassImpl<bool, class CHalfLifeMultiplay> CReGameHook_CSGameRules_CheckMaxRounds;
+typedef IHookChainRegistryClassEmptyImpl<bool, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_CheckMaxRounds;
+
+// CHalfLifeMultiplay::CheckWinLimit hook
+typedef IHookChainClassImpl<bool, class CHalfLifeMultiplay> CReGameHook_CSGameRules_CheckWinLimit;
+typedef IHookChainRegistryClassEmptyImpl<bool, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_CheckWinLimit;
+
 class CReGameHookchains: public IReGameHookchains {
 public:
 	// CBasePlayer virtual
@@ -921,6 +941,12 @@ public:
 	CReGameHookRegistry_CBasePlayer_UpdateStatusBar m_CBasePlayer_UpdateStatusBar;
 	CReGameHookRegistry_CBasePlayer_TakeDamageImpulse m_CBasePlayer_TakeDamageImpulse;
 
+	CReGameHookRegistry_CSGameRules_CheckGameOver m_CSGameRules_CheckGameOver;
+	CReGameHookRegistry_CSGameRules_CheckTimeLimit m_CSGameRules_CheckTimeLimit;
+	CReGameHookRegistry_CSGameRules_CheckFragLimit m_CSGameRules_CheckFragLimit;
+	CReGameHookRegistry_CSGameRules_CheckMaxRounds m_CSGameRules_CheckMaxRounds;
+	CReGameHookRegistry_CSGameRules_CheckWinLimit m_CSGameRules_CheckWinLimit;
+
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
 	virtual IReGameHookRegistry_CBasePlayer_Precache *CBasePlayer_Precache();
@@ -1082,6 +1108,12 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar();
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse();
+
+	virtual IReGameHookRegistry_CSGameRules_CheckGameOver *CSGameRules_CheckGameOver();
+	virtual IReGameHookRegistry_CSGameRules_CheckTimeLimit *CSGameRules_CheckTimeLimit();
+	virtual IReGameHookRegistry_CSGameRules_CheckFragLimit *CSGameRules_CheckFragLimit();
+	virtual IReGameHookRegistry_CSGameRules_CheckMaxRounds *CSGameRules_CheckMaxRounds();
+	virtual IReGameHookRegistry_CSGameRules_CheckWinLimit *CSGameRules_CheckWinLimit();
 };
 
 extern CReGameHookchains g_ReGameHookchains;
