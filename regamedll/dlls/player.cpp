@@ -1850,11 +1850,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(RemoveAllItems)(BOOL removeSuit)
 	int i;
 
 #ifdef REGAMEDLL_FIXES
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 #endif
 
 	if (m_bHasDefuser)
@@ -2353,11 +2349,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 #endif
 	}
 
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 
 #ifndef REGAMEDLL_FIXES
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -3837,11 +3829,7 @@ LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, Disappear)
 
 void EXT_FUNC CBasePlayer::__API_HOOK(Disappear)()
 {
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 
 #ifndef REGAMEDLL_FIXES
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -4105,11 +4093,8 @@ void EXT_FUNC CBasePlayer::__API_HOOK(StartObserver)(Vector &vecPosition, Vector
 	if (m_pActiveItem)
 		m_pActiveItem->Holster();
 
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	// stop controlling any tank
+	DetachTank();
 
 	// clear out the suit message cache so we don't keep chattering
 	SetSuitUpdate(nullptr, SUIT_SENTENCE, SUIT_REPEAT_OK);
@@ -4210,12 +4195,9 @@ void CBasePlayer::PlayerUse()
 	// Hit Use on a train?
 	if (m_afButtonPressed & IN_USE)
 	{
-		if (m_pTank)
+		if (DetachTank())
 		{
-			// Stop controlling the tank
 			// TODO: Send HUD Update
-			m_pTank->Use(this, this, USE_OFF, 0);
-			m_pTank = nullptr;
 			return;
 		}
 
@@ -4392,6 +4374,19 @@ LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, UseEmpty)
 void EXT_FUNC CBasePlayer::__API_HOOK(UseEmpty)()
 {
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "common/wpn_denyselect.wav", 0.4, ATTN_NORM);
+}
+
+bool CBasePlayer::DetachTank()
+{
+	if (m_pTank)
+	{
+		// Stop controlling the tank
+		m_pTank->Use(this, this, USE_OFF, 0);
+		m_pTank = nullptr;
+		return true;
+	}
+
+	return false;
 }
 
 void CBasePlayer::HostageUsed()
