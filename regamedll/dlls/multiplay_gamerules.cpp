@@ -5112,6 +5112,16 @@ TeamName CHalfLifeMultiplay::SelectDefaultTeam()
 		team = CT;
 	}
 	// Choose the team that's losing
+#ifdef REGAMEDLL_ADD
+	else if (m_iNumConsecutiveTerroristLoses > 0)
+	{
+		team = TERRORIST;
+	}
+	else if (m_iNumConsecutiveCTLoses > 0)
+	{
+		team = CT;
+	}
+#else
 	else if (m_iNumTerroristWins < m_iNumCTWins)
 	{
 		team = TERRORIST;
@@ -5120,6 +5130,7 @@ TeamName CHalfLifeMultiplay::SelectDefaultTeam()
 	{
 		team = CT;
 	}
+#endif
 	else
 	{
 		// Teams and scores are equal, pick a random team
