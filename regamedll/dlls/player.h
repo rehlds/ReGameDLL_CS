@@ -651,6 +651,7 @@ public:
 	bool ShouldToShowHealthInfo(CBasePlayer *pReceiver) const;
 	const char *GetKillerWeaponName(entvars_t *pevInflictor, entvars_t *pevKiller) const;
 	bool ShouldGibPlayer(int iGib);
+	bool DetachTank();
 
 	CBasePlayerItem *GetItemByName(const char *itemName);
 	CBasePlayerItem *GetItemById(WeaponIdType weaponID);
