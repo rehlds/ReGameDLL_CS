@@ -1443,6 +1443,7 @@ VectorRef CBaseEntity::__API_HOOK(FireBullets3)(VectorRef vecSrc, VectorRef vecD
 
 			if (tr.iHitgroup == HITGROUP_SHIELD)
 			{
+				// stop on shield hit
 				pEntity->HitShield(iCurrentDamage, &tr);
 				break;
 			}
@@ -1490,6 +1491,7 @@ void CBaseEntity::HitShield(float flDamage, TraceResult *ptr)
 	UTIL_Sparks(ptr->vecEndPos);
 
 #ifdef REGAMEDLL_FIXES
+	// dont modify punchangle if it is already above this threshold
 	if (Q_fabs(pev->punchangle.x) < 4.0)
 	{
 		pev->punchangle.x = clamp(flDamage * RANDOM_FLOAT(-0.15, 0.15), -4.0f, 4.0f);
@@ -1497,15 +1499,22 @@ void CBaseEntity::HitShield(float flDamage, TraceResult *ptr)
 #else
 	pev->punchangle.x = flDamage * RANDOM_FLOAT(-0.15, 0.15);
 
-	if (pev->punchangle.x < 4)
+	if (pev->punchangle.x < 4) // BUGBUG: https://github.com/rehlds/ReGameDLL_CS/pull/919
 		pev->punchangle.x = -4;
 #endif
 
 #ifdef REGAMEDLL_FIXES
+	// dont modify punchangle if it is already above this threshold
 	if (Q_fabs(pev->punchangle.z) < 5.0)
 #endif
 	{
 		pev->punchangle.z = clamp(flDamage * RANDOM_FLOAT(-0.15, 0.15), -5.0f, 5.0f);
+		// the code above is replicated as:
+		//	if (pev->punchangle.z < -5) 
+		//		pev->punchangle.z = -5;
+		//	else if (pev->punchangle.z > 5) 
+		//		pev->punchangle.z = 5;
+		// which is the original logic
 	}
 }
 

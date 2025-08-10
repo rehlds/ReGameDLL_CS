@@ -699,6 +699,8 @@ void EXT_FUNC CBasePlayer::__API_HOOK(TraceAttack)(entvars_t *pevAttacker, float
 	if (bHitShield)
 	{
 #ifndef REGAMEDLL_FIXES
+		// BUGBUG: zeroing out damage BEFORE altering victim's punchangle
+		// will simply nullify any previous punchangles
 		flDamage = 0;
 #endif
 
@@ -706,6 +708,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(TraceAttack)(entvars_t *pevAttacker, float
 		HitShield(flDamage, ptr);
 
 #ifdef REGAMEDLL_FIXES
+		// reset damage after messing with victim's punchangle
 		flDamage = 0;
 #endif
 	}
