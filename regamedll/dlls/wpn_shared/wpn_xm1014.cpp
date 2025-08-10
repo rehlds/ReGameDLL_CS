@@ -1,5 +1,7 @@
 #include "precompiled.h"
 
+const Vector XM1014_CONE_VECTOR = Vector(0.0725, 0.0725, 0.0); // special shotgun spreads
+
 LINK_ENTITY_TO_CLASS(weapon_xm1014, CXM1014, CCSXM1014)
 
 void CXM1014::Spawn()
@@ -222,6 +224,9 @@ void CXM1014::WeaponIdle()
 		}
 		else
 		{
+#ifdef REGAMEDLL_FIXES
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0f;
+#endif
 			SendWeaponAnim(XM1014_IDLE, UseDecrement() != FALSE);
 		}
 	}

@@ -1,5 +1,7 @@
 #include "precompiled.h"
 
+const Vector M3_CONE_VECTOR = Vector(0.0675, 0.0675, 0.0); // special shotgun spreads
+
 LINK_ENTITY_TO_CLASS(weapon_m3, CM3, CCSM3)
 
 void CM3::Spawn()
@@ -225,6 +227,9 @@ void CM3::WeaponIdle()
 		}
 		else
 		{
+#ifdef REGAMEDLL_FIXES
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0f;
+#endif
 			SendWeaponAnim(M3_IDLE, UseDecrement() != FALSE);
 		}
 	}

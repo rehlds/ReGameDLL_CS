@@ -56,13 +56,16 @@ public:
 	virtual bool IsImportantPlayer(CBasePlayer *pPlayer) const;				// return true if pPlayer is important to scenario (VIP, bomb carrier, etc)
 
 public:
-	void ValidateMapData();
+	bool LoadNavigationMap();
+	void DetermineMapScenario();
 	void OnFreeEntPrivateData(CBaseEntity *pEntity);
+	void OnDestroyNavDataNotify(NavNotifyDestroyType navNotifyType, void *dead);
 	bool IsLearningMap() const { return m_isLearningMap; }
 	void SetLearningMapFlag() { m_isLearningMap = true; }
 	bool IsAnalysisRequested() const { return m_isAnalysisRequested; }
 	void RequestAnalysis() { m_isAnalysisRequested = true; }
 	void AckAnalysisRequest() { m_isAnalysisRequested = false; }
+	void AnalysisCompleted();
 
 	// difficulty levels
 	static BotDifficultyType GetDifficultyLevel()
@@ -85,7 +88,8 @@ public:
 		SCENARIO_DEATHMATCH,
 		SCENARIO_DEFUSE_BOMB,
 		SCENARIO_RESCUE_HOSTAGES,
-		SCENARIO_ESCORT_VIP
+		SCENARIO_ESCORT_VIP,
+		SCENARIO_ESCAPE
 	};
 
 	GameScenarioType GetScenario() const
@@ -268,3 +272,4 @@ inline bool AreBotsAllowed()
 }
 
 void PrintAllEntities();
+void GenerateSpawnPointsFromNavData();

@@ -450,6 +450,8 @@ public:
 	void PlayerDeathThink_OrigFunc();
 	void Observer_Think_OrigFunc();
 	void RemoveAllItems_OrigFunc(BOOL removeSuit);
+	void UpdateStatusBar_OrigFunc();
+	void TakeDamageImpulse_OrigFunc(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
@@ -522,7 +524,9 @@ public:
 	void UpdatePlayerSound();
 	void DeathSound();
 	void SetAnimation(PLAYER_ANIM playerAnim);
-	void SetWeaponAnimType(const char *szExtention) { Q_strcpy(m_szAnimExtention, szExtention); }
+	enum AnimationType { ANIM_NORMAL, ANIM_CROUCH };
+	int GetAnimDesired(const char *szAnim, AnimationType type);
+	void SetWeaponAnimType(const char *szExtention) { Q_strlcpy(m_szAnimExtention, szExtention); }
 	void CheatImpulseCommands(int iImpulse);
 	void StartDeathCam();
 	void StartObserver(Vector &vecPosition, Vector &vecViewAngle);
@@ -602,7 +606,7 @@ public:
 	void AddAutoBuyData(const char *str);
 	void AutoBuy();
 	void ClientCommand(const char *cmd, const char *arg1 = nullptr, const char *arg2 = nullptr, const char *arg3 = nullptr);
-	void PrioritizeAutoBuyString(char *autobuyString, const char *priorityString);
+	void PrioritizeAutoBuyString(char (&autobuyString)[MAX_AUTOBUY_LENGTH], const char *priorityString);
 	const char *PickPrimaryCareerTaskWeapon();
 	const char *PickSecondaryCareerTaskWeapon();
 	const char *PickFlashKillWeaponString();
@@ -647,6 +651,7 @@ public:
 	bool ShouldToShowHealthInfo(CBasePlayer *pReceiver) const;
 	const char *GetKillerWeaponName(entvars_t *pevInflictor, entvars_t *pevKiller) const;
 	bool ShouldGibPlayer(int iGib);
+	bool DetachTank();
 
 	CBasePlayerItem *GetItemByName(const char *itemName);
 	CBasePlayerItem *GetItemById(WeaponIdType weaponID);
@@ -656,6 +661,7 @@ public:
 	void UseEmpty();
 	void DropIdlePlayer(const char *reason);
 	bool Kill();
+	void TakeDamageImpulse(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 
 	// templates
 	template<typename T = CBasePlayerItem, typename Functor>
@@ -1042,7 +1048,7 @@ int TrainSpeed(int iSpeed, int iMax);
 void LogAttack(CBasePlayer *pAttacker, CBasePlayer *pVictim, int teamAttack, int healthHit, int armorHit, int newHealth, int newArmor, const char *killer_weapon_name);
 bool CanSeeUseable(CBasePlayer *me, CBaseEntity *pEntity);
 void FixPlayerCrouchStuck(edict_t *pPlayer);
-BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot);
+BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot, float fRadius);
 CBaseEntity *FindEntityForward(CBaseEntity *pMe);
 real_t GetPlayerPitch(const edict_t *pEdict);
 real_t GetPlayerYaw(const edict_t *pEdict);
