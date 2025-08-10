@@ -66,9 +66,11 @@ void CGrenade::__API_HOOK(Explode)(TraceResult *pTrace, int bitsDamageType)
 		UTIL_DecalTrace(pTrace, DECAL_SCORCH1);
 	else
 		UTIL_DecalTrace(pTrace, DECAL_SCORCH2);
-
-	// TODO: unused
+	
+#ifndef REGAMEDLL_FIXES
+	// unused
 	flRndSound = RANDOM_FLOAT(0, 1);
+#endif
 
 	switch (RANDOM_LONG(0, 1))
 	{
@@ -200,8 +202,10 @@ void CGrenade::__API_HOOK(Explode2)(TraceResult *pTrace, int bitsDamageType)
 	else
 		UTIL_DecalTrace(pTrace, DECAL_SCORCH2);
 
-	// TODO: unused
+#ifndef REGAMEDLL_FIXES
+	// unused
 	flRndSound = RANDOM_FLOAT(0, 1);
+#endif
 
 	switch (RANDOM_LONG(0, 2))
 	{
@@ -293,8 +297,10 @@ void CGrenade::__API_HOOK(Explode3)(TraceResult *pTrace, int bitsDamageType)
 	else
 		UTIL_DecalTrace(pTrace, DECAL_SCORCH2);
 
-	// TODO: unused
+#ifndef REGAMEDLL_FIXES
+	// unused
 	flRndSound = RANDOM_FLOAT(0, 1);
+#endif
 
 	switch (RANDOM_LONG(0, 2))
 	{
@@ -682,6 +688,7 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 		return;
 	}
 
+#ifndef REGAMEDLL_FIXES
 	Vector vecTestVelocity;
 
 	// this is my heuristic for modulating the grenade velocity because grenades dropped purely vertical
@@ -690,7 +697,6 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 	vecTestVelocity = pev->velocity;
 	vecTestVelocity.z *= 0.7f;
 
-#ifndef REGAMEDLL_FIXES
 	if (!m_fRegisteredSound && vecTestVelocity.Length() <= 60.0f)
 	{
 		// grenade is moving really slow. It's probably very close to where it will ultimately stop moving.
@@ -705,7 +711,11 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 	{
 		// add a bit of static friction
 		pev->velocity = pev->velocity * 0.8f;
-		pev->sequence = RANDOM_LONG(1, 1); // TODO: what?
+#ifdef REGAMEDLL_FIXES
+		pev->sequence = 1;
+#else
+		pev->sequence = RANDOM_LONG(1, 1); // what?
+#endif
 	}
 	else
 	{
@@ -913,8 +923,18 @@ CGrenade *CGrenade::__API_HOOK(ShootTimed2)(entvars_t *pevOwner, VectorRef vecSt
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
 	pGrenade->pev->velocity = vecVelocity;
-	pGrenade->pev->angles = pevOwner->angles;
-	pGrenade->pev->owner = ENT(pevOwner);
+
+#ifdef REGAMEDLL_FIXES
+	if (!pevOwner)
+	{
+		pGrenade->pev->owner = nullptr;
+	}
+	else
+#endif
+	{
+		pGrenade->pev->angles = pevOwner->angles;
+		pGrenade->pev->owner = ENT(pevOwner);
+	}
 
 	pGrenade->m_usEvent = usEvent;
 
@@ -949,8 +969,18 @@ CGrenade *CGrenade::__API_HOOK(ShootTimed)(entvars_t *pevOwner, VectorRef vecSta
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
 	pGrenade->pev->velocity = vecVelocity;
-	pGrenade->pev->angles = pevOwner->angles;
-	pGrenade->pev->owner = ENT(pevOwner);
+
+#ifdef REGAMEDLL_FIXES
+	if (!pevOwner)
+	{
+		pGrenade->pev->owner = nullptr;
+	}
+	else
+#endif
+	{
+		pGrenade->pev->angles = pevOwner->angles;
+		pGrenade->pev->owner = ENT(pevOwner);
+	}
 
 	// Bounce if touched
 	pGrenade->SetTouch(&CGrenade::BounceTouch);
@@ -1299,8 +1329,17 @@ CGrenade *CGrenade::__API_HOOK(ShootSmokeGrenade)(entvars_t *pevOwner, VectorRef
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
 	pGrenade->pev->velocity = vecVelocity;
-	pGrenade->pev->angles = pevOwner->angles;
-	pGrenade->pev->owner = ENT(pevOwner);
+#ifdef REGAMEDLL_FIXES
+	if (!pevOwner)
+	{
+		pGrenade->pev->owner = nullptr;
+	}
+	else
+#endif
+	{
+		pGrenade->pev->angles = pevOwner->angles;
+		pGrenade->pev->owner = ENT(pevOwner);
+	}
 	pGrenade->m_usEvent = usEvent;
 	pGrenade->m_bLightSmoke = false;
 	pGrenade->m_bDetonated = false;
