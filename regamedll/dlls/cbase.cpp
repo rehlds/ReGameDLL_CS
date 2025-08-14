@@ -1539,6 +1539,11 @@ void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult *ptr, in
 
 	for (i = 0; i < cCount; i++)
 	{
+#ifdef REGAMEDLL_FIXES
+		// early flip-coin, don't waste trace resources
+		if (!RANDOM_LONG(0, 2))
+			continue; 
+#endif
 		// trace in the opposite direction the shot came from (the direction the shot is going)
 		vecTraceDir = vecDir * -1.0f;
 
@@ -1549,7 +1554,9 @@ void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult *ptr, in
 		UTIL_TraceLine(ptr->vecEndPos, ptr->vecEndPos + vecTraceDir * -172.0f, ignore_monsters, ENT(pev), &Bloodtr);
 		if (Bloodtr.flFraction != 1.0f)
 		{
+#ifndef REGAMEDLL_FIXES
 			if (!RANDOM_LONG(0, 2))
+#endif
 			{
 				UTIL_BloodDecalTrace(&Bloodtr, BloodColor());
 			}
