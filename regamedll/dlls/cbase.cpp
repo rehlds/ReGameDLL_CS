@@ -1541,7 +1541,7 @@ void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult *ptr, in
 	{
 #ifdef REGAMEDLL_FIXES
 		// early flip-coin, don't waste trace resources
-		if (!RANDOM_LONG(0, 2))
+		if (RANDOM_LONG(0, 2) != 0)
 			continue; 
 #endif
 		// trace in the opposite direction the shot came from (the direction the shot is going)
