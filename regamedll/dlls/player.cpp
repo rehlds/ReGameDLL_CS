@@ -3404,7 +3404,23 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveShield)(bool bDeploy)
 		}
 	}
 
-#ifndef REGAMEDLL_FIXES
+#ifdef REGAMEDLL_FIXES
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList, nullptr, pev);
+		WRITE_STRING("weapon_shieldgun");
+		WRITE_BYTE(-1); // PrimaryAmmoID
+		WRITE_BYTE(-1); // PrimaryAmmoMaxAmount
+		WRITE_BYTE(-1); // SecondaryAmmoID
+		WRITE_BYTE(-1); // SecondaryAmmoMaxAmount
+		WRITE_BYTE(0); // SlotID (0...N)
+		WRITE_BYTE(0); // NumberInSlot (1...N)
+		WRITE_BYTE(0); // WeaponID
+		WRITE_BYTE(0); // Flags
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeapPickup, nullptr, pev);
+		WRITE_BYTE(0); // WeaponID
+	MESSAGE_END();
+#else
 	// NOTE: Moved above, because CC4::Deploy can reset hitbox of shield
 	pev->gamestate = HITGROUP_SHIELD_ENABLED;
 #endif
