@@ -38,7 +38,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 30
+#define REGAMEDLL_API_VERSION_MINOR 31
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -636,6 +636,10 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CHalfLifeMultiplay::PlayerGotItem hook
+typedef IHookChain<void, CBasePlayer *, CItem *> IReGameHook_CSGameRules_PlayerGotItem;
+typedef IHookChainRegistry<void, CBasePlayer *, CItem *> IReGameHookRegistry_CSGameRules_PlayerGotItem;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -800,6 +804,7 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
+	virtual IReGameHookRegistry_CSGameRules_PlayerGotItem *CSGameRules_PlayerGotItem() = 0;
 };
 
 struct ReGameFuncs_t {
