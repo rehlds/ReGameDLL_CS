@@ -78,6 +78,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | bot_deathmatch                     | 0       | 0   | 1            | Sets the mode for the zBot.<br/>`0` disabled<br/>`1` enable mode Deathmatch and not allow to do the scenario |
 | bot_quota_mode                     | normal  | -   | -            | Determines the type of quota.<br/>`normal` default behaviour<br/>`fill` the server will adjust bots to keep `N` players in the game, where `N` is bot_quota<br/>`match` the server will maintain a `1:N` ratio of humans to bots, where `N` is bot_quota |
 | bot_join_delay                     | 0       | -   | -            | Prevents bots from joining the server for this many seconds after a map change. |
+| bot_join_after_player              | 1       | 0   | 2            | If non-zero, bots will wait for a human to join before entering the game.<br/>`0` disabled (bots join an empty server immediately after a map change)<br/>`1` strict (bots wait for the first human to join a playable team - `T` or `CT`)<br/>`2` soft (bots wait for the first human to connect, including spectators) |
 | bot_freeze                         | 0       | 0   | 1            | Prevents bots on your server from moving.<br/>`0` disabled<br/>`1` enabled |
 | mp_item_staytime                   | 300     | -   | -            | Time to remove item that have been dropped from the players. |
 | mp_legacy_bombtarget_touch         | 1       | 0   | 1            | Legacy func_bomb_target touch. New one is more strict. <br/>`0` New behavior<br/>`1` Legacy behavior|

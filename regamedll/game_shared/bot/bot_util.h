@@ -163,7 +163,8 @@ bool ForEachPlayer(Functor func)
 int UTIL_HumansOnTeam(int teamID, bool isAlive = false);
 
 #define IGNORE_SPECTATORS true
-int UTIL_HumansInGame(bool ignoreSpectators = false);
+#define IGNORE_UNASSIGNED true
+int UTIL_HumansInGame(bool ignoreSpectators = false, bool ignoreUnassigned = false);
 
 bool UTIL_IsNameTaken(const char *name, bool ignoreHumans = false);
 int UTIL_ClientsInGame();
