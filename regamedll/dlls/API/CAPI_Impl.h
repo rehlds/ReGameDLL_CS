@@ -757,6 +757,10 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CHalfLifeMultiplay::PlayerRelationship hook
+typedef IHookChainClassImpl<int, class CHalfLifeMultiplay, CBasePlayer *, CBaseEntity *> CReGameHook_CSGameRules_PlayerRelationship;
+typedef IHookChainRegistryClassEmptyImpl<int, class CHalfLifeMultiplay, CBasePlayer *, CBaseEntity *> CReGameHookRegistry_CSGameRules_PlayerRelationship;
+
 class CReGameHookchains: public IReGameHookchains {
 public:
 	// CBasePlayer virtual
@@ -920,6 +924,7 @@ public:
 	CReGameHookRegistry_CBasePlayer_RemoveAllItems m_CBasePlayer_RemoveAllItems;
 	CReGameHookRegistry_CBasePlayer_UpdateStatusBar m_CBasePlayer_UpdateStatusBar;
 	CReGameHookRegistry_CBasePlayer_TakeDamageImpulse m_CBasePlayer_TakeDamageImpulse;
+	CReGameHookRegistry_CSGameRules_PlayerRelationship m_CSGameRules_PlayerRelationship;
 
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
@@ -1082,6 +1087,7 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar();
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse();
+	virtual IReGameHookRegistry_CSGameRules_PlayerRelationship *CSGameRules_PlayerRelationship();
 };
 
 extern CReGameHookchains g_ReGameHookchains;
