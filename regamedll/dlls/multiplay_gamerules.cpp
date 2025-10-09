@@ -4267,7 +4267,9 @@ BOOL CHalfLifeMultiplay::CanHaveItem(CBasePlayer *pPlayer, CItem *pItem)
 	return TRUE;
 }
 
-void CHalfLifeMultiplay::PlayerGotItem(CBasePlayer *pPlayer, CItem *pItem)
+LINK_HOOK_CLASS_VOID_CUSTOM_CHAIN(CHalfLifeMultiplay, CSGameRules, PlayerGotItem, (CBasePlayer *pPlayer, CItem *pItem), pPlayer, pItem)
+
+void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerGotItem)(CBasePlayer *pPlayer, CItem *pItem)
 {
 	;
 }
