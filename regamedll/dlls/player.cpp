@@ -6709,6 +6709,11 @@ void CBasePlayer::ForceClientDllUpdate()
 			WRITE_SHORT(pPlayer->m_iTeam);
 		MESSAGE_END();
 
+		// Update shadow sprite index
+		MESSAGE_BEGIN(MSG_ONE, gmsgShadowIdx, nullptr, pev);
+			WRITE_LONG(g_iShadowSprite);
+		MESSAGE_END();
+
 		// Update player attributes DEAD, BOMB, VIP etc
 		pPlayer->SetScoreAttrib(this);
 	}
