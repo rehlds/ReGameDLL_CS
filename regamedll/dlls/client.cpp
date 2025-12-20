@@ -749,6 +749,119 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
 }
 
+void EXT_FUNC Host_Say_OrigFunc(CBasePlayer *pPlayer, bool teamonly, const char *text, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsed);
+
+LINK_HOOK_VOID_CHAIN(Host_Say, (CBasePlayer *pPlayer, bool teamonly, const char *text, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsed), pPlayer, teamonly, text, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsed)
+
+void EXT_FUNC Host_Say_OrigFunc(CBasePlayer *pPlayer, bool teamonly, const char *text, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsed)
+{
+	edict_t *pEntity = pPlayer->edict();
+
+	// loop through all players
+	// Start with the first player.
+	// This may return the world in single player if the client types something between levels or during spawn
+	// so check it, or it will infinite loop
+
+	CBasePlayer *pReceiver = nullptr;
+	while ((pReceiver = UTIL_FindEntityByClassname(pReceiver, "player")))
+	{
+		if (FNullEnt(pReceiver->edict()))
+			break;
+
+		if (!pReceiver->pev)
+			continue;
+
+		if (pReceiver->edict() == pEntity)
+			continue;
+
+		if (pReceiver->IsDormant())
+			continue;
+
+		// Not a client ? (should never be true)
+		if (!pReceiver->IsNetClient())
+			continue;
+
+		// can the receiver hear the sender? or has he muted him?
+		if (gpGlobals->deathmatch != 0.0f && CSGameRules()->m_VoiceGameMgr.PlayerHasBlockedPlayer(pReceiver, pPlayer))
+			continue;
+
+		if (teamonly
+#ifdef REGAMEDLL_FIXES
+			&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) != GR_TEAMMATE
+#else
+			&& pReceiver->m_iTeam != pPlayer->m_iTeam
+#endif
+			)
+			continue;
+
+		if (
+#ifdef REGAMEDLL_ADD
+			!(bool)allchat.value &&
+#endif
+			((pReceiver->pev->deadflag != DEAD_NO && !bSenderDead) || (pReceiver->pev->deadflag == DEAD_NO && bSenderDead)))
+		{
+			if (!(pPlayer->pev->flags & FL_PROXY))
+				continue;
+		}
+
+		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY
+#ifdef REGAMEDLL_FIXES
+				&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) == GR_TEAMMATE
+#else
+				&& pReceiver->m_iTeam == pPlayer->m_iTeam
+#endif
+				)
+			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
+				WRITE_BYTE(ENTINDEX(pEntity));
+				WRITE_STRING(pszFormat);
+				WRITE_STRING("");
+				WRITE_STRING(text);
+
+				if (placeName)
+				{
+					WRITE_STRING(placeName);
+				}
+
+			MESSAGE_END();
+		}
+	}
+
+	// print to the sending client
+	MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, &pEntity->v);
+		WRITE_BYTE(ENTINDEX(pEntity));
+		WRITE_STRING(pszFormat);
+		WRITE_STRING("");
+		WRITE_STRING(text);
+
+		if (placeName)
+		{
+			WRITE_STRING(placeName);
+		}
+
+	MESSAGE_END();
+
+#ifdef REGAMEDLL_FIXES
+	// don't to type for listenserver
+	if (IS_DEDICATED_SERVER())
+#endif
+	{
+		// echo to server console
+		if (pszConsoleFormat)
+		{
+			if (placeName && consoleUsed)
+				SERVER_PRINT(UTIL_VarArgs(const_cast<char *>(pszConsoleFormat), STRING(pPlayer->pev->netname), placeName, text));
+			else
+				SERVER_PRINT(UTIL_VarArgs(const_cast<char *>(pszConsoleFormat), STRING(pPlayer->pev->netname), text));
+		}
+		else
+		{
+			SERVER_PRINT(text);
+		}
+	}
+}
+
 void Host_Say(edict_t *pEntity, BOOL teamonly)
 {
 	int j;
@@ -838,7 +951,7 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 
 	const char *placeName = nullptr;
 	const char *pszFormat = nullptr;
-	char *pszConsoleFormat = nullptr;
+	const char *pszConsoleFormat = nullptr;
 	bool consoleUsesPlaceName = false;
 
 #ifdef REGAMEDLL_ADD
@@ -973,109 +1086,8 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	Q_strlcat(text, p);
 	Q_strlcat(text, "\n");
 
-	// loop through all players
-	// Start with the first player.
-	// This may return the world in single player if the client types something between levels or during spawn
-	// so check it, or it will infinite loop
-
-	CBasePlayer *pReceiver = nullptr;
-	while ((pReceiver = UTIL_FindEntityByClassname(pReceiver, "player")))
-	{
-		if (FNullEnt(pReceiver->edict()))
-			break;
-
-		if (!pReceiver->pev)
-			continue;
-
-		if (pReceiver->edict() == pEntity)
-			continue;
-
-		if (pReceiver->IsDormant())
-			continue;
-
-		// Not a client ? (should never be true)
-		if (!pReceiver->IsNetClient())
-			continue;
-
-		// can the receiver hear the sender? or has he muted him?
-		if (gpGlobals->deathmatch != 0.0f && CSGameRules()->m_VoiceGameMgr.PlayerHasBlockedPlayer(pReceiver, pPlayer))
-			continue;
-
-		if (teamonly
-#ifdef REGAMEDLL_FIXES
-			&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) != GR_TEAMMATE
-#else
-			&& pReceiver->m_iTeam != pPlayer->m_iTeam
-#endif
-			)
-			continue;
-
-		if (
-#ifdef REGAMEDLL_ADD
-			!(bool)allchat.value &&
-#endif
-			((pReceiver->pev->deadflag != DEAD_NO && !bSenderDead) || (pReceiver->pev->deadflag == DEAD_NO && bSenderDead)))
-		{
-			if (!(pPlayer->pev->flags & FL_PROXY))
-				continue;
-		}
-
-		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY
-#ifdef REGAMEDLL_FIXES
-				&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) == GR_TEAMMATE
-#else
-				&& pReceiver->m_iTeam == pPlayer->m_iTeam
-#endif
-				)
-			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
-		{
-			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
-				WRITE_BYTE(ENTINDEX(pEntity));
-				WRITE_STRING(pszFormat);
-				WRITE_STRING("");
-				WRITE_STRING(text);
-
-				if (placeName)
-				{
-					WRITE_STRING(placeName);
-				}
-
-			MESSAGE_END();
-		}
-	}
-
-	// print to the sending client
-	MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, &pEntity->v);
-		WRITE_BYTE(ENTINDEX(pEntity));
-		WRITE_STRING(pszFormat);
-		WRITE_STRING("");
-		WRITE_STRING(text);
-
-		if (placeName)
-		{
-			WRITE_STRING(placeName);
-		}
-
-	MESSAGE_END();
-
-#ifdef REGAMEDLL_FIXES
-	// don't to type for listenserver
-	if (IS_DEDICATED_SERVER())
-#endif
-	{
-		// echo to server console
-		if (pszConsoleFormat)
-		{
-			if (placeName && consoleUsesPlaceName)
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), placeName, text));
-			else
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), text));
-		}
-		else
-		{
-			SERVER_PRINT(text);
-		}
-	}
+	// Call the hook with all processed data
+	Host_Say(pPlayer, teamonly != FALSE, text, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 
 	if (logmessages.value)
 	{
