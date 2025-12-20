@@ -71,6 +71,7 @@ public:
 	virtual const char *GetName() const { return "Hunt"; }
 
 	void ClearHuntArea() { m_huntArea = nullptr; }
+	CNavArea *GetHuntArea() { return m_huntArea; }
 
 private:
 	CNavArea *m_huntArea;
@@ -204,6 +205,7 @@ public:
 	const Vector &GetHidingSpot() const { return m_hidingSpot; }
 
 	void SetSearchArea(CNavArea *area) { m_searchFromArea = area; }
+	CNavArea *GetSearchArea() { return m_searchFromArea; }
 	void SetSearchRange(float range) { m_range = range; }
 
 	void SetDuration(float time) { m_duration = time; }
@@ -533,11 +535,20 @@ public:
 	bool IsAwareOfEnemyDeath() const;							// return true if we *noticed* that our enemy died
 	int GetLastVictimID() const;								// return the ID (entindex) of the last victim we killed, or zero
 
+#ifdef REGAMEDLL_ADD
+	bool CanSeeSniper(void) const;							///< return true if we can see an enemy sniper
+	bool HasSeenSniperRecently(void) const;					///< return true if we have seen a sniper recently
+#endif
+
 	// navigation
 	bool HasPath() const;
 	void DestroyPath();
 
 	float GetFeetZ() const;										// return Z of bottom of feet
+
+	void OnDestroyNavDataNotify(NavNotifyDestroyType navNotifyType, void *dead);
+	void RemovePath(CNavArea *area);
+	void RemoveHidingSpot(HidingSpot *spot);
 
 	enum PathResult
 	{
@@ -921,6 +932,11 @@ private:
 
 	float m_fireWeaponTimestamp;
 
+#ifdef REGAMEDLL_ADD
+	bool m_isEnemySniperVisible;									///< do we see an enemy sniper right now
+	CountdownTimer m_sawEnemySniperTimer;							///< tracking time since saw enemy sniper
+#endif
+
 	// reaction time system
 	enum { MAX_ENEMY_QUEUE = 20 };
 	struct ReactionState
@@ -1109,6 +1125,11 @@ inline bool CCSBot::IsAtBombsite()
 
 inline CCSBot::MoraleType CCSBot::GetMorale() const
 {
+#ifdef REGAMEDLL_ADD
+	if (cv_bot_excellent_morale.value != 0.0f)
+		return EXCELLENT;
+#endif
+
 	return m_morale;
 }
 
@@ -1249,6 +1270,18 @@ inline int CCSBot::GetLastVictimID() const
 {
 	return m_lastVictimID;
 }
+
+#ifdef REGAMEDLL_ADD
+inline bool CCSBot::CanSeeSniper(void) const
+{
+	return m_isEnemySniperVisible;
+}
+
+inline bool CCSBot::HasSeenSniperRecently(void) const
+{
+	return !m_sawEnemySniperTimer.IsElapsed();
+}
+#endif
 
 inline bool CCSBot::HasPath() const
 {

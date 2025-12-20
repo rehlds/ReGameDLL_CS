@@ -477,31 +477,24 @@ void CCSBot::StartSaveProcess()
 
 void CCSBot::UpdateSaveProcess()
 {
-	char msg[256];
-	char cmd[128];
-
 	char gd[64]{};
 	GET_GAME_DIR(gd);
 
 	char filename[MAX_OSPATH];
 	Q_snprintf(filename, sizeof(filename), "%s\\%s", gd, TheBots->GetNavMapFilename());
-
-	HintMessageToAllPlayers("Saving...");
 	SaveNavigationMap(filename);
 
+	char msg[256]{};
 	Q_snprintf(msg, sizeof(msg), "Navigation file '%s' saved.", filename);
 	HintMessageToAllPlayers(msg);
+	CONSOLE_ECHO("%s\n", msg);
 
 	hideProgressMeter();
 	StartNormalProcess();
 
-#ifndef REGAMEDLL_FIXES
-	Q_snprintf(cmd, sizeof(cmd), "map %s\n", STRING(gpGlobals->mapname));
-#else
-	Q_snprintf(cmd, sizeof(cmd), "changelevel %s\n", STRING(gpGlobals->mapname));
-#endif
-
-	SERVER_COMMAND(cmd);
+	// tell bot manager that the analysis is completed
+	if (TheCSBots())
+		TheCSBots()->AnalysisCompleted();
 }
 
 void CCSBot::StartNormalProcess()

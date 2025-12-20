@@ -839,6 +839,12 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	char *pszConsoleFormat = nullptr;
 	bool consoleUsesPlaceName = false;
 
+#ifdef REGAMEDLL_ADD
+	// there's no team on FFA mode
+	if (teamonly && CSGameRules()->IsFreeForAll() && (pPlayer->m_iTeam == CT || pPlayer->m_iTeam == TERRORIST))
+		teamonly = FALSE;
+#endif
+
 	// team only
 	if (teamonly)
 	{
@@ -1020,7 +1026,13 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, co
 		if (gpGlobals->deathmatch != 0.0f && CSGameRules()->m_VoiceGameMgr.PlayerHasBlockedPlayer(pReceiver, pPlayer))
 			continue;
 
-		if (teamonly && pReceiver->m_iTeam != pPlayer->m_iTeam)
+		if (teamonly
+#ifdef REGAMEDLL_FIXES
+			&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) != GR_TEAMMATE
+#else
+			&& pReceiver->m_iTeam != pPlayer->m_iTeam
+#endif
+			)
 			continue;
 
 		if (
@@ -1033,7 +1045,13 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, co
 				continue;
 		}
 
-		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY && pReceiver->m_iTeam == pPlayer->m_iTeam)
+		if ((pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_ENEMY
+#ifdef REGAMEDLL_FIXES
+				&& CSGameRules()->PlayerRelationship(pPlayer, pReceiver) == GR_TEAMMATE
+#else
+				&& pReceiver->m_iTeam == pPlayer->m_iTeam
+#endif
+				)
 			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
@@ -3843,9 +3861,6 @@ void EXT_FUNC ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 
 #ifdef REGAMEDLL_ADD
 	CSGameRules()->ServerActivate();
-
-	if (location_area_info.value)
-		LoadNavigationMap();
 #endif
 }
 

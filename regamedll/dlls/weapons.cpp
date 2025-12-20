@@ -618,11 +618,18 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
 	if (pPlayer->m_bIsVIP
-		&& m_iId != WEAPON_USP
+		&&
+#ifndef REGAMEDLL_FIXES
+		m_iId != WEAPON_USP
 		&& m_iId != WEAPON_GLOCK18
 		&& m_iId != WEAPON_P228
 		&& m_iId != WEAPON_DEAGLE
-		&& m_iId != WEAPON_KNIFE)
+		&& m_iId != WEAPON_KNIFE
+#else
+		!IsSecondaryWeapon(m_iId)
+#endif
+
+		)
 	{
 		return;
 	}
@@ -682,7 +689,7 @@ void CBasePlayerWeapon::EjectBrassLate()
 	vecRight = RANDOM_FLOAT(50, 70) * gpGlobals->v_right;
 
 	vecShellVelocity = (m_pPlayer->pev->velocity + vecRight + vecUp) + gpGlobals->v_forward * 25;
-	soundType = (m_iId == WEAPON_XM1014 || m_iId == WEAPON_M3) ? 2 : 1;
+	soundType = (m_iId == WEAPON_XM1014 || m_iId == WEAPON_M3) ? TE_BOUNCE_SHOTSHELL : TE_BOUNCE_SHELL;
 
 	EjectBrass(pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_up * -9 + gpGlobals->v_forward * 16, gpGlobals->v_right * -9,
 		vecShellVelocity, pev->angles.y, m_iShellId, soundType, m_pPlayer->entindex());
@@ -1124,7 +1131,11 @@ void EXT_FUNC CBasePlayerWeapon::__API_HOOK(ItemPostFrame)()
 		m_fFireOnEmpty = FALSE;
 
 		// if it's a pistol then set the shots fired to 0 after the player releases a button
+#ifdef REGAMEDLL_FIXES
+		if (IsPistol())
+#else
 		if (IsSecondaryWeapon(m_iId))
+#endif
 		{
 			m_iShotsFired = 0;
 		}

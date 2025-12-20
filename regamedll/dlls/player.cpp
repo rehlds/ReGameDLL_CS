@@ -115,6 +115,57 @@ void CBasePlayer::SendItemStatus()
 	MESSAGE_END();
 }
 
+#ifdef REGAMEDLL_ADD
+
+enum PlayerIdShowHealth
+{
+	PLAYERID_HIDE      = 0, // Don't show health
+	PLAYERID_TEAMMATES = 1, // Show health for teammates only (default CS)
+	PLAYERID_ALL       = 2  // Show health for all players
+};
+
+enum PlayerIdField
+{
+	PLAYERID_FIELD_NONE   = 0, // No extra info
+	PLAYERID_FIELD_TEAM   = 1, // Show team name
+	PLAYERID_FIELD_HEALTH = 2, // Show health percentage
+	PLAYERID_FIELD_BOTH   = 3  // Show both team name and health
+};
+
+inline const char *GetPlayerIdString(bool sameTeam)
+{
+	int showHealth = static_cast<int>(playerid_showhealth.value);
+	int fieldType = static_cast<int>(playerid_field.value);
+
+	// Don't show health
+	if (showHealth == PLAYERID_HIDE)
+	{
+		return (fieldType == PLAYERID_FIELD_NONE) ? "1 %p2" : "1 %c1: %p2";
+	}
+
+	// Health only for teammates
+	if (showHealth == PLAYERID_TEAMMATES && !sameTeam)
+	{
+		switch (fieldType)
+		{
+		case PLAYERID_FIELD_TEAM:   return "1 %c1: %p2";
+		case PLAYERID_FIELD_HEALTH: return "1 %p2";
+		case PLAYERID_FIELD_BOTH:   return "1 %c1: %p2";
+		default:                    return "1 %p2";
+		}
+	}
+
+	// Show health to everyone
+	switch (fieldType)
+	{
+	case PLAYERID_FIELD_TEAM:   return "1 %c1: %p2\n2 : %i3%%";
+	case PLAYERID_FIELD_HEALTH: return "1 %p2\n2  %h: %i3%%";
+	case PLAYERID_FIELD_BOTH:   return "1 %c1: %p2\n2  %h: %i3%%";
+	default:                    return "1 %p2\n2  : %i3%%";
+	}
+}
+#endif
+
 const char *GetCSModelName(int item_id)
 {
 	const char *modelName = nullptr;
@@ -647,27 +698,19 @@ void EXT_FUNC CBasePlayer::__API_HOOK(TraceAttack)(entvars_t *pevAttacker, float
 
 	if (bHitShield)
 	{
+#ifndef REGAMEDLL_FIXES
+		// BUGBUG: zeroing out damage BEFORE altering victim's punchangle
+		// will simply nullify any previous punchangles
 		flDamage = 0;
+#endif
+
 		bShouldBleed = false;
+		HitShield(flDamage, ptr);
 
-		if (RANDOM_LONG(0, 1))
-			EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/ric_metal-1.wav", VOL_NORM, ATTN_NORM);
-		else
-			EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/ric_metal-2.wav", VOL_NORM, ATTN_NORM);
-
-		UTIL_Sparks(ptr->vecEndPos);
-
-		pev->punchangle.x = flDamage * RANDOM_FLOAT(-0.15, 0.15);
-		pev->punchangle.z = flDamage * RANDOM_FLOAT(-0.15, 0.15);
-
-		if (pev->punchangle.x < 4)
-			pev->punchangle.x = -4;
-
-		if (pev->punchangle.z < -5)
-			pev->punchangle.z = -5;
-
-		else if (pev->punchangle.z > 5)
-			pev->punchangle.z = 5;
+#ifdef REGAMEDLL_FIXES
+		// reset damage after messing with victim's punchangle
+		flDamage = 0;
+#endif
 	}
 	else
 	{
@@ -1182,7 +1225,7 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 
 		if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
-			m_flVelocityModifier = 0.5f;
+			TakeDamageImpulse(pAttack, 0.0f, 0.5f);
 
 			if (m_LastHitGroup == HITGROUP_HEAD)
 				m_bHighDamage = (flDamage > 60);
@@ -1195,10 +1238,13 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 		{
 			if (pev->velocity.Length() < 300)
 			{
-				Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
-				pev->velocity = pev->velocity + attack_velocity;
+#ifdef REGAMEDLL_ADD
+				float knockbackValue = knockback.value;
+#else
+				float knockbackValue = 170;
+#endif
 
-				m_flVelocityModifier = 0.65f;
+				TakeDamageImpulse(pAttack, knockbackValue, 0.65f);
 			}
 
 			SetAnimation(PLAYER_LARGE_FLINCH);
@@ -1487,7 +1533,7 @@ void CBasePlayer::PackDeadPlayerItems()
 		{
 			DropShield();
 #ifdef REGAMEDLL_ADD
-			if(iPackGun != GR_PLR_DROP_GUN_ALL)
+			if (iPackGun != GR_PLR_DROP_GUN_ALL)
 #endif
 			{
 				bSkipPrimSec = true;
@@ -1644,6 +1690,10 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveDefaultItems)()
 	// Give default secondary equipment
 	{
 		char *secondaryString = NULL;
+		int secondaryCount = 0;
+		const int MAX_SECONDARY = 13; // x2 + 1
+		WeaponInfoStruct *secondaryWeaponInfoArray[MAX_SECONDARY];
+
 		if (m_iTeam == CT)
 			secondaryString = ct_default_weapons_secondary.string;
 		else if (m_iTeam == TERRORIST)
@@ -1665,11 +1715,24 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveDefaultItems)()
 				if (weaponInfo) {
 					const auto iItemID = GetItemIdByWeaponId(weaponInfo->id);
 					if (iItemID != ITEM_NONE && !HasRestrictItem(iItemID, ITEM_TYPE_EQUIPPED) && IsSecondaryWeapon(iItemID)) {
-						GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
+						if (default_weapons_random.value != 0.0f) {
+							if (secondaryCount < MAX_SECONDARY) {
+								secondaryWeaponInfoArray[secondaryCount++] = weaponInfo;
+							}
+						}
+						else {
+							GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
+						}
 					}
 				}
 
 				secondaryString = SharedParse(secondaryString);
+			}
+
+			if (default_weapons_random.value != 0.0f) {
+				WeaponInfoStruct *weaponInfo = secondaryWeaponInfoArray[RANDOM_LONG(0, secondaryCount - 1)];
+				if (weaponInfo)
+					GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
 			}
 		}
 	}
@@ -1677,6 +1740,9 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveDefaultItems)()
 	// Give default primary equipment
 	{
 		char *primaryString = NULL;
+		int primaryCount = 0;
+		const int MAX_PRIMARY = 39; // x2 + 1
+		WeaponInfoStruct *primaryWeaponInfoArray[MAX_PRIMARY];
 
 		if (m_iTeam == CT)
 			primaryString = ct_default_weapons_primary.string;
@@ -1699,11 +1765,24 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveDefaultItems)()
 				if (weaponInfo) {
 					const auto iItemID = GetItemIdByWeaponId(weaponInfo->id);
 					if (iItemID != ITEM_NONE && !HasRestrictItem(iItemID, ITEM_TYPE_EQUIPPED) && IsPrimaryWeapon(iItemID)) {
-						GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
+						if (default_weapons_random.value != 0.0f) {
+							if (primaryCount < MAX_PRIMARY) {
+								primaryWeaponInfoArray[primaryCount++] = weaponInfo;
+							}
+						}
+						else {
+							GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
+						}
 					}
 				}
 
 				primaryString = SharedParse(primaryString);
+			}
+
+			if (default_weapons_random.value != 0.0f) {
+				WeaponInfoStruct *weaponInfo = primaryWeaponInfoArray[RANDOM_LONG(0, primaryCount - 1)];
+				if (weaponInfo)
+					GiveWeapon(weaponInfo->gunClipSize * iAmountOfBPAmmo, weaponInfo->entityName);
 			}
 		}
 	}
@@ -1763,11 +1842,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(RemoveAllItems)(BOOL removeSuit)
 	int i;
 
 #ifdef REGAMEDLL_FIXES
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 #endif
 
 	if (m_bHasDefuser)
@@ -2186,7 +2261,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 			{
 				CBasePlayer *pAttacker = CBasePlayer::Instance(pevAttacker);
 
-				if(pAttacker /*safety*/ && !pAttacker->IsBot() && pAttacker->m_iTeam != m_iTeam)
+				if (pAttacker /*safety*/ && !pAttacker->IsBot() && pAttacker->m_iTeam != m_iTeam)
 				{
 					if (pAttacker->HasShield())
 						killerHasShield = true;
@@ -2266,11 +2341,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 #endif
 	}
 
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 
 #ifndef REGAMEDLL_FIXES
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -3333,7 +3404,23 @@ void EXT_FUNC CBasePlayer::__API_HOOK(GiveShield)(bool bDeploy)
 		}
 	}
 
-#ifndef REGAMEDLL_FIXES
+#ifdef REGAMEDLL_FIXES
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList, nullptr, pev);
+		WRITE_STRING("weapon_shieldgun");
+		WRITE_BYTE(-1); // PrimaryAmmoID
+		WRITE_BYTE(-1); // PrimaryAmmoMaxAmount
+		WRITE_BYTE(-1); // SecondaryAmmoID
+		WRITE_BYTE(-1); // SecondaryAmmoMaxAmount
+		WRITE_BYTE(0); // SlotID (0...N)
+		WRITE_BYTE(0); // NumberInSlot (1...N)
+		WRITE_BYTE(0); // WeaponID
+		WRITE_BYTE(0); // Flags
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeapPickup, nullptr, pev);
+		WRITE_BYTE(0); // WeaponID
+	MESSAGE_END();
+#else
 	// NOTE: Moved above, because CC4::Deploy can reset hitbox of shield
 	pev->gamestate = HITGROUP_SHIELD_ENABLED;
 #endif
@@ -3750,11 +3837,7 @@ LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, Disappear)
 
 void EXT_FUNC CBasePlayer::__API_HOOK(Disappear)()
 {
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	DetachTank();
 
 #ifndef REGAMEDLL_FIXES
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -4018,11 +4101,8 @@ void EXT_FUNC CBasePlayer::__API_HOOK(StartObserver)(Vector &vecPosition, Vector
 	if (m_pActiveItem)
 		m_pActiveItem->Holster();
 
-	if (m_pTank)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = nullptr;
-	}
+	// stop controlling any tank
+	DetachTank();
 
 	// clear out the suit message cache so we don't keep chattering
 	SetSuitUpdate(nullptr, SUIT_SENTENCE, SUIT_REPEAT_OK);
@@ -4123,12 +4203,9 @@ void CBasePlayer::PlayerUse()
 	// Hit Use on a train?
 	if (m_afButtonPressed & IN_USE)
 	{
-		if (m_pTank)
+		if (DetachTank())
 		{
-			// Stop controlling the tank
 			// TODO: Send HUD Update
-			m_pTank->Use(this, this, USE_OFF, 0);
-			m_pTank = nullptr;
 			return;
 		}
 
@@ -4305,6 +4382,19 @@ LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, UseEmpty)
 void EXT_FUNC CBasePlayer::__API_HOOK(UseEmpty)()
 {
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "common/wpn_denyselect.wav", 0.4, ATTN_NORM);
+}
+
+bool CBasePlayer::DetachTank()
+{
+	if (m_pTank)
+	{
+		// Stop controlling the tank
+		m_pTank->Use(this, this, USE_OFF, 0);
+		m_pTank = nullptr;
+		return true;
+	}
+
+	return false;
 }
 
 void CBasePlayer::HostageUsed()
@@ -5338,17 +5428,24 @@ pt_end:
 }
 
 // checks if the spot is clear of players
-BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot)
+BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot, float fRadius)
 {
 	if (!pSpot->IsTriggered(pPlayer))
 		return FALSE;
 
 	CBaseEntity *pEntity = nullptr;
-	while ((pEntity = UTIL_FindEntityInSphere(pEntity, pSpot->pev->origin, MAX_PLAYER_USE_RADIUS)))
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, pSpot->pev->origin, fRadius)))
 	{
 		// if ent is a client, don't spawn on 'em
-		if (pEntity->IsPlayer() && pEntity != pPlayer)
+		if (pEntity->IsPlayer() && pEntity != pPlayer
+#ifdef REGAMEDLL_FIXES
+			&& pEntity->IsAlive()
+#endif
+			)
+		{
 			return FALSE;
+		}
 	}
 
 	return TRUE;
@@ -5373,17 +5470,34 @@ bool CBasePlayer::SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot
 	{
 		if (pSpot)
 		{
-			// check if pSpot is valid
-			if (IsSpawnPointValid(this, pSpot))
+#ifdef REGAMEDLL_ADD
+			if (FClassnameIs(pSpot->edict(), "info_spawn_point"))
 			{
-				if (pSpot->pev->origin == Vector(0, 0, 0))
+				if (!IsSpawnPointValid(this, pSpot, 512.0f) || pSpot->pev->origin == Vector(0, 0, 0))
 				{
 					pSpot = UTIL_FindEntityByClassname(pSpot, pEntClassName);
 					continue;
 				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+#endif
+			{
+				// check if pSpot is valid
+				if (IsSpawnPointValid(this, pSpot, MAX_PLAYER_USE_RADIUS))
+				{
+					if (pSpot->pev->origin == Vector(0, 0, 0))
+					{
+						pSpot = UTIL_FindEntityByClassname(pSpot, pEntClassName);
+						continue;
+					}
 
-				// if so, go to pSpot
-				return true;
+					// if so, go to pSpot
+					return true;
+				}
 			}
 		}
 
@@ -5441,6 +5555,24 @@ edict_t *EXT_FUNC CBasePlayer::__API_HOOK(EntSelectSpawnPoint)()
 		if (!FNullEnt(pSpot))
 			goto ReturnSpot;
 	}
+#ifdef REGAMEDLL_ADD
+	else if (randomspawn.value > 0)
+	{
+		pSpot = g_pLastSpawn;
+
+		if (SelectSpawnSpot("info_spawn_point", pSpot))
+		{
+			g_pLastSpawn = pSpot;
+
+			return pSpot->edict();
+		}
+
+		if (m_iTeam == CT)
+			goto CTSpawn;
+		else if (m_iTeam == TERRORIST)
+			goto TSpawn;
+	}
+#endif
 	// VIP spawn point
 	else if (g_pGameRules->IsDeathmatch() && m_bIsVIP)
 	{
@@ -5468,6 +5600,9 @@ CTSpawn:
 	// The terrorist spawn points
 	else if (g_pGameRules->IsDeathmatch() && m_iTeam == TERRORIST)
 	{
+#ifdef REGAMEDLL_ADD
+TSpawn:
+#endif
 		pSpot = g_pLastTerroristSpawn;
 
 		if (SelectSpawnSpot("info_player_deathmatch", pSpot))
@@ -6572,6 +6707,11 @@ void CBasePlayer::ForceClientDllUpdate()
 			WRITE_SHORT(pPlayer->m_iDeaths);
 			WRITE_SHORT(0);
 			WRITE_SHORT(pPlayer->m_iTeam);
+		MESSAGE_END();
+
+		// Update shadow sprite index
+		MESSAGE_BEGIN(MSG_ONE, gmsgShadowIdx, nullptr, pev);
+			WRITE_LONG(g_iShadowSprite);
 		MESSAGE_END();
 
 		// Update player attributes DEAD, BOMB, VIP etc
@@ -8037,7 +8177,9 @@ void CBasePlayer::InitStatusBar()
 	m_SbarString0[0] = '\0';
 }
 
-void CBasePlayer::UpdateStatusBar()
+LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, UpdateStatusBar)
+
+void EXT_FUNC CBasePlayer::__API_HOOK(UpdateStatusBar)()
 {
 	int newSBarState[SBAR_END];
 	char sbuf0[MAX_SBAR_STRING];
@@ -8073,11 +8215,19 @@ void CBasePlayer::UpdateStatusBar()
 				if (sameTeam || GetObserverMode() != OBS_NONE)
 				{
 					if (playerid.value != PLAYERID_MODE_OFF || GetObserverMode() != OBS_NONE)
+#ifndef	REGAMEDLL_ADD
 						Q_strlcpy(sbuf0, "1 %c1: %p2\n2  %h: %i3%%");
+#else
+						Q_strlcpy(sbuf0, GetPlayerIdString(sameTeam));
+#endif
 					else
 						Q_strlcpy(sbuf0, " ");
-
-					newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
+#ifdef	REGAMEDLL_ADD
+					if (static_cast<int>(playerid_showhealth.value) != PLAYERID_FIELD_NONE)
+#endif
+					{
+						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
+					}
 
 					if (!(m_flDisplayHistory & DHF_FRIEND_SEEN) && !(pev->flags & FL_SPECTATOR))
 					{
@@ -8088,10 +8238,18 @@ void CBasePlayer::UpdateStatusBar()
 				else if (GetObserverMode() == OBS_NONE)
 				{
 					if (playerid.value != PLAYERID_MODE_TEAMONLY && playerid.value != PLAYERID_MODE_OFF)
+#ifndef	REGAMEDLL_ADD
 						Q_strlcpy(sbuf0, "1 %c1: %p2");
+#else
+						Q_strlcpy(sbuf0, GetPlayerIdString(sameTeam));
+#endif
 					else
 						Q_strlcpy(sbuf0, " ");
 
+#ifdef	REGAMEDLL_ADD
+					if (static_cast<int>(playerid_showhealth.value) == PLAYERID_ALL)
+						newSBarState[SBAR_ID_TARGETHEALTH] = int((pEntity->pev->health / pEntity->pev->max_health) * 100);
+#endif
 					if (!(m_flDisplayHistory & DHF_ENEMY_SEEN))
 					{
 						m_flDisplayHistory |= DHF_ENEMY_SEEN;
@@ -10116,7 +10274,11 @@ bool CBasePlayer::IsObservingPlayer(CBasePlayer *pPlayer)
 
 void CBasePlayer::UpdateLocation(bool forceUpdate)
 {
+#ifdef REGAMEDLL_FIXES
+	if (!forceUpdate && m_flLastUpdateTime > gpGlobals->time - 2.0f)
+#else
 	if (!forceUpdate && m_flLastUpdateTime >= gpGlobals->time + 2.0f)
+#endif
 		return;
 
 	const char *placeName = nullptr;
@@ -10714,6 +10876,17 @@ bool CBasePlayer::Kill()
 		CSGameRules()->m_iConsecutiveVIP = 10;
 
 	return true;
+}
+
+LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayer, TakeDamageImpulse, (CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier), pAttacker, flKnockbackForce, flVelModifier)
+
+void EXT_FUNC CBasePlayer::__API_HOOK(TakeDamageImpulse)(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier)
+{
+	if (flKnockbackForce != 0.0f)
+		pev->velocity += (pev->origin - pAttacker->pev->origin).Normalize() * flKnockbackForce;
+
+	if (flVelModifier != 0.0f)
+		m_flVelocityModifier = flVelModifier;
 }
 
 const usercmd_t *CBasePlayer::GetLastUserCommand() const

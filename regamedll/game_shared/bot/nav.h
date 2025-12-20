@@ -71,6 +71,13 @@ enum NavAttributeType
 	NAV_NO_JUMP = 0x08, // inhibit discontinuity jumping
 };
 
+enum NavNotifyDestroyType
+{
+	NAV_NOTIFY_DESTROY_AREA,
+	NAV_NOTIFY_DESTROY_SPOT,
+	NAV_NOTIFY_DESTROY_SPOT_ENCOUNTER
+};
+
 enum NavDirType
 {
 	NORTH = 0,

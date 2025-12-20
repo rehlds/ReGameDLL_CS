@@ -1,18 +1,27 @@
-# ReGameDLL_CS [![GitHub release (by tag)](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/latest/total)](https://github.com/s1lentq/ReGameDLL_CS/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/total) [![Percentage of issues still open](http://isitmaintained.com/badge/open/s1lentq/ReGameDLL_CS.svg)](http://isitmaintained.com/project/s1lentq/ReGameDLL_CS "Percentage of issues still open") [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/20008568/b3623150-a2d3-11e6-85f3-0d6571045fc9.png" alt="Counter-Strike 1.6 GameDLL" />
+# ReGameDLL_CS [![GitHub release (by tag)](https://img.shields.io/github/downloads/rehlds/ReGameDLL_CS/latest/total)](https://github.com/rehlds/ReGameDLL_CS/releases/latest) ![GitHub all releases](https://img.shields.io/github/downloads/rehlds/ReGameDLL_CS/total) [![Percentage of issues still open](http://isitmaintained.com/badge/open/rehlds/ReGameDLL_CS.svg)](http://isitmaintained.com/project/rehlds/ReGameDLL_CS "Percentage of issues still open") [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://www.gnu.org/licenses/gpl-3.0) <img align="right" src="https://cloud.githubusercontent.com/assets/5860435/20008568/b3623150-a2d3-11e6-85f3-0d6571045fc9.png" alt="Counter-Strike 1.6 GameDLL" />
 Reverse-engineered gamedll (mp.dll / Counter-Strike)
 
 ## What is this?
-Regamedll_CS is a result of reverse engineering of original library mod HLDS (build 6153beta) using DWARF debug info embedded into linux version of HLDS, cs.so
+ReGameDLL_CS is a result of reverse engineering of original library mod HLDS (build 6153beta) using DWARF debug info embedded into linux version of HLDS, cs.so
 
 ## Goals of the project
 * Provide more stable (than official) version of Counter-Strike game with extended API for mods and plugins
+
+## 🛠 License
+
+ReGameDLL_CS is licensed under the [MIT License](./LICENSE).
+
+### License Transition
+> [!NOTE]
+> Originally released under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html), ReHReGameDLL_CSLDS transitioned to the MIT License in July 2025 with the agreement of the core contributors.
+> See [LICENSE-TRANSITION.md](./LICENSE-TRANSITION.md) for details.
 
 ## How can use it?
 ReGameDLL_CS is fully compatible with official mod CS 1.6 / CZero by Valve. All you have to do is to download binaries and replace original mp.dll/cs.so
 
 ## Downloads
-* [Release builds](https://github.com/s1lentq/ReGameDLL_CS/releases)
-* [Dev builds](https://github.com/s1lentq/ReGameDLL_CS/actions/workflows/build.yml)
+* [Release builds](https://github.com/rehlds/ReGameDLL_CS/releases)
+* [Dev builds](https://github.com/rehlds/ReGameDLL_CS/actions/workflows/build.yml)
 
 <b>Warning!</b> ReGameDLL_CS is not binary compatible with original hlds since it's compiled with compilers other than ones used for original mod CS.
 This means that plugins that do binary code analysis (Orpheu for example) probably will not work with ReGameDLL_CS.
@@ -69,6 +78,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | bot_deathmatch                     | 0       | 0   | 1            | Sets the mode for the zBot.<br/>`0` disabled<br/>`1` enable mode Deathmatch and not allow to do the scenario |
 | bot_quota_mode                     | normal  | -   | -            | Determines the type of quota.<br/>`normal` default behaviour<br/>`fill` the server will adjust bots to keep `N` players in the game, where `N` is bot_quota<br/>`match` the server will maintain a `1:N` ratio of humans to bots, where `N` is bot_quota |
 | bot_join_delay                     | 0       | -   | -            | Prevents bots from joining the server for this many seconds after a map change. |
+| bot_join_after_player              | 1       | 0   | 2            | If non-zero, bots will wait for a human to join before entering the game.<br/>`0` disabled (bots join an empty server immediately after a map change)<br/>`1` strict (bots wait for the first human to join a playable team - `T` or `CT`)<br/>`2` soft (bots wait for the first human to connect, including spectators) |
 | bot_freeze                         | 0       | 0   | 1            | Prevents bots on your server from moving.<br/>`0` disabled<br/>`1` enabled |
 | mp_item_staytime                   | 300     | -   | -            | Time to remove item that have been dropped from the players. |
 | mp_legacy_bombtarget_touch         | 1       | 0   | 1            | Legacy func_bomb_target touch. New one is more strict. <br/>`0` New behavior<br/>`1` Legacy behavior|
@@ -98,6 +108,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_ct_give_player_knife            | 1         | 0  | 1           | Whether Counter-Terrorist player spawn with knife. |
 | mp_ct_default_weapons_primary      | ""        | "" | -           | The default primary (rifle) weapon that the CTs will spawn with. |
 | mp_ct_default_weapons_secondary    | "usp"     | "" | -           | The default secondary (pistol) weapon that the CTs will spawn with. |
+| mp_default_weapons_random          | 0       | 0   | 1            | Randomize default weapons (if there are multiple).<br/> `0` disabled<br/>`1` enabled |
 | mp_give_player_c4                  | 1       | 0   | 1            | Whether this map should spawn a C4 bomb for a player or not.<br/> `0` disabled<br/>`1` enabled |
 | mp_weapons_allow_map_placed        | 1       | 0   | 1            | When set, map weapons (located on the floor by map) will be shown.<br/> `0` hide all map weapons.<br/>`1` enabled<br/>`NOTE`: Effect will work after round restart. |
 | mp_free_armor                      | 0       | 0   | 2            | Give free armor on player spawn.<br/>`0` disabled <br/>`1` Give Kevlar <br/>`2` Give Kevlar + Helmet |
@@ -123,6 +134,15 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_ammo_respawn_time               | 20      | 0.0 | -            | The respawn time for ammunition. |
 | mp_vote_flags                      | km      | 0   | -            | Vote systems enabled in server.<br/>`0` voting disabled<br/>`k` votekick enabled via `vote` command<br/>`m` votemap enabled via `votemap` command |
 | mp_votemap_min_time                | 180     | 0.0 | -            | Minimum seconds that must elapse on map before `votemap` command can be used. |
+| mp_flymove_method                  | 0       | 0   | 1            | Set the method used for flymove calculations.<br/> `0` default method<br/>`1` alternative method (more accurate) |
+| mp_stamina_restore_rate            | 0       | 0.0 | -            | Framerate (FPS), that used as reference when restoring stamina (fuser2) after jump. |
+| mp_logkills                        | 1       | 0   | 1            | Log kills.<br/>`0` disabled <br/>`1` enabled |
+| mp_jump_height                     | 45      | 0.0 | -            | Player jump height. |
+| bot_excellent_morale               | 0       | 0   | 1            | Bots always have great morale regardless of defeat or victory. |
+| mp_randomspawn                     | 0       | 0   | 1            | Random player spawns<br/>`0` disabled <br/>`1` enabled<br/>`NOTE`: Navigation `maps/.nav` file required |
+| mp_playerid_showhealth             | 1       | 0   | 2            | Player ID display mode.<br/>`0` don't show health<br/>`1` show health for teammates only (default CS behaviour)<br/>`2` show health for all players |
+| mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
+| mp_knockback                       | 170     | -   | -            | Knockback force applied to the victim when damaged by strong weapons (e.g. `AWP`, `AK47`).<br/>Works only if not crouching, and not hit in the legs.<br/>Set to `0` to disable. |
 
 </details>
 

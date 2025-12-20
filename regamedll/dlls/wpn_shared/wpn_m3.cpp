@@ -227,6 +227,9 @@ void CM3::WeaponIdle()
 		}
 		else
 		{
+#ifdef REGAMEDLL_FIXES
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0f;
+#endif
 			SendWeaponAnim(M3_IDLE, UseDecrement() != FALSE);
 		}
 	}

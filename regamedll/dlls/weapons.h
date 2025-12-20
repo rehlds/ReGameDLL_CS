@@ -379,6 +379,9 @@ public:
 	virtual void RetireWeapon();
 	virtual BOOL ShouldWeaponIdle() { return FALSE; }
 	virtual BOOL UseDecrement() { return FALSE; }
+#ifdef REGAMEDLL_FIXES
+	virtual BOOL IsPistol() { return FALSE; }
+#endif
 
 public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
@@ -394,7 +397,9 @@ public:
 	float GetNextAttackDelay(float delay);
 	float GetNextAttackDelay2(float delay);
 	bool HasSecondaryAttack();
+#ifndef REGAMEDLL_FIXES
 	BOOL IsPistol() { return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE || m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN); }
+#endif
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
 	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
@@ -990,15 +995,9 @@ public:
 		return FALSE;
 	#endif
 	}
-	virtual BOOL IsPistol()
-	{
-	#ifdef REGAMEDLL_FIXES
-		return FALSE;
-	#else
-		// TODO: why the object flashbang is IsPistol?
-		return TRUE;
-	#endif
-	}
+#ifndef REGAMEDLL_FIXES
+	virtual BOOL IsPistol() { return TRUE; } // TODO: why the object flashbang is IsPistol?
+#endif
 
 #ifdef REGAMEDLL_API
 	BOOL CanDeploy_OrigFunc();
@@ -1221,6 +1220,7 @@ public:
 	virtual int iItemSlot() { return KNIFE_SLOT; }
 	virtual void PrimaryAttack();
 	virtual void SecondaryAttack();
+	virtual void WeaponIdle();
 	virtual BOOL UseDecrement()
 	{
 	#ifdef CLIENT_WEAPONS
@@ -1229,7 +1229,6 @@ public:
 		return FALSE;
 	#endif
 	}
-	virtual void WeaponIdle();
 
 public:
 	void EXPORT SwingAgain();

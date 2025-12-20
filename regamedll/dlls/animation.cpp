@@ -547,7 +547,9 @@ void AngleQuaternion(vec_t *angles, vec_t *quaternion)
 {
 	static const ALIGN16_BEG size_t ps_signmask[4] ALIGN16_END = { 0x80000000, 0, 0x80000000, 0 };
 
-	__m128 a = _mm_loadu_ps(angles);
+	vec4_t _ps_angles = { angles[0], angles[1], angles[2],  0.0f };
+
+	__m128 a = _mm_loadu_ps(_ps_angles);
 	a = _mm_mul_ps(a, _mm_load_ps(_ps_0p5)); //a *= 0.5
 	__m128 s, c;
 	sincos_ps(a, &s, &c);

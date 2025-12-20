@@ -1464,7 +1464,7 @@ void UTIL_Remove(CBaseEntity *pEntity)
 	pEntity->pev->targetname = 0;
 }
 
-NOXREF BOOL UTIL_IsValidEntity(edict_t *pent)
+BOOL UTIL_IsValidEntity(edict_t *pent)
 {
 	if (!pent || pent->free || (pent->v.flags & FL_KILLME))
 		return FALSE;
