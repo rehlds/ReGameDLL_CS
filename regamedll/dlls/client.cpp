@@ -955,23 +955,27 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		}
 	}
 
-	SendSayMessage(pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
+	SendSayMessage(pPlayer, pcmd, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 }
 
-LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, BOOL teamonly, const char *p, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
+LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, pszCmd, teamonly, pszText, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
 
-void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, const char *p, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
 {
+	char msg[256]; // local mutable copy of pszText
 	char text[128];
 	int j;
 
+	msg[0] = '\0';
 	text[0] = '\0';
 
 	// safety
-	if (!p) 
-		p = "";
-	if (!pszFormat) 
+	if (!pszText)
+		pszText = "";
+	if (!pszFormat)
 		pszFormat = "";
+
+	Q_strlcpy(msg, pszText);
 
 	// -3 for /n and null terminator
 	j = sizeof(text) - 3 - Q_strlen(pszFormat);
@@ -983,18 +987,23 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, co
 	if (j < 0) 
 		j = 0;
 
-	Q_strlcpy(text, p);
-
-	size_t len = Q_strlen(text);
+	size_t len = Q_strlen(msg);
 	if ((signed int)len > j)
 	{
-		text[j] = '\0';
+		msg[j] = '\0';
 		len = j;
 	}
 
-	// add newline only if not already present (avoid multilines in chat)
-	if (len == 0 || text[len - 1] != '\n') 
-		Q_strlcat(text, "\n");
+	// removing newline if exists (UTIL_LogPrintf fix)
+	// (may come from a modder mistake)
+	if (len > 0 && msg[len - 1] == '\n')
+	{
+		msg[len - 1] = '\0';
+		len--;
+	}
+
+	Q_strlcat(text, msg);
+	Q_strlcat(text, "\n");
 
 	// loop through all players
 	// Start with the first player.
@@ -1107,13 +1116,17 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, co
 
 	if (logmessages.value)
 	{
+#ifdef REGAMEDLL_ADD
+		const char *temp = pszCmd; // allow custom say command
+#else
 		const char *temp = teamonly ? "say_team" : "say";
+#endif
 		const char *deadText = (pPlayer->m_iTeam != SPECTATOR && bSenderDead) ? " (dead)" : "";
 
 		char *szTeam = GetTeam(pPlayer->m_iTeam);
 
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" %s \"%s\"%s\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()),
-			szTeam, temp, p, deadText);
+			szTeam, temp, msg, deadText);
 	}
 }
 

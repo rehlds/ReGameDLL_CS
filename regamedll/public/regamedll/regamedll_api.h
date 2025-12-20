@@ -637,8 +637,8 @@ typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, flo
 typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
 // SendSayMessage hook
-typedef IHookChain<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
-typedef IHookChainRegistry<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
+typedef IHookChain<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
+typedef IHookChainRegistry<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
 
 class IReGameHookchains {
 public:

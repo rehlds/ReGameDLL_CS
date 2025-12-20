@@ -758,8 +758,8 @@ typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReG
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
 // SendSayMessage hook
-typedef IHookChainImpl<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> CReGameHook_SendSayMessage;
-typedef IHookChainRegistryImpl<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> CReGameHookRegistry_SendSayMessage;
+typedef IHookChainImpl<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> CReGameHook_SendSayMessage;
+typedef IHookChainRegistryImpl<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> CReGameHookRegistry_SendSayMessage;
 
 class CReGameHookchains: public IReGameHookchains {
 public:
