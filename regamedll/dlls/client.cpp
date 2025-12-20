@@ -751,9 +751,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 
 void Host_Say(edict_t *pEntity, BOOL teamonly)
 {
-	int j;
 	char *p;
-	char text[128];
 	char szTemp[256];
 	const char *cpSay = "say";
 	const char *cpSayTeam = "say_team";
@@ -946,19 +944,6 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		}
 	}
 
-	text[0] = '\0';
-
-	// -3 for /n and null terminator
-	j = sizeof(text) - 3 - Q_strlen(text) - Q_strlen(pszFormat);
-
-	if (placeName)
-	{
-		j -= Q_strlen(placeName) + 1;
-	}
-
-	if ((signed int)Q_strlen(p) > j)
-		p[j] = 0;
-
 	for (char *pAmpersand = p; pAmpersand && *pAmpersand != '\0'; pAmpersand++)
 	{
 		if (pAmpersand[0] == '%')
@@ -970,7 +955,54 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		}
 	}
 
-	Q_strlcat(text, p);
+	SendSayMessage(pPlayer, pcmd, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
+}
+
+LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, pszCmd, teamonly, pszText, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
+
+void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+{
+	char msg[256]; // local mutable copy of pszText
+	char text[128];
+	int j;
+
+	msg[0] = '\0';
+	text[0] = '\0';
+
+	// safety
+	if (!pszText)
+		pszText = "";
+	if (!pszFormat)
+		pszFormat = "";
+
+	Q_strlcpy(msg, pszText);
+
+	// -3 for /n and null terminator
+	j = sizeof(text) - 3 - Q_strlen(pszFormat);
+
+	if (placeName)
+		j -= Q_strlen(placeName) + 1;
+
+	// huge pszFormat/placeName len
+	if (j < 0) 
+		j = 0;
+
+	size_t len = Q_strlen(msg);
+	if ((signed int)len > j)
+	{
+		msg[j] = '\0';
+		len = j;
+	}
+
+	// removing newline if exists (UTIL_LogPrintf fix)
+	// (may come from a modder mistake)
+	if (len > 0 && msg[len - 1] == '\n')
+	{
+		msg[len - 1] = '\0';
+		len--;
+	}
+
+	Q_strlcat(text, msg);
 	Q_strlcat(text, "\n");
 
 	// loop through all players
@@ -979,6 +1011,8 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	// so check it, or it will infinite loop
 
 	CBasePlayer *pReceiver = nullptr;
+	edict_t *pEntity = ENT(pPlayer->pev);
+
 	while ((pReceiver = UTIL_FindEntityByClassname(pReceiver, "player")))
 	{
 		if (FNullEnt(pReceiver->edict()))
@@ -1066,10 +1100,13 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 		// echo to server console
 		if (pszConsoleFormat)
 		{
+			char fmt[128];
+			Q_strlcpy(fmt, pszConsoleFormat);
+
 			if (placeName && consoleUsesPlaceName)
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), placeName, text));
+				SERVER_PRINT(UTIL_VarArgs(fmt, STRING(pPlayer->pev->netname), placeName, text));
 			else
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), text));
+				SERVER_PRINT(UTIL_VarArgs(fmt, STRING(pPlayer->pev->netname), text));
 		}
 		else
 		{
@@ -1079,13 +1116,17 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 
 	if (logmessages.value)
 	{
+#ifdef REGAMEDLL_ADD
+		const char *temp = pszCmd; // allow custom say command
+#else
 		const char *temp = teamonly ? "say_team" : "say";
+#endif
 		const char *deadText = (pPlayer->m_iTeam != SPECTATOR && bSenderDead) ? " (dead)" : "";
 
 		char *szTeam = GetTeam(pPlayer->m_iTeam);
 
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" %s \"%s\"%s\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()),
-			szTeam, temp, p, deadText);
+			szTeam, temp, msg, deadText);
 	}
 }
 

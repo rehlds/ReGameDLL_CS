@@ -636,6 +636,10 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// SendSayMessage hook
+typedef IHookChain<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
+typedef IHookChainRegistry<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -798,8 +802,11 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_PlayerDeathThink *CBasePlayer_PlayerDeathThink() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_Observer_Think *CBasePlayer_Observer_Think() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems() = 0;
+
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
+
+	virtual IReGameHookRegistry_SendSayMessage *SendSayMessage() = 0;
 };
 
 struct ReGameFuncs_t {
