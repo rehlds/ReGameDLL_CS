@@ -1064,15 +1064,15 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, const char *pszCm
 			|| pReceiver->m_iIgnoreGlobalChat == IGNOREMSG_NONE)
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pReceiver->pev);
-			WRITE_BYTE(ENTINDEX(pEntity));
-			WRITE_STRING(pszFormat);
-			WRITE_STRING("");
-			WRITE_STRING(text);
+				WRITE_BYTE(ENTINDEX(pEntity));
+				WRITE_STRING(pszFormat);
+				WRITE_STRING("");
+				WRITE_STRING(text);
 
-			if (placeName)
-			{
-				WRITE_STRING(placeName);
-			}
+				if (placeName)
+				{
+					WRITE_STRING(placeName);
+				}
 
 			MESSAGE_END();
 		}
@@ -1080,15 +1080,15 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, const char *pszCm
 
 	// print to the sending client
 	MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, &pEntity->v);
-	WRITE_BYTE(ENTINDEX(pEntity));
-	WRITE_STRING(pszFormat);
-	WRITE_STRING("");
-	WRITE_STRING(text);
+		WRITE_BYTE(ENTINDEX(pEntity));
+		WRITE_STRING(pszFormat);
+		WRITE_STRING("");
+		WRITE_STRING(text);
 
-	if (placeName)
-	{
-		WRITE_STRING(placeName);
-	}
+		if (placeName)
+		{
+			WRITE_STRING(placeName);
+		}
 
 	MESSAGE_END();
 
