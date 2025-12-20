@@ -629,8 +629,8 @@ typedef IHookChainClass<void, class CBasePlayer, BOOL> IReGameHook_CBasePlayer_R
 typedef IHookChainRegistryClass<void, class CBasePlayer, BOOL> IReGameHookRegistry_CBasePlayer_RemoveAllItems;
 
 // SendSayMessage hook
-typedef IHookChain<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> IReGameHook_SendSayMessage;
-typedef IHookChainRegistry<void, CBasePlayer *, BOOL, char*, const char*, char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
+typedef IHookChain<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
+typedef IHookChainRegistry<void, CBasePlayer *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
 
 class IReGameHookchains {
 public:

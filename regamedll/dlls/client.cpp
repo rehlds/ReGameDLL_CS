@@ -952,28 +952,43 @@ void Host_Say(edict_t *pEntity, BOOL teamonly)
 	SendSayMessage(pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 }
 
-LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
+LINK_HOOK_VOID_CHAIN(SendSayMessage, (CBasePlayer *pPlayer, BOOL teamonly, const char *p, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName), pPlayer, teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName)
 
-void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, const char *p, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
 {
 	char text[128];
 	int j;
 
 	text[0] = '\0';
 
+	// safety
+	if (!p) 
+		p = "";
+	if (!pszFormat) 
+		pszFormat = "";
+
 	// -3 for /n and null terminator
-	j = sizeof(text) - 3 - Q_strlen(text) - Q_strlen(pszFormat);
+	j = sizeof(text) - 3 - Q_strlen(pszFormat);
 
 	if (placeName)
-	{
 		j -= Q_strlen(placeName) + 1;
+
+	// huge pszFormat/placeName len
+	if (j < 0) 
+		j = 0;
+
+	Q_strlcpy(text, p);
+
+	size_t len = Q_strlen(text);
+	if ((signed int)len > j)
+	{
+		text[j] = '\0';
+		len = j;
 	}
 
-	if ((signed int)Q_strlen(p) > j)
-		p[j] = 0;
-
-	Q_strlcat(text, p);
-	Q_strlcat(text, "\n");
+	// add newline only if not already present (avoid multilines in chat)
+	if (len == 0 || text[len - 1] != '\n') 
+		Q_strlcat(text, "\n");
 
 	// loop through all players
 	// Start with the first player.
@@ -1058,10 +1073,13 @@ void EXT_FUNC __API_HOOK(SendSayMessage)(CBasePlayer *pPlayer, BOOL teamonly, ch
 		// echo to server console
 		if (pszConsoleFormat)
 		{
+			char fmt[128];
+			Q_strlcpy(fmt, pszConsoleFormat);
+
 			if (placeName && consoleUsesPlaceName)
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), placeName, text));
+				SERVER_PRINT(UTIL_VarArgs(fmt, STRING(pPlayer->pev->netname), placeName, text));
 			else
-				SERVER_PRINT(UTIL_VarArgs(pszConsoleFormat, STRING(pPlayer->pev->netname), text));
+				SERVER_PRINT(UTIL_VarArgs(fmt, STRING(pPlayer->pev->netname), text));
 		}
 		else
 		{
