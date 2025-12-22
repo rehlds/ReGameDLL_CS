@@ -757,6 +757,14 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CBasePlayerItem::Materialize hook
+typedef IHookChainClassImpl<void, CBasePlayerItem> CReGameHook_CBasePlayerItem_Materialize;
+typedef IHookChainRegistryClassImpl<void, CBasePlayerItem> CReGameHookRegistry_CBasePlayerItem_Materialize;
+
+// CBasePlayerItem::CheckRespawn hook
+typedef IHookChainClassImpl<void, CBasePlayerItem> CReGameHook_CBasePlayerItem_CheckRespawn;
+typedef IHookChainRegistryClassImpl<void, CBasePlayerItem> CReGameHookRegistry_CBasePlayerItem_CheckRespawn;
+
 class CReGameHookchains: public IReGameHookchains {
 public:
 	// CBasePlayer virtual
@@ -921,6 +929,9 @@ public:
 	CReGameHookRegistry_CBasePlayer_UpdateStatusBar m_CBasePlayer_UpdateStatusBar;
 	CReGameHookRegistry_CBasePlayer_TakeDamageImpulse m_CBasePlayer_TakeDamageImpulse;
 
+	CReGameHookRegistry_CBasePlayerItem_Materialize m_CBasePlayerItem_Materialize;
+	CReGameHookRegistry_CBasePlayerItem_CheckRespawn m_CBasePlayerItem_CheckRespawn;
+
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
 	virtual IReGameHookRegistry_CBasePlayer_Precache *CBasePlayer_Precache();
@@ -1080,8 +1091,13 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_PlayerDeathThink *CBasePlayer_PlayerDeathThink();
 	virtual IReGameHookRegistry_CBasePlayer_Observer_Think *CBasePlayer_Observer_Think();
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
+
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar();
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse();
+
+	virtual IReGameHookRegistry_CBasePlayerItem_Materialize *CBasePlayerItem_Materialize();
+	virtual IReGameHookRegistry_CBasePlayerItem_CheckRespawn *CBasePlayerItem_CheckRespawn();
+
 };
 
 extern CReGameHookchains g_ReGameHookchains;
