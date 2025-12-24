@@ -757,6 +757,10 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClassImpl<void, CBasePlayer, CBasePlayer *, float, float> CReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CBasePlayer::HandleSignals hook
+typedef IHookChainClassImpl<void, CBasePlayer> CReGameHook_CBasePlayer_HandleSignals;
+typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBasePlayer_HandleSignals;
+
 class CReGameHookchains: public IReGameHookchains {
 public:
 	// CBasePlayer virtual
@@ -920,6 +924,7 @@ public:
 	CReGameHookRegistry_CBasePlayer_RemoveAllItems m_CBasePlayer_RemoveAllItems;
 	CReGameHookRegistry_CBasePlayer_UpdateStatusBar m_CBasePlayer_UpdateStatusBar;
 	CReGameHookRegistry_CBasePlayer_TakeDamageImpulse m_CBasePlayer_TakeDamageImpulse;
+	CReGameHookRegistry_CBasePlayer_HandleSignals m_CBasePlayer_HandleSignals;
 
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
@@ -1082,6 +1087,7 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_RemoveAllItems *CBasePlayer_RemoveAllItems();
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar();
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse();
+	virtual IReGameHookRegistry_CBasePlayer_HandleSignals *CBasePlayer_HandleSignals();
 };
 
 extern CReGameHookchains g_ReGameHookchains;
