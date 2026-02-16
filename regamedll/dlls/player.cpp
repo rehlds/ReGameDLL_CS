@@ -3431,7 +3431,12 @@ void CBasePlayer::RemoveShield()
 	if (HasShield())
 	{
 		m_bOwnsShield = false;
-		m_bHasPrimary = false;
+#ifdef REGAMEDLL_FIXES
+		if (!m_rgpPlayerItems[PRIMARY_WEAPON_SLOT]) // prevent potential mod bugs
+#endif
+		{
+			m_bHasPrimary = false;
+		}
 		m_bShieldDrawn = false;
 		pev->gamestate = HITGROUP_SHIELD_DISABLED;
 
@@ -8470,7 +8475,7 @@ CBaseEntity *EXT_FUNC CBasePlayer::__API_HOOK(DropPlayerItem)(const char *pszIte
 		}
 
 #ifdef REGAMEDLL_FIXES
-		if (!m_rgpPlayerItems[PRIMARY_WEAPON_SLOT]) {
+		if (!m_rgpPlayerItems[PRIMARY_WEAPON_SLOT] && !HasShield()) {
 			m_bHasPrimary = false; // ensure value assignation on successful weapon removal
 		}
 #endif
