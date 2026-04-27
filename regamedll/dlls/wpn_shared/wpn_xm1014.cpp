@@ -224,6 +224,9 @@ void CXM1014::WeaponIdle()
 		}
 		else
 		{
+#ifdef REGAMEDLL_FIXES
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0f;
+#endif
 			SendWeaponAnim(XM1014_IDLE, UseDecrement() != FALSE);
 		}
 	}

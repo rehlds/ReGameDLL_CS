@@ -87,7 +87,7 @@ int UTIL_ActivePlayersInGame()
 	return iCount;
 }
 
-int UTIL_HumansInGame(bool ignoreSpectators)
+int UTIL_HumansInGame(bool ignoreSpectators, bool ignoreUnassigned)
 {
 	int iCount = 0;
 
@@ -113,6 +113,9 @@ int UTIL_HumansInGame(bool ignoreSpectators)
 			continue;
 
 		if (ignoreSpectators && pPlayer->m_iJoiningState != JOINED)
+			continue;
+
+		if (ignoreUnassigned && pPlayer->m_iTeam == UNASSIGNED)
 			continue;
 
 		iCount++;

@@ -678,31 +678,32 @@
 #endif
 
 // Break Model Defines
-#define BREAK_TYPEMASK              0x4F
 #define BREAK_GLASS                 0x01
 #define BREAK_METAL                 0x02
 #define BREAK_FLESH                 0x04
 #define BREAK_WOOD                  0x08
 
-#define BREAK_SMOKE                 0x10
-#define BREAK_TRANS                 0x20
+#define BREAK_SMOKE                 0x10    // generates black floating particles from shards
+#define BREAK_TRANS                 0x20    // transparent shard flag (use with any of BREAK_TYPEMASK)
 #define BREAK_CONCRETE              0x40
 #define BREAK_2                     0x80
 
-// Colliding temp entity sounds
-#define BOUNCE_GLASS                BREAK_GLASS
-#define BOUNCE_METAL                BREAK_METAL
-#define BOUNCE_FLESH                BREAK_FLESH
-#define BOUNCE_WOOD                 BREAK_WOOD
-#define BOUNCE_SHRAP                0x10
-#define BOUNCE_SHELL                0x20
-#define BOUNCE_CONCRETE             BREAK_CONCRETE
-#define BOUNCE_SHOTSHELL            0x80
+#define BREAK_TYPEMASK              BREAK_GLASS|BREAK_METAL|BREAK_FLESH|BREAK_WOOD|BREAK_CONCRETE
 
-// Temp entity bounce sound types
+// Colliding temp entity sounds
+#define BOUNCE_GLASS                BREAK_GLASS         // "debris/glass%i.wav", Com_RandomLong( 1, 4 )
+#define BOUNCE_METAL                BREAK_METAL         // "debris/metal%i.wav", Com_RandomLong( 1, 6 )
+#define BOUNCE_FLESH                BREAK_FLESH         // "debris/flesh%i.wav", Com_RandomLong( 1, 7 )
+#define BOUNCE_WOOD                 BREAK_WOOD          // "debris/wood%i.wav", Com_RandomLong( 1, 4 )
+#define BOUNCE_SHRAP                0x10                // "weapons/ric%i.wav", Com_RandomLong( 1, 5 ) NOTE: unreachable
+#define BOUNCE_SHELL                0x20                // "player/pl_shell%i.wav", Com_RandomLong( 1, 3 ) 
+#define BOUNCE_CONCRETE             BREAK_CONCRETE      // "debris/concrete%i.wav", Com_RandomLong( 1, 3 )
+#define BOUNCE_SHOTSHELL            0x80                // "weapons/sshell%i.wav", Com_RandomLong( 1, 3 )
+
+// "Brass" message and TE_MODEL soundtype
 #define TE_BOUNCE_NULL              0
-#define TE_BOUNCE_SHELL             1
-#define TE_BOUNCE_SHOTSHELL         2
+#define TE_BOUNCE_SHELL             1       // gun shell, sound is BOUNCE_SHELL
+#define TE_BOUNCE_SHOTSHELL         2       // shotgun shell, sound is BOUNCE_SHOTSHELL
 
 // Rendering constants
 enum

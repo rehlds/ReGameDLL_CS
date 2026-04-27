@@ -889,26 +889,33 @@ void CCSBotManager::MaintainBotQuota()
 	if (m_isLearningMap)
 		return;
 
-	int humanPlayersInGame = UTIL_HumansInGame();
+	int totalHumansInGame = UTIL_HumansInGame();
+	int humanPlayersInGame = UTIL_HumansInGame(IGNORE_SPECTATORS, IGNORE_UNASSIGNED);
+	int spectatorPlayersInGame = UTIL_SpectatorsInGame();
 
 	// don't add bots until local player has been registered, to make sure he's player ID #1
-	if (!IS_DEDICATED_SERVER() && humanPlayersInGame == 0)
+	if (!IS_DEDICATED_SERVER() && totalHumansInGame == 0)
 		return;
 
 	int desiredBotCount = int(cv_bot_quota.value);
 	int occupiedBotSlots = UTIL_BotsInGame();
 
+	bool isRoundInProgress = false;
 	bool isRoundInDeathmatch = false;
 
 #ifdef REGAMEDLL_ADD
 	if (round_infinite.value > 0)
+	{
 		isRoundInDeathmatch = true; // is no round end gameplay
+	}
+	else
 #endif
-
-	// isRoundInProgress is true if the round has progressed far enough that new players will join as dead.
-	bool isRoundInProgress = CSGameRules()->IsGameStarted() &&
+	{
+		// isRoundInProgress is true if the round has progressed far enough that new players will join as dead.
+		isRoundInProgress = CSGameRules()->IsGameStarted() &&
 							 !TheCSBots()->IsRoundOver() &&
-							 (CSGameRules()->GetRoundRespawnTime() != -1 && CSGameRules()->GetRoundElapsedTime() >= CSGameRules()->GetRoundRespawnTime()) && !isRoundInDeathmatch;
+							 (CSGameRules()->GetRoundRespawnTime() != -1 && CSGameRules()->GetRoundElapsedTime() >= CSGameRules()->GetRoundRespawnTime());
+	}
 
 #ifdef REGAMEDLL_ADD
 	if (FStrEq(cv_bot_quota_mode.string, "fill"))
@@ -945,9 +952,14 @@ void CCSBotManager::MaintainBotQuota()
 #endif // #ifdef REGAMEDLL_ADD
 
 	// wait for a player to join, if necessary
-	if (cv_bot_join_after_player.value > 0.0)
+	if (cv_bot_join_after_player.value == 1)
 	{
 		if (humanPlayersInGame == 0)
+			desiredBotCount = 0;
+	}
+	else if (cv_bot_join_after_player.value == 2)
+	{
+		if (humanPlayersInGame == 0 && spectatorPlayersInGame == 0)
 			desiredBotCount = 0;
 	}
 
@@ -962,9 +974,9 @@ void CCSBotManager::MaintainBotQuota()
 
 	// if bots will auto-vacate, we need to keep one slot open to allow players to join
 	if (cv_bot_auto_vacate.value > 0.0)
-		desiredBotCount = Q_min(desiredBotCount, gpGlobals->maxClients - (humanPlayersInGame + 1));
+		desiredBotCount = Q_min(desiredBotCount, gpGlobals->maxClients - (totalHumansInGame + 1));
 	else
-		desiredBotCount = Q_min(desiredBotCount, gpGlobals->maxClients - humanPlayersInGame);
+		desiredBotCount = Q_min(desiredBotCount, gpGlobals->maxClients - totalHumansInGame);
 
 #ifdef REGAMEDLL_FIXES
 	// Try to balance teams, if we are in the first specified seconds of a round and bots can join either team.
@@ -1069,28 +1081,28 @@ void CCSBotManager::MaintainBotQuota()
 	}
 	else
 	{
-		if (CSGameRules() && !CSGameRules()->IsCareer())
-			return;
-
-		bool humansAreCTs = (Q_strcmp(humans_join_team.string, "CT") == 0);
-
-		if (humansAreCTs)
+		if (CSGameRules() && CSGameRules()->IsCareer())
 		{
-			if (CSGameRules()->m_iNumCT <= 6)
-				return;
+			bool humansAreCTs = (Q_strcmp(humans_join_team.string, "CT") == 0);
 
-			UTIL_KickBotFromTeam(CT);
+			if (humansAreCTs)
+			{
+				if (CSGameRules()->m_iNumCT <= 6)
+					return;
+
+				UTIL_KickBotFromTeam(CT);
+			}
+			else
+			{
+				if (CSGameRules()->m_iNumTerrorist <= 6)
+					return;
+
+				UTIL_KickBotFromTeam(TERRORIST);
+			}
+
+			int newQuota = cv_bot_quota.value - 1;
+			CVAR_SET_FLOAT("bot_quota", clamp(newQuota, 0, (int)cv_bot_quota.value));
 		}
-		else
-		{
-			if (CSGameRules()->m_iNumTerrorist <= 6)
-				return;
-
-			UTIL_KickBotFromTeam(TERRORIST);
-		}
-
-		int newQuota = cv_bot_quota.value - 1;
-		CVAR_SET_FLOAT("bot_quota", clamp(newQuota, 0, (int)cv_bot_quota.value));
 	}
 }
 
