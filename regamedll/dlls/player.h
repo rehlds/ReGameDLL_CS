@@ -452,6 +452,7 @@ public:
 	void RemoveAllItems_OrigFunc(BOOL removeSuit);
 	void UpdateStatusBar_OrigFunc();
 	void TakeDamageImpulse_OrigFunc(CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
+	void HandleSignals_OrigFunc();
 
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
