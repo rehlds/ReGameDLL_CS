@@ -4391,7 +4391,9 @@ edict_t *EXT_FUNC CHalfLifeMultiplay::__API_HOOK(GetPlayerSpawnSpot)(CBasePlayer
 	return pentSpawnSpot;
 }
 
-int CHalfLifeMultiplay::PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarget)
+LINK_HOOK_CLASS_CUSTOM_CHAIN(int, CHalfLifeMultiplay, CSGameRules, PlayerRelationship, (CBasePlayer *pPlayer, CBaseEntity *pTarget), pPlayer, pEntity)
+
+int EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerRelationship)(CBasePlayer *pPlayer, CBaseEntity *pTarget)
 {
 	if (pPlayer == pTarget)
 		return GR_TEAMMATE;
