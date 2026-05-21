@@ -167,8 +167,10 @@ void CUMP45::UMP45Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CUMP45::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), UMP45_RELOAD, UMP45_RELOAD_TIME))
 	{

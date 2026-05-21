@@ -186,8 +186,10 @@ void CFiveSeven::FiveSevenFire(float flSpread, float flCycleTime, BOOL fUseSemi)
 
 void CFiveSeven::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), FIVESEVEN_RELOAD, FIVESEVEN_RELOAD_TIME))
 	{

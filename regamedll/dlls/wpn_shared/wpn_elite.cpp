@@ -209,8 +209,10 @@ void CELITE::ELITEFire(float flSpread, float flCycleTime, BOOL fUseSemi)
 
 void CELITE::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), ELITE_RELOAD, ELITE_RELOAD_TIME))
 	{

@@ -186,8 +186,10 @@ void CP228::P228Fire(float flSpread, float flCycleTime, BOOL fUseSemi)
 
 void CP228::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_357sig <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), m_pPlayer->HasShield() ? P228_SHIELD_RELOAD : P228_RELOAD, P228_RELOAD_TIME))
 	{

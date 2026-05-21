@@ -3611,11 +3611,11 @@ void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)
 
 			if (pPlayer->m_iMapVote)
 			{
-				m_iMapVotes[pPlayer->m_iMapVote]--;
+				m_iMapVotes[pPlayer->m_iMapVote - 1]--;
 
-				if (m_iMapVotes[pPlayer->m_iMapVote] < 0)
+				if (m_iMapVotes[pPlayer->m_iMapVote - 1] < 0)
 				{
-					m_iMapVotes[pPlayer->m_iMapVote] = 0;
+					m_iMapVotes[pPlayer->m_iMapVote - 1] = 0;
 				}
 			}
 
@@ -4815,13 +4815,13 @@ void CHalfLifeMultiplay::DisplayMaps(CBasePlayer *pPlayer, int iVote)
 
 		if (pPlayer)
 		{
-			if (m_iMapVotes[iCount] == 1)
+			if (m_iMapVotes[iCount - 1] == 1)
 			{
 				ClientPrint(pPlayer->pev, HUD_PRINTCONSOLE, "#Vote", UTIL_dtos1(iCount), item->mapname, UTIL_dtos2(1));
 			}
 			else
 			{
-				ClientPrint(pPlayer->pev, HUD_PRINTCONSOLE, "#Votes", UTIL_dtos1(iCount), item->mapname, UTIL_dtos2(m_iMapVotes[iCount]));
+				ClientPrint(pPlayer->pev, HUD_PRINTCONSOLE, "#Votes", UTIL_dtos1(iCount), item->mapname, UTIL_dtos2(m_iMapVotes[iCount - 1]));
 			}
 		}
 
@@ -4877,7 +4877,7 @@ void CHalfLifeMultiplay::ProcessMapVote(CBasePlayer *pPlayer, int iVote)
 		}
 	}
 
-	m_iMapVotes[iVote] = iValidVotes;
+	m_iMapVotes[iVote - 1] = iValidVotes;
 
 	float ratio = mapvoteratio.value;
 	if (mapvoteratio.value > 1)

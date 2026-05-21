@@ -170,12 +170,6 @@ void CM249::M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CM249::Reload()
 {
-#ifdef REGAMEDLL_FIXES
-	// to prevent reload if not enough ammo
-	if (m_pPlayer->ammo_556natobox <= 0)
-		return;
-#endif
-
 	if (DefaultReload(iMaxClip(), M249_RELOAD, M249_RELOAD_TIME))
 	{
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

@@ -216,8 +216,10 @@ void CFamas::FamasFire(float flSpread, float flCycleTime, BOOL fUseAutoAim, BOOL
 
 void CFamas::Reload()
 {
+#ifndef REGAMEDLL_FXES
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), FAMAS_RELOAD, FAMAS_RELOAD_TIME))
 	{

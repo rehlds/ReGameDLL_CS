@@ -262,8 +262,10 @@ void CGLOCK18::GLOCK18Fire(float flSpread, float flCycleTime, BOOL bFireBurst)
 void CGLOCK18::Reload()
 {
 	int iResult;
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
+#endif
 
 	if (m_pPlayer->HasShield())
 		iResult = GLOCK18_SHIELD_RELOAD;

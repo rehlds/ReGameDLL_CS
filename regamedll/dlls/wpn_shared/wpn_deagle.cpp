@@ -187,8 +187,10 @@ void CDEAGLE::DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseSemi)
 
 void CDEAGLE::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), DEAGLE_RELOAD, DEAGLE_RELOAD_TIME))
 	{

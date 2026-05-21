@@ -163,8 +163,10 @@ void CMAC10::MAC10Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CMAC10::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
+#endif
 
 	if (DefaultReload(iMaxClip(), MAC10_RELOAD, MAC10_RELOAD_TIME))
 	{

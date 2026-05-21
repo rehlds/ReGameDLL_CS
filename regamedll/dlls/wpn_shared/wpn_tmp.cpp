@@ -161,12 +161,6 @@ void CTMP::TMPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CTMP::Reload()
 {
-#ifdef REGAMEDLL_FIXES
-	// to prevent reload if not enough ammo
-	if (m_pPlayer->ammo_9mm <= 0)
-		return;
-#endif
-
 	if (DefaultReload(iMaxClip(), TMP_RELOAD, TMP_RELOAD_TIME))
 	{
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

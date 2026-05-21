@@ -249,8 +249,10 @@ void CUSP::USPFire(float flSpread, float flCycleTime, BOOL fUseSemi)
 
 void CUSP::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
+#endif
 
 	int iAnim;
 	if (m_pPlayer->HasShield())

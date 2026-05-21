@@ -1227,7 +1227,7 @@ bool CBasePlayerItem::DestroyItem()
 				m_pPlayer->m_iHideHUD |= HIDEHUD_WEAPONS;
 			}
 
-			if (!m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT]) {
+			if (!m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT] && !m_pPlayer->HasShield()) {
 				m_pPlayer->m_bHasPrimary = false;
 			}
 #endif
