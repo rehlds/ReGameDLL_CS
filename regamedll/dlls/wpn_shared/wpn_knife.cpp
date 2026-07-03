@@ -456,6 +456,12 @@ BOOL CKnife::Swing(BOOL fFirst)
 		{
 			// also play knife strike
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, RANDOM_LONG(0, 3) + 98);
+
+#ifdef REGAMEDLL_ADD
+			// spark effect at the point of impact
+			if (knife_wall_sparks.value)
+				UTIL_Sparks(tr.vecEndPos);
+#endif
 		}
 	}
 
@@ -633,6 +639,12 @@ BOOL CKnife::Stab(BOOL fFirst)
 		{
 			// also play knife strike
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, RANDOM_LONG(0, 3) + 98);
+
+#ifdef REGAMEDLL_ADD
+			// spark effect at the point of impact
+			if (knife_wall_sparks.value)
+				UTIL_Sparks(tr.vecEndPos);
+#endif
 		}
 	}
 
