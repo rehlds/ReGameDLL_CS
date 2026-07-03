@@ -162,14 +162,17 @@ skipwhite:
 				return data;
 			}
 
-			s_shared_token[len++] = c;
+			// prevent overflow of the fixed-size token buffer
+			if (len < (int)sizeof(s_shared_token) - 1)
+				s_shared_token[len++] = c;
 		}
 	}
 
 	// parse single characters
 	if (c == '{' || c == '}'|| c == ')'|| c == '(' || c == '\'' || c == ',')
 	{
-		s_shared_token[len++] = c;
+		if (len < (int)sizeof(s_shared_token) - 1)
+			s_shared_token[len++] = c;
 		s_shared_token[len] = '\0';
 		return data + 1;
 	}
@@ -177,9 +180,9 @@ skipwhite:
 	// parse a regular word
 	do
 	{
-		s_shared_token[len] = c;
+		if (len < (int)sizeof(s_shared_token) - 1)
+			s_shared_token[len++] = c;
 		data++;
-		len++;
 		c = *data;
 
 		if (c == '{' || c == '}'|| c == ')'|| c == '(' || c == '\'' || c == ',')
