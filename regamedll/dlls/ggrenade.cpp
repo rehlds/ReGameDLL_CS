@@ -1155,6 +1155,12 @@ void CGrenade::__API_HOOK(DefuseBombEnd)(CBasePlayer *pPlayer, bool bDefused)
 			g_pGameRules->m_bBombDropped = FALSE;
 			m_pBombDefuser = nullptr;
 			m_bStartDefuse = false;
+
+#ifdef REGAMEDLL_ADD
+			// restore the HUD round timer
+			if (show_bomb_timer.value != 0.0f)
+				SyncRoundTimerForAll();
+#endif
 		}
 		else
 		{

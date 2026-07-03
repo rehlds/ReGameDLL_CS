@@ -3603,14 +3603,59 @@ void CBasePlayer::ResetMenu()
 	MESSAGE_END();
 }
 
+#ifdef REGAMEDLL_ADD
+// Find the planted C4 in the world, if any
+static CGrenade *FindPlantedBomb()
+{
+	CGrenade *pBomb = nullptr;
+	while ((pBomb = UTIL_FindEntityByClassname(pBomb, "grenade")))
+	{
+		// skip the ones marked for removal (just defused)
+		if (pBomb->m_bIsC4 && !(pBomb->pev->flags & FL_KILLME))
+			return pBomb;
+	}
+
+	return nullptr;
+}
+
+// Resync the HUD round timer for all players
+// (used when the timer switches between the round time and the C4 countdown)
+void SyncRoundTimerForAll()
+{
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+		if (UTIL_IsValidPlayer(pPlayer))
+			pPlayer->SyncRoundTimer();
+	}
+}
+#endif
+
 void CBasePlayer::SyncRoundTimer()
 {
 	float tmRemaining = 0;
 	BOOL bFreezePeriod = g_pGameRules->IsFreezePeriod();
 
+#ifdef REGAMEDLL_ADD
+	bool bBombTimer = false;
+#endif
+
 	if (g_pGameRules->IsMultiplayer())
 	{
 		tmRemaining = CSGameRules()->GetRoundRemainingTimeReal();
+
+#ifdef REGAMEDLL_ADD
+		// show the time until the planted bomb explodes instead of the round timer
+		if (show_bomb_timer.value != 0.0f && !bFreezePeriod)
+		{
+			CGrenade *pBomb = FindPlantedBomb();
+			if (pBomb && pBomb->m_flC4Blow > gpGlobals->time)
+			{
+				tmRemaining = pBomb->m_flC4Blow - gpGlobals->time;
+				bBombTimer = true;
+			}
+		}
+#endif
 
 #ifdef REGAMEDLL_FIXES
 		// hide timer HUD because it is useless.
@@ -3630,6 +3675,15 @@ void CBasePlayer::SyncRoundTimer()
 
 	if (tmRemaining < 0)
 		tmRemaining = 0;
+
+#ifdef REGAMEDLL_ADD
+	// the client hides the HUD timer once the bomb is planted, re-show it
+	if (bBombTimer)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgShowTimer, nullptr, pev);
+		MESSAGE_END();
+	}
+#endif
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgRoundTime, nullptr, pev);
 		WRITE_SHORT(int(tmRemaining));

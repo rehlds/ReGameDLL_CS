@@ -217,6 +217,7 @@ extern cvar_t randomspawn;
 extern cvar_t playerid_showhealth;
 extern cvar_t playerid_field;
 extern cvar_t knockback;
+extern cvar_t show_bomb_timer;
 
 #endif
 
