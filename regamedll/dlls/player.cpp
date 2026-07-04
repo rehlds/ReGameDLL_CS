@@ -8108,6 +8108,11 @@ LINK_HOOK_CLASS_CHAIN(bool, CBasePlayer, HintMessageEx, (const char *pMessage, f
 
 bool EXT_FUNC CBasePlayer::__API_HOOK(HintMessageEx)(const char *pMessage, float duration, bool bDisplayIfPlayerDead, bool bOverride)
 {
+#ifdef REGAMEDLL_ADD
+	if (show_hintmessages.value == 0.0f)
+		return false;
+#endif
+
 	if (!bDisplayIfPlayerDead && !IsAlive())
 		return false;
 
