@@ -16,7 +16,7 @@ TEST(RegularWordOverflow, SharedParse, 10)
 	input[sizeof(input) - 1] = '\0';
 
 	SharedParse(input);
-	CHECK(Q_strlen(SharedGetToken()) < SHARED_TOKEN_SIZE);
+	CHECK("oversized word must be truncated", Q_strlen(SharedGetToken()) < SHARED_TOKEN_SIZE);
 }
 
 TEST(QuotedStringOverflow, SharedParse, 10)
@@ -29,7 +29,7 @@ TEST(QuotedStringOverflow, SharedParse, 10)
 	input[5002] = '\0';
 
 	SharedParse(input);
-	CHECK(Q_strlen(SharedGetToken()) < SHARED_TOKEN_SIZE);
+	CHECK("oversized quoted string must be truncated", Q_strlen(SharedGetToken()) < SHARED_TOKEN_SIZE);
 }
 
 TEST(NormalTokensStillWork, SharedParse, 10)
@@ -37,11 +37,11 @@ TEST(NormalTokensStillWork, SharedParse, 10)
 	// The fix must not change behavior for well-formed input.
 	char input[] = "  primaryWeapon   \"hello world\"  , ";
 	char *p = SharedParse(input);
-	CHECK(Q_strcmp(SharedGetToken(), "primaryWeapon") == 0);
+	CHECK("plain word token", Q_strcmp(SharedGetToken(), "primaryWeapon") == 0);
 
 	p = SharedParse(p);
-	CHECK(Q_strcmp(SharedGetToken(), "hello world") == 0);
+	CHECK("quoted string token", Q_strcmp(SharedGetToken(), "hello world") == 0);
 
 	p = SharedParse(p);
-	CHECK(Q_strcmp(SharedGetToken(), ",") == 0);
+	CHECK("comma token", Q_strcmp(SharedGetToken(), ",") == 0);
 }
