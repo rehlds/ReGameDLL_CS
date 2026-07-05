@@ -70,6 +70,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_timelimit                       | 0       | -   | -            | Period between map rotations.<br />`0` means no limit |
 | mp_forcerespawn                    | 0       | 0   | -            | Players will automatically respawn when killed.<br/>`0` disabled<br/>`>0.00001` time delay to respawn |
 | mp_hostage_hurtable                | 1       | 0   | 1            | The hostages can take damage.<br/>`0` disabled<br/>`1` from any team<br/>`2` only from `CT`<br/>`3` only from `T` |
+| mp_hostage_fear                    | 1       | 0   | 1            | The hostages with improved AI (`hostage_ai_enable 1`) get scared of gunfire, explosions and nearby deaths.<br/>`0` disabled (hostages stay calm)<br/>`1` enabled |
 | mp_show_radioicon                  | 1       | 0   | 1            | Show radio icon.<br/>`0` disabled<br/>`1` enabled |
 | mp_show_scenarioicon               | 0       | 0   | 1            | Show scenario icon in HUD such as count of alive hostages or ticking bomb.<br/>`0` disabled<br/>`1` enabled |
 | mp_old_bomb_defused_sound          | 1       | 0   | 1            | Play "Bomb has been defused" sound instead of "Counter-Terrorists win" when bomb was defused<br/>`0` disabled<br/>`1` enabled |
