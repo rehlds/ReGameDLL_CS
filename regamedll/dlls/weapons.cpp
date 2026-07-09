@@ -626,7 +626,8 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 		&& m_iId != WEAPON_DEAGLE
 		&& m_iId != WEAPON_KNIFE
 #else
-		!IsSecondaryWeapon(m_iId)
+		m_iId != WEAPON_KNIFE
+		&& !IsSecondaryWeapon(m_iId)
 #endif
 
 		)
