@@ -119,6 +119,13 @@ void CGrenade::__API_HOOK(Explode2)(TraceResult *pTrace, int bitsDamageType)
 	m_bJustBlew = true;
 	CSGameRules()->CheckWinConditions();
 
+#ifdef REGAMEDLL_ADD
+	// restore the HUD round timer if the round did not end on the explosion
+	// (e.g. mp_round_infinite blocks the bomb round-end check)
+	if (show_bomb_timer.value != 0.0f)
+		SyncRoundTimerForAll();
+#endif
+
 	// Pull out of the wall a bit
 	if (pTrace->flFraction != 1.0f)
 	{
@@ -1155,6 +1162,12 @@ void CGrenade::__API_HOOK(DefuseBombEnd)(CBasePlayer *pPlayer, bool bDefused)
 			g_pGameRules->m_bBombDropped = FALSE;
 			m_pBombDefuser = nullptr;
 			m_bStartDefuse = false;
+
+#ifdef REGAMEDLL_ADD
+			// restore the HUD round timer
+			if (show_bomb_timer.value != 0.0f)
+				SyncRoundTimerForAll();
+#endif
 		}
 		else
 		{

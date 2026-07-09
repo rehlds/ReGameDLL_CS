@@ -197,6 +197,13 @@ void CC4::PrimaryAttack()
 					WRITE_BYTE(BOMB_FLAG_PLANTED);
 				MESSAGE_END();
 
+#ifdef REGAMEDLL_ADD
+				// show the C4 countdown on the HUD round timer;
+				// must be sent after gmsgBombDrop, the client hides the timer on it
+				if (show_bomb_timer.value != 0.0f)
+					SyncRoundTimerForAll();
+#endif
+
 				UTIL_ClientPrintAll(HUD_PRINTCENTER, "#Bomb_Planted");
 				if (TheBots)
 				{
