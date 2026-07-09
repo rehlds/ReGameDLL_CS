@@ -9851,13 +9851,17 @@ void CBasePlayer::PrioritizeAutoBuyString(char (&autobuyString)[MAX_AUTOBUY_LENG
 		int i = 0;
 
 		// get the next token from the priority string.
-		while (*priorityChar != '\0' && *priorityChar != ' ')
+		while (*priorityChar != '\0' && *priorityChar != ' ' && i < (int)sizeof(priorityToken) - 1)
 		{
 			priorityToken[i++] = *priorityChar;
 			priorityChar++;
 		}
 
 		priorityToken[i] = '\0';
+
+		// skip the rest of an oversized token that did not fit
+		while (*priorityChar != '\0' && *priorityChar != ' ')
+			priorityChar++;
 
 		// skip spaces
 		while (*priorityChar == ' ')
