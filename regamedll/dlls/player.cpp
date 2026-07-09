@@ -10735,7 +10735,8 @@ bool EXT_FUNC CBasePlayer::__API_HOOK(GetIntoGame)()
 void CBasePlayer::PlayerRespawnThink()
 {
 #ifdef REGAMEDLL_ADD
-	if (GetObserverMode() != OBS_NONE && (m_iTeam == UNASSIGNED || m_iTeam == SPECTATOR))
+	// Players without a team can never respawn (e.g. stuck at team menu when both teams are full)
+	if (m_iTeam == UNASSIGNED || m_iTeam == SPECTATOR)
 		return;
 
 	// Player cannot respawn while in the Choose Appearance menu
