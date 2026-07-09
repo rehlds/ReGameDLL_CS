@@ -3240,13 +3240,14 @@ void CBasePlayer::WaterMove()
 				if (pev->dmg > 5)
 					pev->dmg = 5;
 
-				TakeDamage(VARS(eoNullEntity), VARS(eoNullEntity), pev->dmg, DMG_DROWN);
-
 #ifdef REGAMEDLL_FIXES
-				// NOTE: If we died after the damage of above and was followed respawn,
-				// so we should get out of code.
-				if (!(m_bitsDamageType & DMG_DROWN))
+				// Don't track drowning damage that wasn't actually applied (player is
+				// invulnerable/DAMAGE_NO, or died from it and possibly respawned) -
+				// otherwise it would be "given back" as free health when surfacing.
+				if (!TakeDamage(VARS(eoNullEntity), VARS(eoNullEntity), pev->dmg, DMG_DROWN))
 					return;
+#else
+				TakeDamage(VARS(eoNullEntity), VARS(eoNullEntity), pev->dmg, DMG_DROWN);
 #endif
 
 				pev->pain_finished = gpGlobals->time + 1;
