@@ -1560,6 +1560,12 @@ bool CHostageImprov::IsScared() const
 
 void CHostageImprov::Frighten(ScareType scare)
 {
+#ifdef REGAMEDLL_ADD
+	// keep hostages calm, they won't get scared of gunfire, explosions or nearby deaths
+	if (hostagefear.value <= 0.0f)
+		return;
+#endif
+
 	const float ignoreTime = 10.0f;
 
 	if (!IsScared())
