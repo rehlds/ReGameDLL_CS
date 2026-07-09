@@ -123,6 +123,7 @@ cvar_t round_restart_delay   = { "mp_round_restart_delay", "5", FCVAR_SERVER, 0.
 cvar_t showtriggers          = { "showtriggers", "0", 0, 0.0f, nullptr }; // debug cvar shows triggers
                                                                           // TODO: Maybe it's better to register in the engine?
 cvar_t hostagehurtable              = { "mp_hostage_hurtable", "1", FCVAR_SERVER, 1.0f, nullptr };
+cvar_t hostagefear                  = { "mp_hostage_fear", "1", FCVAR_SERVER, 1.0f, nullptr };
 cvar_t roundover                    = { "mp_roundover", "0", FCVAR_SERVER, 0.0f, nullptr };
 cvar_t forcerespawn                 = { "mp_forcerespawn", "0", FCVAR_SERVER, 0.0f, nullptr };
 cvar_t show_radioicon               = { "mp_show_radioicon", "1", 0, 1.0f, nullptr };
@@ -202,6 +203,7 @@ cvar_t playerid_field          = { "mp_playerid_field", "3", 0, 3.0f, nullptr };
 cvar_t knockback               = { "mp_knockback", "170", 0, 170.0f, nullptr };
 
 cvar_t knife_wall_sparks       = { "mp_knife_wall_sparks", "0", 0, 0.0f, nullptr };
+cvar_t show_bomb_timer         = { "mp_show_bomb_timer", "0", 0, 0.0f, nullptr };
 
 void GameDLL_Version_f()
 {
@@ -405,6 +407,7 @@ void EXT_FUNC GameDLLInit()
 
 	CVAR_REGISTER(&showtriggers);
 	CVAR_REGISTER(&hostagehurtable);
+	CVAR_REGISTER(&hostagefear);
 	CVAR_REGISTER(&roundover);
 	CVAR_REGISTER(&forcerespawn);
 	CVAR_REGISTER(&show_radioicon);
@@ -492,6 +495,7 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&knockback);
 
 	CVAR_REGISTER(&knife_wall_sparks);
+	CVAR_REGISTER(&show_bomb_timer);
 
 	// print version
 	CONSOLE_ECHO("ReGameDLL version: " APP_VERSION "\n");

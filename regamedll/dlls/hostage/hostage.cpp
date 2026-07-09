@@ -1450,6 +1450,11 @@ void CHostageManager::ServerActivate()
 
 #ifdef REGAMEDLL_ADD
 		if (!AreRunningCZero()) {
+			// Free stale navigation data of the previous map,
+			// CCSBotManager::LoadNavigationMap does this only when bots are allowed
+			if (!AreBotsAllowed())
+				DestroyNavigationMap();
+
 			LoadNavigationMap();
 		}
 #endif

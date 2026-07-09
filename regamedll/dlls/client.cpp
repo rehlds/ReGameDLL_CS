@@ -1893,6 +1893,15 @@ BOOL EXT_FUNC __API_HOOK(HandleMenu_ChooseTeam)(CBasePlayer *pPlayer, int slot)
 			}
 		}
 
+#ifdef REGAMEDLL_FIXES
+		// Both teams are full and no bot could be vacated, deny;
+		// otherwise the player would get into the game while on UNASSIGNED team
+		if (team == UNASSIGNED)
+		{
+			return FALSE;
+		}
+#endif
+
 		break;
 	}
 	case MENU_SLOT_TEAM_SPECT:

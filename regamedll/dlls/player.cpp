@@ -3603,14 +3603,59 @@ void CBasePlayer::ResetMenu()
 	MESSAGE_END();
 }
 
+#ifdef REGAMEDLL_ADD
+// Find the planted C4 in the world, if any
+static CGrenade *FindPlantedBomb()
+{
+	CGrenade *pBomb = nullptr;
+	while ((pBomb = UTIL_FindEntityByClassname(pBomb, "grenade")))
+	{
+		// skip the ones marked for removal (just defused)
+		if (pBomb->m_bIsC4 && !(pBomb->pev->flags & FL_KILLME))
+			return pBomb;
+	}
+
+	return nullptr;
+}
+
+// Resync the HUD round timer for all players
+// (used when the timer switches between the round time and the C4 countdown)
+void SyncRoundTimerForAll()
+{
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+		if (UTIL_IsValidPlayer(pPlayer))
+			pPlayer->SyncRoundTimer();
+	}
+}
+#endif
+
 void CBasePlayer::SyncRoundTimer()
 {
 	float tmRemaining = 0;
 	BOOL bFreezePeriod = g_pGameRules->IsFreezePeriod();
 
+#ifdef REGAMEDLL_ADD
+	bool bBombTimer = false;
+#endif
+
 	if (g_pGameRules->IsMultiplayer())
 	{
 		tmRemaining = CSGameRules()->GetRoundRemainingTimeReal();
+
+#ifdef REGAMEDLL_ADD
+		// show the time until the planted bomb explodes instead of the round timer
+		if (show_bomb_timer.value != 0.0f && !bFreezePeriod)
+		{
+			CGrenade *pBomb = FindPlantedBomb();
+			if (pBomb && pBomb->m_flC4Blow > gpGlobals->time)
+			{
+				tmRemaining = pBomb->m_flC4Blow - gpGlobals->time;
+				bBombTimer = true;
+			}
+		}
+#endif
 
 #ifdef REGAMEDLL_FIXES
 		// hide timer HUD because it is useless.
@@ -3630,6 +3675,15 @@ void CBasePlayer::SyncRoundTimer()
 
 	if (tmRemaining < 0)
 		tmRemaining = 0;
+
+#ifdef REGAMEDLL_ADD
+	// the client hides the HUD timer once the bomb is planted, re-show it
+	if (bBombTimer)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgShowTimer, nullptr, pev);
+		MESSAGE_END();
+	}
+#endif
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgRoundTime, nullptr, pev);
 		WRITE_SHORT(int(tmRemaining));
@@ -9851,13 +9905,17 @@ void CBasePlayer::PrioritizeAutoBuyString(char (&autobuyString)[MAX_AUTOBUY_LENG
 		int i = 0;
 
 		// get the next token from the priority string.
-		while (*priorityChar != '\0' && *priorityChar != ' ')
+		while (*priorityChar != '\0' && *priorityChar != ' ' && i < (int)sizeof(priorityToken) - 1)
 		{
 			priorityToken[i++] = *priorityChar;
 			priorityChar++;
 		}
 
 		priorityToken[i] = '\0';
+
+		// skip the rest of an oversized token that did not fit
+		while (*priorityChar != '\0' && *priorityChar != ' ')
+			priorityChar++;
 
 		// skip spaces
 		while (*priorityChar == ' ')
@@ -10731,7 +10789,8 @@ bool EXT_FUNC CBasePlayer::__API_HOOK(GetIntoGame)()
 void CBasePlayer::PlayerRespawnThink()
 {
 #ifdef REGAMEDLL_ADD
-	if (GetObserverMode() != OBS_NONE && (m_iTeam == UNASSIGNED || m_iTeam == SPECTATOR))
+	// Players without a team can never respawn (e.g. stuck at team menu when both teams are full)
+	if (m_iTeam == UNASSIGNED || m_iTeam == SPECTATOR)
 		return;
 
 	// Player cannot respawn while in the Choose Appearance menu

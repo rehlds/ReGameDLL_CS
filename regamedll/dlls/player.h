@@ -1060,3 +1060,7 @@ bool IsSecondaryWeaponClass(int classId);
 bool IsSecondaryWeaponId(int id);
 const char *GetWeaponAliasFromName(const char *weaponName);
 bool CurrentWeaponSatisfies(CBasePlayerWeapon *pWeapon, int id, int classId);
+
+#ifdef REGAMEDLL_ADD
+void SyncRoundTimerForAll();
+#endif
