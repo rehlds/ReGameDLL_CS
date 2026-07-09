@@ -216,7 +216,7 @@ void CFamas::FamasFire(float flSpread, float flCycleTime, BOOL fUseAutoAim, BOOL
 
 void CFamas::Reload()
 {
-#ifndef REGAMEDLL_FXES
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 #endif
