@@ -8111,6 +8111,14 @@ bool EXT_FUNC CBasePlayer::__API_HOOK(HintMessageEx)(const char *pMessage, float
 	if (!bDisplayIfPlayerDead && !IsAlive())
 		return false;
 
+#ifdef REGAMEDLL_ADD
+	// Server-side sibling of the client's _ah (auto-help) preference: suppresses
+	// non-forced hints only. bOverride still bypasses it, exactly as it already
+	// bypasses m_bShowHints, so ReAPI callers keep their existing escape hatch.
+	if (!bOverride && show_hintmessages.value == 0.0f)
+		return true;
+#endif
+
 	if (bOverride || m_bShowHints)
 		return m_hintMessageQueue.AddMessage(pMessage, duration, true, nullptr);
 
