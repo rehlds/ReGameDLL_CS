@@ -74,7 +74,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_show_radioicon                  | 1       | 0   | 1            | Show radio icon.<br/>`0` disabled<br/>`1` enabled |
 | mp_show_scenarioicon               | 0       | 0   | 1            | Show scenario icon in HUD such as count of alive hostages or ticking bomb.<br/>`0` disabled<br/>`1` enabled |
 | mp_show_bomb_timer                 | 0       | 0   | 1            | Show the time until the planted bomb explodes on the HUD round timer.<br/>`0` disabled<br/>`1` enabled (when the bomb is planted, the round timer shows the C4 countdown) |
-| mp_show_hintmessages               | 1       | 0   | 1            | Send hint messages (Hint_*) to clients.<br/>`0` disabled (hints are blocked server-side)<br/>`1` enabled |
+| mp_show_hintmessages               | 1       | 0   | 1            | Send hint messages (Hint_*) to clients.<br/>`0` disabled (non-forced hints are suppressed server-side; forced hints, e.g. ReAPI `rg_hint_message` with override, still pass)<br/>`1` enabled |
 | mp_old_bomb_defused_sound          | 1       | 0   | 1            | Play "Bomb has been defused" sound instead of "Counter-Terrorists win" when bomb was defused<br/>`0` disabled<br/>`1` enabled |
 | showtriggers                       | 0       | 0   | 1            | Debug cvar shows triggers. |
 | sv_alltalk                         | 0       | 0   | 5            | When players can hear each other ([further explanation](../../wiki/sv_alltalk)).<br/>`0` dead don't hear alive<br/>`1` no restrictions<br/>`2` teammates hear each other<br/>`3` Same as 2, but spectators hear everybody<br/>`4` alive hear alive, dead hear dead and alive.<br/>`5` alive hear alive teammates, dead hear dead and alive.
