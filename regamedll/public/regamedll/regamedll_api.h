@@ -636,6 +636,10 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHook_CBasePlayer_TakeDamageImpulse;
 typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
+// CBasePlayer::HandleSignals hook
+typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_HandleSignals;
+typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBasePlayer_HandleSignals;
+
 // SendSayMessage hook
 typedef IHookChain<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
 typedef IHookChainRegistry<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
@@ -805,6 +809,7 @@ public:
 
 	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar() = 0;
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
+	virtual IReGameHookRegistry_CBasePlayer_HandleSignals *CBasePlayer_HandleSignals() = 0;
 
 	virtual IReGameHookRegistry_SendSayMessage *SendSayMessage() = 0;
 };
