@@ -426,21 +426,15 @@ set_target_properties(regamedll PROPERTIES
 
 if (XASH_COMPAT)
 	if (CMAKE_SYSTEM_NAME STREQUAL "Android")
-		set(LINK_FLAGS "${LINK_FLAGS} -Wl,-z,notext")
-
-set_target_properties(regamedll PROPERTIES
+		set_target_properties(regamedll PROPERTIES
 			OUTPUT_NAME server)
 	else()
-		set(LINK_FLAGS "${LINK_FLAGS} -Wl,-z,notext")
-
-set_target_properties(regamedll PROPERTIES
+		set_target_properties(regamedll PROPERTIES
 			PREFIX ""
 			OUTPUT_NAME cs${POSTFIX})
 	endif()
 else()
-	set(LINK_FLAGS "${LINK_FLAGS} -Wl,-z,notext")
-
-set_target_properties(regamedll PROPERTIES
+	set_target_properties(regamedll PROPERTIES
 		OUTPUT_NAME cs
 		PREFIX ""
 		POSITION_INDEPENDENT_CODE OFF)
