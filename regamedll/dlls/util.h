@@ -227,6 +227,36 @@ void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, float fadeTime,
 void UTIL_ScreenFadeWrite(const ScreenFade &fade, CBaseEntity *pEntity);
 void UTIL_ScreenFadeAll(const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
 void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold = 0.0f, int alpha = 0, int flags = 0);
+// ----------------------------------------------------
+// Native HUD Messages Queue
+// ----------------------------------------------------
+#define MAX_HUD_QUEUE 10
+#define NUM_HUD_CHANNELS 4
+
+struct QueuedHudMessage_t {
+	hudtextparms_t textparms;
+	char message[512];
+	bool inUse;
+};
+
+class CHudMessageQueue {
+public:
+	CHudMessageQueue();
+
+	void QueueMessage(int client, const hudtextparms_t &textparms, const char *pMessage);
+	void Think();
+	void Reset();
+
+private:
+	struct PlayerHudQueue {
+		QueuedHudMessage_t messages[MAX_HUD_QUEUE];
+		float channelFreeTime[NUM_HUD_CHANNELS];
+	};
+	PlayerHudQueue m_players[33];
+};
+
+extern CHudMessageQueue g_HudQueue;
+
 void UTIL_HudMessage(CBaseEntity *pEntity, const hudtextparms_t &textparms, const char *pMessage);
 void UTIL_HudMessageAll(const hudtextparms_t &textparms, const char *pMessage);
 void UTIL_ClientPrintAll(int msg_dest, const char *msg_name, const char *param1 = nullptr, const char *param2 = nullptr, const char *param3 = nullptr, const char *param4 = nullptr);

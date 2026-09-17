@@ -1116,4 +1116,5 @@ public:
 	EXT_FUNC virtual AmmoInfoStruct *GetAmmoInfoEx(const char *ammoName);
 	EXT_FUNC virtual bool BGetICSEntity(const char *pchVersion) const;
 	EXT_FUNC virtual bool BGetIGameRules(const char *pchVersion) const;
+	EXT_FUNC virtual void QueueHudMessage(int client, const struct hudtextparms_s &textparms, const char *pMessage);
 };
