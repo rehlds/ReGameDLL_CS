@@ -3910,7 +3910,7 @@ void EXT_FUNC PlayerPostThink(edict_t *pEntity)
 
 void EXT_FUNC ParmsNewLevel()
 {
-	;
+	g_HudQueue.Reset();
 }
 
 void EXT_FUNC ParmsChangeLevel()
@@ -3933,6 +3933,7 @@ void EXT_FUNC StartFrame()
 			return;
 	}
 
+	g_HudQueue.Think();
 	CLocalNav::Think();
 
 	gpGlobals->teamplay = 1.0f;
