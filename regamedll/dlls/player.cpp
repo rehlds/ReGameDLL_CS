@@ -7148,7 +7148,9 @@ void OLD_CheckRescueZone(CBasePlayer *pPlayer)
 	}
 }
 
-void CBasePlayer::HandleSignals()
+LINK_HOOK_CLASS_VOID_CHAIN2(CBasePlayer, HandleSignals)
+
+void EXT_FUNC CBasePlayer::__API_HOOK(HandleSignals)()
 {
 	if (CSGameRules()->IsMultiplayer())
 	{
