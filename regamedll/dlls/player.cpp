@@ -4854,7 +4854,12 @@ void EXT_FUNC CBasePlayer::__API_HOOK(PreThink)()
 	CBaseEntity *pGroundEntity = Instance(pev->groundentity);
 	if (pGroundEntity && pGroundEntity->Classify() == CLASS_VEHICLE)
 	{
+#ifdef REGAMEDLL_ADD
+		// The index of the vehicle, so the client can draw the player along with it; any non-zero value still means on a vehicle
+		pev->iuser4 = pGroundEntity->entindex();
+#else
 		pev->iuser4 = 1;
+#endif
 	}
 	else
 	{

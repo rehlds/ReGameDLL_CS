@@ -176,7 +176,7 @@ entity_state_player_t gamedll Player_Encode
 	DEFINE_DELTA( basevelocity[2], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
 	DEFINE_DELTA( spectator, DT_INTEGER, 1, 1.0 )
 
-	DEFINE_DELTA( iuser4, DT_INTEGER, 2, 1.0 )
+	DEFINE_DELTA( iuser4, DT_INTEGER, 11, 1.0 )
 }
 
 custom_entity_state_t gamedll Custom_Encode
