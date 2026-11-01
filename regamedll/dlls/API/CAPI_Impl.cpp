@@ -143,6 +143,32 @@ CGrenade *EXT_FUNC SpawnGrenade_api(WeaponIdType weaponId, entvars_t *pevOwner, 
 	return nullptr;
 }
 
+int EXT_FUNC GetPlayerAccount_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0;
+
+	return pPlayer->m_iAccount;
+}
+
+void EXT_FUNC SetPlayerAccount_api(CBasePlayer *pPlayer, int amount)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->m_iAccount = amount;
+}
+
+CBasePlayer *EXT_FUNC UTIL_PlayerByIndex_api(int playerIndex)
+{
+	return ::UTIL_PlayerByIndex(playerIndex);
+}
+
+void EXT_FUNC UTIL_ClientPrintAll_api(int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4)
+{
+	::UTIL_ClientPrintAll(msg_dest, msg_name, param1, param2, param3, param4);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -176,6 +202,11 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	TextureTypePlaySound_api,
 	CreateWeaponBox_api,
 	SpawnGrenade_api,
+
+	GetPlayerAccount_api,
+	SetPlayerAccount_api,
+	UTIL_PlayerByIndex_api,
+	UTIL_ClientPrintAll_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
