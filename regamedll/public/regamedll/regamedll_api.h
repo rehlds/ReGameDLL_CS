@@ -38,7 +38,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 33
+#define REGAMEDLL_API_VERSION_MINOR 34
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -851,6 +851,11 @@ struct ReGameFuncs_t {
 	void (*UTIL_ShowMessage)(const char *pString, CBaseEntity *pEntity, bool isHint);
 	void (*UTIL_ScreenFade)(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
 	void (*UTIL_ScreenShake)(const Vector &center, float amplitude, float frequency, float duration, float radius);
+
+	// Extended API (5.34)
+	void (*UTIL_SayTextAll)(const char *pText, CBaseEntity *pEntity);
+	void (*SetPlayerFrags)(CBasePlayer *pPlayer, float frags);
+	void (*SetPlayerDeaths)(CBasePlayer *pPlayer, int deaths);
 };
 
 class IReGameApi {

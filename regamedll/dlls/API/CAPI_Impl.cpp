@@ -233,6 +233,27 @@ void EXT_FUNC UTIL_ScreenShake_api(const Vector &center, float amplitude, float 
 	::UTIL_ScreenShake(center, amplitude, frequency, duration, radius);
 }
 
+void EXT_FUNC UTIL_SayTextAll_api(const char *pText, CBaseEntity *pEntity)
+{
+	::UTIL_SayTextAll(pText, pEntity);
+}
+
+void EXT_FUNC SetPlayerFrags_api(CBasePlayer *pPlayer, float frags)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->frags = frags;
+}
+
+void EXT_FUNC SetPlayerDeaths_api(CBasePlayer *pPlayer, int deaths)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->m_iDeaths = deaths;
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -281,6 +302,10 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	UTIL_ShowMessage_api,
 	UTIL_ScreenFade_api,
 	UTIL_ScreenShake_api,
+
+	UTIL_SayTextAll_api,
+	SetPlayerFrags_api,
+	SetPlayerDeaths_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
