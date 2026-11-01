@@ -390,17 +390,18 @@ BOOL CKnife::Swing(BOOL fFirst)
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev,
-			KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
-			gpGlobals->v_forward,
-			&tr,
-			(DMG_NEVERGIB | DMG_BULLET));
+		if (pEntity)
+		{
+			pEntity->TraceAttack(m_pPlayer->pev,
+				KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
+				gpGlobals->v_forward,
+				&tr,
+				(DMG_NEVERGIB | DMG_BULLET));
 
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		}
 
-#ifndef REGAMEDLL_FIXES
-		if (pEntity)	// -V595
-#endif
+		if (pEntity)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE
 #ifdef REGAMEDLL_FIXES
@@ -585,12 +586,13 @@ BOOL CKnife::Stab(BOOL fFirst)
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, (DMG_NEVERGIB | DMG_BULLET));
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		if (pEntity)
+		{
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, (DMG_NEVERGIB | DMG_BULLET));
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		}
 
-#ifndef REGAMEDLL_FIXES
-		if (pEntity)	// -V595
-#endif
+		if (pEntity)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE
 #ifdef REGAMEDLL_FIXES
