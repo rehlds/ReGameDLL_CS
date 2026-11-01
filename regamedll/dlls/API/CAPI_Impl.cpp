@@ -169,6 +169,55 @@ void EXT_FUNC UTIL_ClientPrintAll_api(int msg_dest, const char *msg_name, const 
 	::UTIL_ClientPrintAll(msg_dest, msg_name, param1, param2, param3, param4);
 }
 
+void EXT_FUNC SetPlayerHealth_api(CBasePlayer *pPlayer, float health)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->health = health;
+}
+
+void EXT_FUNC SetPlayerArmor_api(CBasePlayer *pPlayer, float armor, float armorType)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->armorvalue = armor;
+	pPlayer->pev->armortype = armorType;
+}
+
+void EXT_FUNC UTIL_ShowMessageAll_api(const char *pString, bool isHint)
+{
+	::UTIL_ShowMessageAll(pString, isHint);
+}
+
+bool EXT_FUNC BotAdd_api(TeamName team)
+{
+	if (!TheBots)
+		return false;
+
+	BotProfileTeamType botTeam;
+	switch (team)
+	{
+		case TERRORIST:
+			botTeam = BOT_TEAM_T;
+			break;
+		case CT:
+			botTeam = BOT_TEAM_CT;
+			break;
+		default:
+			botTeam = BOT_TEAM_ANY;
+			break;
+	}
+
+	return TheCSBots()->BotAddCommand(botTeam, false);
+}
+
+bool EXT_FUNC BotKick_api(TeamName team)
+{
+	return UTIL_KickBotFromTeam(team);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -207,6 +256,12 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	SetPlayerAccount_api,
 	UTIL_PlayerByIndex_api,
 	UTIL_ClientPrintAll_api,
+
+	SetPlayerHealth_api,
+	SetPlayerArmor_api,
+	UTIL_ShowMessageAll_api,
+	BotAdd_api,
+	BotKick_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);

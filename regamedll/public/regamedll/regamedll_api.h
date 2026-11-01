@@ -38,7 +38,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 31
+#define REGAMEDLL_API_VERSION_MINOR 32
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -839,6 +839,13 @@ struct ReGameFuncs_t {
 	void (*SetPlayerAccount)(CBasePlayer *pPlayer, int amount);
 	CBasePlayer *(*UTIL_PlayerByIndex)(int playerIndex);
 	void (*UTIL_ClientPrintAll)(int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4);
+
+	// Extended API (5.32)
+	void (*SetPlayerHealth)(CBasePlayer *pPlayer, float health);
+	void (*SetPlayerArmor)(CBasePlayer *pPlayer, float armor, float armorType);
+	void (*UTIL_ShowMessageAll)(const char *pString, bool isHint);
+	bool (*BotAdd)(TeamName team);
+	bool (*BotKick)(TeamName team);
 };
 
 class IReGameApi {
