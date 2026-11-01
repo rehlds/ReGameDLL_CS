@@ -147,6 +147,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
 | mp_knockback                       | 170     | -   | -            | Knockback force applied to the victim when damaged by strong weapons (e.g. `AWP`, `AK47`).<br/>Works only if not crouching, and not hit in the legs.<br/>Set to `0` to disable. |
 | mp_knife_wall_sparks               | 0       | 0   | 1            | Show a spark effect at the point of impact when a knife hits a wall.<br/>`0` disabled<br/>`1` enabled |
+| mp_knife_hit_detection             | 0       | 0   | 3            | Improved knife hit detection (bit flags, sum to combine).<br/>`0` vanilla behavior<br/>`+1` reject hits landing too far off the crosshair<br/>`+2` allow hitting a target right below the attacker |
 
 </details>
 
