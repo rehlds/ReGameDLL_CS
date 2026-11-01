@@ -254,6 +254,38 @@ void EXT_FUNC SetPlayerDeaths_api(CBasePlayer *pPlayer, int deaths)
 	pPlayer->m_iDeaths = deaths;
 }
 
+float EXT_FUNC GetPlayerHealth_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0.0f;
+
+	return pPlayer->pev->health;
+}
+
+float EXT_FUNC GetPlayerArmor_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0.0f;
+
+	return pPlayer->pev->armorvalue;
+}
+
+TeamName EXT_FUNC GetPlayerTeam_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return UNASSIGNED;
+
+	return pPlayer->m_iTeam;
+}
+
+bool EXT_FUNC IsPlayerAlive_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return false;
+
+	return pPlayer->IsAlive() != FALSE;
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -306,6 +338,11 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	UTIL_SayTextAll_api,
 	SetPlayerFrags_api,
 	SetPlayerDeaths_api,
+
+	GetPlayerHealth_api,
+	GetPlayerArmor_api,
+	GetPlayerTeam_api,
+	IsPlayerAlive_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
