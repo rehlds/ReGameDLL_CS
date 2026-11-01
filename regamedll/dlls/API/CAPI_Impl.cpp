@@ -218,6 +218,21 @@ bool EXT_FUNC BotKick_api(TeamName team)
 	return UTIL_KickBotFromTeam(team);
 }
 
+void EXT_FUNC UTIL_ShowMessage_api(const char *pString, CBaseEntity *pEntity, bool isHint)
+{
+	::UTIL_ShowMessage(pString, pEntity, isHint);
+}
+
+void EXT_FUNC UTIL_ScreenFade_api(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
+{
+	::UTIL_ScreenFade(pEntity, color, fadeTime, fadeHold, alpha, flags);
+}
+
+void EXT_FUNC UTIL_ScreenShake_api(const Vector &center, float amplitude, float frequency, float duration, float radius)
+{
+	::UTIL_ScreenShake(center, amplitude, frequency, duration, radius);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -262,6 +277,10 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	UTIL_ShowMessageAll_api,
 	BotAdd_api,
 	BotKick_api,
+
+	UTIL_ShowMessage_api,
+	UTIL_ScreenFade_api,
+	UTIL_ScreenShake_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
