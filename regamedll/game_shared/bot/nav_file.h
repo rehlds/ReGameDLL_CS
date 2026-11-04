@@ -48,7 +48,7 @@ public:
 	void AddPlace(Place place);					// add the place to the directory if not already known
 	Place EntryToPlace(EntryType entry) const;	// given an entry, return the Place
 	void Save(int fd);							// store the directory
-	void Load(SteamFile *file);					// load the directory
+	bool Load(SteamFile *file);					// load the directory, false if the file ends early or is corrupt
 
 private:
 	std::vector<Place> m_directory;

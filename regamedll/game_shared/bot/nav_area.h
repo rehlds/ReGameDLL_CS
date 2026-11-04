@@ -161,7 +161,7 @@ public:
 	unsigned char GetFlags() const { return m_flags; }
 
 	void Save(int fd, unsigned int version) const;
-	void Load(SteamFile *file, unsigned int version);
+	bool Load(SteamFile *file, unsigned int version);
 
 	const Vector *GetPosition() const { return &m_pos; }
 	unsigned int GetID() const { return m_id; }
@@ -228,7 +228,7 @@ public:
 	void Save(FILE *fp) const;
 	void Save(int fd, unsigned int version);
 
-	void Load(SteamFile *file, unsigned int version);
+	bool Load(SteamFile *file, unsigned int version);	// false if the file ends early or is corrupt
 	NavErrorType PostLoad();
 
 	unsigned int GetID() const { return m_id; }

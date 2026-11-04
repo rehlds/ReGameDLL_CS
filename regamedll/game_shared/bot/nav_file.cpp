@@ -97,11 +97,12 @@ void PlaceDirectory::Save(int fd)
 	}
 }
 
-void PlaceDirectory::Load(SteamFile *file)
+bool PlaceDirectory::Load(SteamFile *file)
 {
 	// read number of entries
 	EntryType count;
-	file->Read(&count, sizeof(EntryType));
+	if (!file->Read(&count, sizeof(EntryType)))
+		return false;
 
 	m_directory.reserve(count);
 
@@ -110,8 +111,14 @@ void PlaceDirectory::Load(SteamFile *file)
 	unsigned short len;
 	for (int i = 0; i < count; i++)
 	{
-		file->Read(&len, sizeof(unsigned short));
-		file->Read(placeName, len);
+		// the saved length counts the terminating zero
+		if (!file->Read(&len, sizeof(unsigned short)) || len == 0 || len > sizeof(placeName))
+			return false;
+
+		if (!file->Read(placeName, len))
+			return false;
+
+		placeName[len - 1] = '\0';
 
 		Place place = TheBotPhrases->NameToID(placeName);
 		if (!TheBotPhrases->IsValid() && place == UNDEFINED_PLACE)
@@ -119,6 +126,8 @@ void PlaceDirectory::Load(SteamFile *file)
 
 		AddPlace(place);
 	}
+
+	return true;
 }
 
 char *GetBspFilename()
@@ -295,28 +304,32 @@ void CNavArea::Save(int fd, unsigned int version)
 	_write(fd, &entry, sizeof(entry));
 }
 
-void CNavArea::Load(SteamFile *file, unsigned int version)
+// Every read stops at the end of the file, so a corrupt count can't run a loop past the data
+bool CNavArea::Load(SteamFile *file, unsigned int version)
 {
 	// load ID
-	file->Read(&m_id, sizeof(unsigned int));
+	if (!file->Read(&m_id, sizeof(unsigned int)))
+		return false;
 
 	// update nextID to avoid collisions
 	if (m_id >= m_nextID)
 		m_nextID = m_id + 1;
 
 	// load attribute flags
-	file->Read(&m_attributeFlags, sizeof(unsigned char));
+	if (!file->Read(&m_attributeFlags, sizeof(unsigned char)))
+		return false;
 
 	// load extent of area
-	file->Read(&m_extent, 6 * sizeof(float));
+	if (!file->Read(&m_extent, 6 * sizeof(float)))
+		return false;
 
 	m_center.x = (m_extent.lo.x + m_extent.hi.x) / 2.0f;
 	m_center.y = (m_extent.lo.y + m_extent.hi.y) / 2.0f;
 	m_center.z = (m_extent.lo.z + m_extent.hi.z) / 2.0f;
 
 	// load heights of implicit corners
-	file->Read(&m_neZ, sizeof(float));
-	file->Read(&m_swZ, sizeof(float));
+	if (!file->Read(&m_neZ, sizeof(float)) || !file->Read(&m_swZ, sizeof(float)))
+		return false;
 
 	// load connections (IDs) to adjacent areas
 	// in the enum order NORTH, EAST, SOUTH, WEST
@@ -324,12 +337,14 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 	{
 		// load number of connections for this direction
 		unsigned int count;
-		file->Read(&count, sizeof(unsigned int));
+		if (!file->Read(&count, sizeof(unsigned int)))
+			return false;
 
 		for (unsigned int i = 0; i < count; i++)
 		{
 			NavConnect connect;
-			file->Read(&connect.id, sizeof(unsigned int));
+			if (!file->Read(&connect.id, sizeof(unsigned int)))
+				return false;
 
 			m_connect[d].push_back(connect);
 		}
@@ -338,7 +353,8 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 	// Load hiding spots
 	// load number of hiding spots
 	unsigned char hidingSpotCount = 0;
-	file->Read(&hidingSpotCount, sizeof(unsigned char));
+	if (!file->Read(&hidingSpotCount, sizeof(unsigned char)))
+		return false;
 
 	if (version == 1)
 	{
@@ -346,7 +362,8 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 		Vector pos;
 		for (int h = 0; h < hidingSpotCount; h++)
 		{
-			file->Read(&pos, 3 * sizeof(float));
+			if (!file->Read(&pos, 3 * sizeof(float)))
+				return false;
 
 			// create new hiding spot and put on master list
 			HidingSpot *spot = new HidingSpot(&pos, HidingSpot::IN_COVER);
@@ -359,36 +376,42 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 		// load HidingSpot objects for this area
 		for (int h = 0; h < hidingSpotCount; h++)
 		{
-			// create new hiding spot and put on master list
+			// create new hiding spot and put on master list, which frees it whatever the load does
 			HidingSpot *spot = new HidingSpot;
 
-			spot->Load(file, version);
-
 			m_hidingSpotList.push_back(spot);
+
+			if (!spot->Load(file, version))
+				return false;
 		}
 	}
 
 	// Load number of approach areas
-	file->Read(&m_approachCount, sizeof(unsigned char));
+	if (!file->Read(&m_approachCount, sizeof(unsigned char)) || m_approachCount > MAX_APPROACH_AREAS)
+		return false;
 
 	// load approach area info (IDs)
 	unsigned char type = 0;
 	for (int a = 0; a < m_approachCount; a++)
 	{
-		file->Read(&m_approach[a].here.id, sizeof(unsigned int));
+		if (!file->Read(&m_approach[a].here.id, sizeof(unsigned int)))
+			return false;
 
-		file->Read(&m_approach[a].prev.id, sizeof(unsigned int));
-		file->Read(&type, sizeof(unsigned char));
+		if (!file->Read(&m_approach[a].prev.id, sizeof(unsigned int)) || !file->Read(&type, sizeof(unsigned char)))
+			return false;
+
 		m_approach[a].prevToHereHow = (NavTraverseType)type;
 
-		file->Read(&m_approach[a].next.id, sizeof(unsigned int));
-		file->Read(&type, sizeof(unsigned char));
+		if (!file->Read(&m_approach[a].next.id, sizeof(unsigned int)) || !file->Read(&type, sizeof(unsigned char)))
+			return false;
+
 		m_approach[a].hereToNextHow = (NavTraverseType)type;
 	}
 
 	// Load encounter paths for this area
 	unsigned int count;
-	file->Read(&count, sizeof(unsigned int));
+	if (!file->Read(&count, sizeof(unsigned int)))
+		return false;
 
 	if (version < 3)
 	{
@@ -397,53 +420,60 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 		{
 			SpotEncounter encounter;
 
-			file->Read(&encounter.from.id, sizeof(unsigned int));
-			file->Read(&encounter.to.id, sizeof(unsigned int));
+			if (!file->Read(&encounter.from.id, sizeof(unsigned int)) || !file->Read(&encounter.to.id, sizeof(unsigned int)))
+				return false;
 
-			file->Read(&encounter.path.from.x, 3 * sizeof(float));
-			file->Read(&encounter.path.to.x, 3 * sizeof(float));
+			if (!file->Read(&encounter.path.from.x, 3 * sizeof(float)) || !file->Read(&encounter.path.to.x, 3 * sizeof(float)))
+				return false;
 
 			// read list of spots along this path
 			unsigned char spotCount = 0;
-			file->Read(&spotCount, sizeof(unsigned char));
+			if (!file->Read(&spotCount, sizeof(unsigned char)))
+				return false;
 
 			for (int s = 0; s < spotCount; s++)
 			{
 				Vector pos;
-				file->Read(&pos, 3 * sizeof(float));
-				file->Read(&pos, sizeof(float));
+				if (!file->Read(&pos, 3 * sizeof(float)) || !file->Read(&pos, sizeof(float)))
+					return false;
 			}
 		}
 
-		return;
+		return true;
 	}
 
 	for (unsigned int e = 0; e < count; e++)
 	{
 		SpotEncounter encounter;
 
-		file->Read(&encounter.from.id, sizeof(unsigned int));
+		if (!file->Read(&encounter.from.id, sizeof(unsigned int)))
+			return false;
 
 		unsigned char dir = 0;
-		file->Read(&dir, sizeof(unsigned char));
+		if (!file->Read(&dir, sizeof(unsigned char)))
+			return false;
+
 		encounter.fromDir = static_cast<NavDirType>(dir);
 
-		file->Read(&encounter.to.id, sizeof(unsigned int));
+		if (!file->Read(&encounter.to.id, sizeof(unsigned int)) || !file->Read(&dir, sizeof(unsigned char)))
+			return false;
 
-		file->Read(&dir, sizeof(unsigned char));
 		encounter.toDir = static_cast<NavDirType>(dir);
 
 		// read list of spots along this path
 		unsigned char spotCount = 0;
-		file->Read(&spotCount, sizeof(unsigned char));
+		if (!file->Read(&spotCount, sizeof(unsigned char)))
+			return false;
 
 		SpotOrder order;
 		for (int s = 0; s < spotCount; s++)
 		{
-			file->Read(&order.id, sizeof(unsigned int));
+			if (!file->Read(&order.id, sizeof(unsigned int)))
+				return false;
 
 			unsigned char t = 0;
-			file->Read(&t, sizeof(unsigned char));
+			if (!file->Read(&t, sizeof(unsigned char)))
+				return false;
 
 			order.t = float(t) / 255.0f;
 
@@ -457,11 +487,14 @@ void CNavArea::Load(SteamFile *file, unsigned int version)
 	{
 		// Load Place data
 		PlaceDirectory::EntryType entry;
-		file->Read(&entry, sizeof(entry));
+		if (!file->Read(&entry, sizeof(entry)))
+			return false;
 
 		// convert entry to actual Place
 		SetPlace(placeDirectory.EntryToPlace(entry));
 	}
+
+	return true;
 }
 
 NavErrorType CNavArea::PostLoad()
@@ -817,7 +850,11 @@ NavErrorType LoadNavigationMap()
 	{
 		// get size of source bsp file and verify that the bsp hasn't changed
 		unsigned int saveBspSize;
-		navFile.Read(&saveBspSize, sizeof(unsigned int));
+		if (!navFile.Read(&saveBspSize, sizeof(unsigned int)))
+		{
+			CONSOLE_ECHO("ERROR: Navigation file '%s' is corrupt.\n", filename);
+			return NAV_CORRUPT_DATA;
+		}
 
 		// verify size
 		char *bspFilename = GetBspFilename();
@@ -837,16 +874,18 @@ NavErrorType LoadNavigationMap()
 	}
 
 	// load Place directory
-	if (version >= NAV_VERSION)
+	if (version >= NAV_VERSION && !placeDirectory.Load(&navFile))
 	{
-		placeDirectory.Load(&navFile);
+		CONSOLE_ECHO("ERROR: Navigation file '%s' is corrupt.\n", filename);
+		placeDirectory.Reset();
+		return NAV_CORRUPT_DATA;
 	}
 
 	// get number of areas
 	unsigned int count;
 	result = navFile.Read(&count, sizeof(unsigned int));
 
-	if (count == 0)
+	if (!result || count == 0)
 	{
 		return NAV_INVALID_FILE;
 	}
@@ -860,9 +899,17 @@ NavErrorType LoadNavigationMap()
 	// load the areas and compute total extent
 	for (unsigned int i = 0; i < count; i++)
 	{
+		// the list owns the area before it loads, so a failed load frees it with the rest
 		CNavArea *area = new CNavArea;
-		area->Load(&navFile, version);
 		TheNavAreaList.push_back(area);
+
+		if (!area->Load(&navFile, version))
+		{
+			CONSOLE_ECHO("ERROR: Navigation file '%s' is corrupt.\n", filename);
+			DestroyNavigationMap();
+			placeDirectory.Reset();
+			return NAV_CORRUPT_DATA;
+		}
 
 		const Extent *areaExtent = area->GetExtent();
 

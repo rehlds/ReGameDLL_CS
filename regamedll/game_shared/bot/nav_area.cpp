@@ -124,16 +124,19 @@ void HidingSpot::Save(int fd, unsigned int version) const
 	_write(fd, &m_flags, sizeof(unsigned char));
 }
 
-void HidingSpot::Load(SteamFile *file, unsigned int version)
+bool HidingSpot::Load(SteamFile *file, unsigned int version)
 {
-	file->Read(&m_id, sizeof(unsigned int));
-	file->Read(&m_pos, 3 * sizeof(float));
-	file->Read(&m_flags, sizeof(unsigned char));
+	if (!file->Read(&m_id, sizeof(unsigned int))
+		|| !file->Read(&m_pos, 3 * sizeof(float))
+		|| !file->Read(&m_flags, sizeof(unsigned char)))
+		return false;
 
 	// update next ID to avoid ID collisions by later spots
 	if (m_id >= m_nextID) {
 		m_nextID = m_id + 1;
 	}
+
+	return true;
 }
 
 // Given a HidingSpot ID, return the associated HidingSpot
