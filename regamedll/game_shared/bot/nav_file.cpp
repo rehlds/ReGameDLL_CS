@@ -173,8 +173,8 @@ void CNavArea::Save(int fd, unsigned int version)
 	for (int d = 0; d < NUM_DIRECTIONS; d++)
 	{
 		// save number of connections for this direction
-		size_t count = m_connect[d].size();
-		_write(fd, &count, sizeof(size_t));
+		unsigned int count = m_connect[d].size();
+		_write(fd, &count, sizeof(unsigned int));
 
 		for (auto &connect : m_connect[d]) {
 			_write(fd, &connect.area->m_id, sizeof(unsigned int));
