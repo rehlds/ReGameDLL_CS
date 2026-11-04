@@ -25,13 +25,23 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 option(DEBUG "Build with debug information." OFF)
 option(USE_STATIC_LIBSTDC "Enables static linking libstdc++." OFF)
 option(USE_LEGACY_LIBC "Enables linking against legacy libc (<= 2.15) for compat with older distros (Debian 8/Ubuntu 16.04/Centos 7)." OFF)
+option(X64BITS "Build a 64-bit library on a 64-bit system." OFF)
 option(XASH_COMPAT "Enable Xash3D FWGS compatiblity (support for it's 64-bit ABI support and crossplatform library suffix)")
+
+# Xash3D FWGS is 64-bit wherever the system is
+if (XASH_COMPAT AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(X64BITS ON)
+endif()
+
+if (X64BITS AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+	message(FATAL_ERROR "X64BITS needs a 64-bit compiler")
+endif()
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Avoid -rdynamic -fPIC options
-if (NOT XASH_COMPAT)
+# Avoid -rdynamic -fPIC options; a 64-bit library can't do without -fPIC
+if (NOT XASH_COMPAT AND NOT X64BITS)
 	set(CMAKE_SHARED_LIBRARY_CXX_FLAGS "")
 	set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 endif()
@@ -44,16 +54,12 @@ if (NOT DEBUG)
 	set(LINK_FLAGS "")
 endif()
 
-# add -m32 flag only on 64-bit systems, if building for 64-bit wasn't enabled with XASH_COMPAT
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-	if (XASH_COMPAT)
-		set(COMPILE_FLAGS "${COMPILE_FLAGS} -DXASH_64BIT")
-	else()
-		set(COMPILE_FLAGS "${COMPILE_FLAGS} -m32")
-		set(LINK_FLAGS "${LINK_FLAGS} -m32")
-		list(APPEND LINK_LIBS aelf32)
-		set(CMAKE_SIZEOF_VOID_P 4)
-	endif()
+# add -m32 flag only on 64-bit systems, if building for 64-bit wasn't enabled with X64BITS
+if (CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT X64BITS)
+	set(COMPILE_FLAGS "${COMPILE_FLAGS} -m32")
+	set(LINK_FLAGS "${LINK_FLAGS} -m32")
+	list(APPEND LINK_LIBS aelf32)
+	set(CMAKE_SIZEOF_VOID_P 4)
 endif()
 
 if(XASH_COMPAT)
@@ -437,6 +443,10 @@ set_target_properties(regamedll PROPERTIES
 			PREFIX ""
 			OUTPUT_NAME cs${POSTFIX})
 	endif()
+elseif (X64BITS)
+	set_target_properties(regamedll PROPERTIES
+		OUTPUT_NAME cs
+		PREFIX "")
 else()
 	set(LINK_FLAGS "${LINK_FLAGS} -Wl,-z,notext")
 
