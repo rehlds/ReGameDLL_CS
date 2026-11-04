@@ -142,7 +142,7 @@ CAssertDisable *IgnoreAssertsNearby(int nRange)
 static int g_iLastLineRange = 5;
 static int g_nLastIgnoreNumTimes = 1;
 
-int CALLBACK AssertDialogProc(
+INT_PTR CALLBACK AssertDialogProc(
 	HWND hDlg,		// handle to dialog box
 	UINT uMsg,		// message
 	WPARAM wParam,	// first message parameter
