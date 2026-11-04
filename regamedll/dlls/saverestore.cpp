@@ -534,7 +534,7 @@ int CSave::WriteFields(const char *pname, void *pBaseData, TYPEDESCRIPTION *pFie
 			WriteInt(pTest->fieldName, (int *)(char *)pOutputData, pTest->fieldSize);
 			break;
 		case FIELD_FUNCTION:
-			WriteFunction(pTest->fieldName, &pOutputData, pTest->fieldSize);
+			WriteFunction(pTest->fieldName, (void **)pOutputData, pTest->fieldSize);
 			break;
 		default:
 			ALERT(at_error, "Bad field type\n");
