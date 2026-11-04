@@ -27,7 +27,8 @@
 */#ifndef ARCHTYPES_H
 #define ARCHTYPES_H
 
-#ifdef __x86_64__
+// A 64-bit build, whatever the compiler and the processor
+#if defined(_WIN64) || defined(__LP64__)
 #define X64BITS
 #endif
 

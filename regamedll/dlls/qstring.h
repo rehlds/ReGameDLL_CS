@@ -34,7 +34,7 @@
 class QString final
 {
 public:
-#if XASH_64BIT
+#ifdef X64BITS
 	using qstring_t = int;
 #else
 	using qstring_t = unsigned int;
@@ -75,8 +75,8 @@ constexpr QString::qstring_t iStringNull = {0};
 extern globalvars_t *gpGlobals;
 
 #define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (QString::qstring_t)(offset)))
-#if XASH_64BIT
-// Xash3D FWGS in 64-bit mode has internal string pool which allows mods to continue use 32-bit string_t
+#ifdef X64BITS
+// A 64-bit engine keeps strings in a pool of its own, which lets mods continue to use 32-bit string_t
 inline int MAKE_STRING(const char *str)
 {
 	ptrdiff_t diff = str - STRING(0);
