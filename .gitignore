@@ -6,6 +6,7 @@
 **/msvc/Debug*
 **/msvc/Release*
 **/msvc/Tests
+**/msvc/x64
 **/msvc/*.sdf
 **/msvc/*.opensdf
 **/msvc/*.user
