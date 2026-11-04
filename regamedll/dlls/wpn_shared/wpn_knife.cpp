@@ -170,6 +170,56 @@ void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *mins, fl
 	}
 }
 
+#ifdef REGAMEDLL_ADD
+// Returns true if the target's hull lies within a 60-degree cone around the attacker's
+// aim direction. Hull-assisted traces can catch entities far off the crosshair
+// (behind the attacker's back or high above the head), so filter those hits out.
+bool IsKnifeHitWithinAimCone(CBaseEntity *pHit, const Vector &vecSrc, const Vector &vecAim)
+{
+	Vector vecNearest(
+		Q_clamp(vecSrc.x, pHit->pev->absmin.x, pHit->pev->absmax.x),
+		Q_clamp(vecSrc.y, pHit->pev->absmin.y, pHit->pev->absmax.y),
+		Q_clamp(vecSrc.z, pHit->pev->absmin.z, pHit->pev->absmax.z));
+
+	Vector vecToTarget = vecNearest - vecSrc;
+
+	// the attack originates inside the target's hull
+	if (vecToTarget.Length() < 1.0f)
+		return true;
+
+	return DotProduct(vecToTarget.Normalize(), vecAim) > 0.5f; // cos(60)
+}
+
+// The regular knife trace starts at eye level, so its reach (distance + hull padding)
+// cannot cover a target right below the attacker (e.g. when standing on their head)
+// even at point-blank range. Retrace from the body center to cover that case.
+void KnifeTraceFromBody(CBasePlayer *pPlayer, float flDistance, TraceResult &tr)
+{
+	TraceResult trBody;
+	Vector vecSrc = pPlayer->pev->origin;
+	Vector vecEnd = vecSrc + gpGlobals->v_forward * flDistance;
+
+	gpGlobals->trace_flags = FTRACE_KNIFE;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, pPlayer->edict(), &trBody);
+
+	if (trBody.flFraction >= 1.0f)
+	{
+		gpGlobals->trace_flags = FTRACE_KNIFE;
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, pPlayer->edict(), &trBody);
+		gpGlobals->trace_flags = 0;
+	}
+
+	if (trBody.flFraction < 1.0f)
+	{
+		// accept damageable entities only, a world hit here must not
+		// override the regular trace verdict
+		CBaseEntity *pHit = CBaseEntity::Instance(trBody.pHit);
+		if (pHit && !pHit->IsBSPModel() && IsKnifeHitWithinAimCone(pHit, vecSrc, gpGlobals->v_forward))
+			tr = trBody;
+	}
+}
+#endif
+
 void CKnife::PrimaryAttack()
 {
 	Swing(TRUE);
@@ -306,11 +356,28 @@ BOOL CKnife::Swing(BOOL fFirst)
 			{
 				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, m_pPlayer->edict());
 			}
+#ifdef REGAMEDLL_ADD
+			else if (((int)knife_hit_detection.value & 1) && !IsKnifeHitWithinAimCone(pHit, vecSrc, gpGlobals->v_forward))
+			{
+				// the hull caught an entity too far off the crosshair, treat as miss
+				tr.flFraction = 1.0f;
+			}
+#endif
 
 			// This is the point on the actual surface (the hull could have hit space)
 			vecEnd = tr.vecEndPos;
 		}
 	}
+
+#ifdef REGAMEDLL_ADD
+	if (((int)knife_hit_detection.value & 2) && tr.flFraction >= 1.0f)
+	{
+		KnifeTraceFromBody(m_pPlayer, KnifeSwingDistance(), tr);
+
+		if (tr.flFraction < 1.0f)
+			vecEnd = tr.vecEndPos;
+	}
+#endif
 
 	if (tr.flFraction >= 1.0f)
 	{
@@ -390,17 +457,18 @@ BOOL CKnife::Swing(BOOL fFirst)
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev,
-			KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
-			gpGlobals->v_forward,
-			&tr,
-			(DMG_NEVERGIB | DMG_BULLET));
+		if (pEntity)
+		{
+			pEntity->TraceAttack(m_pPlayer->pev,
+				KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
+				gpGlobals->v_forward,
+				&tr,
+				(DMG_NEVERGIB | DMG_BULLET));
 
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		}
 
-#ifndef REGAMEDLL_FIXES
-		if (pEntity)	// -V595
-#endif
+		if (pEntity)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE
 #ifdef REGAMEDLL_FIXES
@@ -505,11 +573,28 @@ BOOL CKnife::Stab(BOOL fFirst)
 			{
 				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, m_pPlayer->edict());
 			}
+#ifdef REGAMEDLL_ADD
+			else if (((int)knife_hit_detection.value & 1) && !IsKnifeHitWithinAimCone(pHit, vecSrc, gpGlobals->v_forward))
+			{
+				// the hull caught an entity too far off the crosshair, treat as miss
+				tr.flFraction = 1.0f;
+			}
+#endif
 
 			// This is the point on the actual surface (the hull could have hit space)
 			vecEnd = tr.vecEndPos;
 		}
 	}
+
+#ifdef REGAMEDLL_ADD
+	if (((int)knife_hit_detection.value & 2) && tr.flFraction >= 1.0f)
+	{
+		KnifeTraceFromBody(m_pPlayer, KnifeStabDistance(), tr);
+
+		if (tr.flFraction < 1.0f)
+			vecEnd = tr.vecEndPos;
+	}
+#endif
 
 	if (tr.flFraction >= 1.0f)
 	{
@@ -585,12 +670,13 @@ BOOL CKnife::Stab(BOOL fFirst)
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, (DMG_NEVERGIB | DMG_BULLET));
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		if (pEntity)
+		{
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, (DMG_NEVERGIB | DMG_BULLET));
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		}
 
-#ifndef REGAMEDLL_FIXES
-		if (pEntity)	// -V595
-#endif
+		if (pEntity)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE
 #ifdef REGAMEDLL_FIXES
