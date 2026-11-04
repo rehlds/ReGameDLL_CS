@@ -426,7 +426,7 @@ void CSave::WritePositionVector(const char *pname, const float *value, int count
 
 void CSave::WriteFunction(const char *pname, void **data, int count)
 {
-	const char *functionName = NAME_FOR_FUNCTION((uint32)*data);
+	const char *functionName = NAME_FOR_FUNCTION(*data);
 
 	if (functionName)
 		BufferField(pname, Q_strlen(functionName) + 1, functionName);
@@ -749,9 +749,9 @@ int CRestore::ReadField(void *pBaseData, TYPEDESCRIPTION *pFields, int fieldCoun
 					case FIELD_FUNCTION:
 					{
 						if (!Q_strlen((char *)pInputData))
-							*((int *)pOutputData) = 0;
+							*((void **)pOutputData) = nullptr;
 						else
-							*((int *)pOutputData) = FUNCTION_FROM_NAME((char *)pInputData);
+							*((void **)pOutputData) = FUNCTION_FROM_NAME((char *)pInputData);
 
 						break;
 					}
