@@ -39,6 +39,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | give                                | Give weapon command.<br/> Args:<br/><weapon_name><br/>Usage:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 255                         | Give all weapons.<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 200                         | Noclip with air acceleration.<br/><br/>NOTE: `sv_cheats 1` required. |
+| god                                 | Toggle godmode (ignore all damage).<br/> Args: none — call again to disable.<br/><br/>NOTE: `sv_cheats 1` required. `kill` still works while godmode is on. |
 
 ## Configuration (cvars)
 <details>
