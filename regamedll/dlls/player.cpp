@@ -917,6 +917,12 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 	int armorHit = 0;
 	CBasePlayer *pAttack = nullptr;
 
+#ifdef REGAMEDLL_FIXES
+	// don't take damage while godmode is enabled (cheat command "god")
+	if (pev->flags & FL_GODMODE)
+		return FALSE;
+#endif
+
 #ifdef REGAMEDLL_ADD
 	{
 		CBaseEntity *pAttacker = GET_PRIVATE<CBaseEntity>(ENT(pevAttacker));
