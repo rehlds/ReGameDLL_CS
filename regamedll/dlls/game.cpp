@@ -257,6 +257,9 @@ void GameDLL_SwapTeams_f()
 
 #endif // REGAMEDLL_ADD
 
+cvar_t point_servercommand_whitelist = { "mp_point_servercommand_whitelist", "", FCVAR_SPONLY, 0.0f, nullptr };
+cvar_t point_command_cooldown         = { "mp_point_command_cooldown", "0", FCVAR_SPONLY, 0.0f, nullptr };
+
 SpewRetval_t GameDLL_SpewHandler(SpewType_t spewType, int level, const char *pMsg);
 
 void EXT_FUNC GameDLLInit()
@@ -509,6 +512,9 @@ void EXT_FUNC GameDLLInit()
 	SERVER_EXECUTE();
 
 #endif // REGAMEDLL_ADD
+
+	CVAR_REGISTER(&point_servercommand_whitelist);
+	CVAR_REGISTER(&point_command_cooldown);
 
 	Regamedll_Game_Init();
 
