@@ -176,6 +176,10 @@ void CNavArea::Initialize()
 
 	m_prevHash = nullptr;
 	m_nextHash = nullptr;
+
+	m_nextOpen = nullptr;
+	m_prevOpen = nullptr;
+	m_openMarker = 0;
 }
 
 // Constructor used during normal runtime
@@ -264,6 +268,10 @@ CNavArea::CNavArea(CNavNode *nwNode, class CNavNode *neNode, class CNavNode *seN
 // Destructor
 CNavArea::~CNavArea()
 {
+	// detach from the A* open list before the memory is freed
+	if (IsOpen())
+		RemoveFromOpenList();
+
 	// tell all bots that this area no longer exists
 	TheCSBots()->OnDestroyNavDataNotify(NAV_NOTIFY_DESTROY_AREA, this);
 
@@ -920,6 +928,9 @@ void DestroyLadders()
 void DestroyNavigationMap()
 {
 	CNavArea::m_isReset = true;
+
+	// the open list may still reference areas that are about to be deleted
+	CNavArea::ClearSearchLists();
 
 	// destroy all hiding spots
 	DestroyHidingSpots();
@@ -2496,6 +2507,10 @@ void CNavArea::AddToOpenList()
 // TODO: "bubbling" does unnecessary work, since the order of all other nodes will be unchanged - only this node is altered
 void CNavArea::UpdateOnOpenList()
 {
+	// only valid if this area is actually on the open list
+	if (!IsOpen())
+		return;
+
 	// since value can only decrease, bubble this area up from current spot
 	while (m_prevOpen && this->GetTotalCost() < m_prevOpen->GetTotalCost())
 	{
