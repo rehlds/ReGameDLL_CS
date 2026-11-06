@@ -402,4 +402,19 @@ bool CReGameApi::BGetIGameRules(const char *pchVersion) const
 	return false;
 }
 
+void CReGameApi::QueueHudMessage(int client, const struct hudtextparms_s &textparms, const char *pMessage)
+{
+	if (client == 0)
+	{
+		for (int i = 1; i <= gpGlobals->maxClients; i++)
+		{
+			g_HudQueue.QueueMessage(i, textparms, pMessage);
+		}
+	}
+	else
+	{
+		g_HudQueue.QueueMessage(client, textparms, pMessage);
+	}
+}
+
 EXPOSE_SINGLE_INTERFACE(CReGameApi, IReGameApi, VRE_GAMEDLL_API_VERSION);
