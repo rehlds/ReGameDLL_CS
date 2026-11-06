@@ -856,6 +856,7 @@ public:
 	virtual struct AmmoInfoStruct *GetAmmoInfoEx(const char *ammoName) = 0;
 	virtual bool BGetICSEntity(const char *pchVersion) const = 0;
 	virtual bool BGetIGameRules(const char *pchVersion) const = 0;
+	virtual void QueueHudMessage(int client, const struct hudtextparms_s &textparms, const char *pMessage) = 0;
 };
 
 #define VRE_GAMEDLL_API_VERSION "VRE_GAMEDLL_API_VERSION001"

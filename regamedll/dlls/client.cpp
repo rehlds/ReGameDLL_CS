@@ -1,4 +1,6 @@
 #include "precompiled.h"
+#include "weapons.h"
+#include "gamerules.h"
 
 int gmsgWeapPickup = 0;
 int gmsgHudText = 0;
@@ -3910,7 +3912,7 @@ void EXT_FUNC PlayerPostThink(edict_t *pEntity)
 
 void EXT_FUNC ParmsNewLevel()
 {
-	;
+	g_HudQueue.Reset();
 }
 
 void EXT_FUNC ParmsChangeLevel()
@@ -3924,6 +3926,60 @@ void EXT_FUNC ParmsChangeLevel()
 	}
 }
 
+extern cvar_t entity_gc;
+
+void CollectGarbage()
+{
+	if (entity_gc.value <= 0.0f)
+		return;
+
+	// Check if we are near the max entities limit
+	if (NUMBER_OF_ENTITIES() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE))
+		return;
+
+	int count = 0;
+	// We iterate from oldest (lowest index) to newest
+	for (int i = 1; i < gpGlobals->maxEntities; i++)
+	{
+		edict_t *pEdict = INDEXENT(i);
+		if (!pEdict || pEdict->free)
+			continue;
+
+		CBaseEntity *pEntity = CBaseEntity::Instance(pEdict);
+		if (!pEntity)
+			continue;
+
+		if (FClassnameIs(pEdict, "weaponbox"))
+		{
+			CWeaponBox *pBox = (CWeaponBox *)pEntity;
+			if (pBox->m_bIsBomb)
+				continue; // DO NOT remove the C4!
+
+			UTIL_Remove(pEntity);
+			count++;
+		}
+		else if (FClassnameIs(pEdict, "weapon_shield"))
+		{
+			UTIL_Remove(pEntity);
+			count++;
+		}
+		else if (FClassnameIs(pEdict, "gib"))
+		{
+			UTIL_Remove(pEntity);
+			count++;
+		}
+
+		// Stop if we cleared enough entities (e.g., 50 entities) to avoid lagging the server by doing too much at once
+		if (count >= 50)
+			break;
+	}
+
+	if (count > 0)
+	{
+		ALERT(at_console, "Garbage Collector: Removed %d old entities to prevent server crash.\n", count);
+	}
+}
+
 void EXT_FUNC StartFrame()
 {
 	if (g_pGameRules)
@@ -3933,6 +3989,9 @@ void EXT_FUNC StartFrame()
 			return;
 	}
 
+	CollectGarbage();
+
+	g_HudQueue.Think();
 	CLocalNav::Think();
 
 	gpGlobals->teamplay = 1.0f;
