@@ -105,6 +105,10 @@ BOOL CCSBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float f
 		CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pAttacker);
 		if (BotRelationship(pPlayer) == BOT_TEAMMATE && !pPlayer->IsBot())
 		{
+#ifdef REGAMEDLL_FIXES
+			// (Ancient bug maybe) The bots will not react if they get shot by a teammate while mp_friendlyfire is 0.
+			if (friendlyfire.value != 0.0f)
+#endif
 			GetChatter()->FriendlyFire();
 		}
 
