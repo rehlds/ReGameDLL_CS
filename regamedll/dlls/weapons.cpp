@@ -107,6 +107,11 @@ void EXT_FUNC __API_HOOK(AddMultiDamage)(entvars_t *pevInflictor, CBaseEntity *p
 	if (!pEntity)
 		return;
 
+#ifdef REGAMEDLL_FIXES
+	if (flDamage <= 0.0f) // avoid zero or negative damage TakeDamage
+		return;
+#endif
+
 	gMultiDamage.type |= bitsDamageType;
 
 	if (pEntity != gMultiDamage.hEntity)
