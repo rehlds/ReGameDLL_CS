@@ -147,6 +147,10 @@ endif()
 if (NOT DEBUG)
 	set(LINK_FLAGS "${LINK_FLAGS} \
 		-Wl,-gc-sections -Wl,--version-script=\"${PROJECT_SOURCE_DIR}/../version_script.lds\"")
+	if (CMAKE_SYSTEM_NAME MATCHES "BSD|DragonFly")
+		# lld rejects version script entries for symbols not defined in the output (libstdc++-only names)
+		set(LINK_FLAGS "${LINK_FLAGS} -Wl,--undefined-version")
+	endif()
 endif()
 
 find_program(CCACHE_FOUND ccache)

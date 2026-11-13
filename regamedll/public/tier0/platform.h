@@ -71,7 +71,7 @@
 // Can't use extern "C" when DLL exporting a global
 #define DLL_GLOBAL_EXPORT extern __declspec(dllexport)
 #define DLL_GLOBAL_IMPORT extern __declspec(dllimport)
-#elif defined __linux__
+#elif defined __linux__ || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
 
 // Used for dll exporting and importing
 #define DLL_EXPORT extern "C"

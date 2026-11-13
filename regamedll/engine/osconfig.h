@@ -84,7 +84,9 @@
 	#include <sys/stat.h>
 	#include <sys/time.h>
 	#include <sys/types.h>
+	#ifdef __linux__
 	#include <sys/sysinfo.h>
+	#endif
 	#include <unistd.h>
 #endif // _WIN32
 
