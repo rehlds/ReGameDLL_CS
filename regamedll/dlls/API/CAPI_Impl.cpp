@@ -143,6 +143,22 @@ CGrenade *EXT_FUNC SpawnGrenade_api(WeaponIdType weaponId, entvars_t *pevOwner, 
 	return nullptr;
 }
 
+bool EXT_FUNC IsInsideSmokeCloud_api(const Vector &pos)
+{
+	if (!TheBots)
+		return false;
+
+	return TheBots->IsInsideSmokeCloud(&pos);
+}
+
+bool EXT_FUNC IsLineBlockedBySmoke_api(const Vector &from, const Vector &to)
+{
+	if (!TheBots)
+		return false;
+
+	return TheBots->IsLineBlockedBySmoke(&from, &to);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -176,6 +192,9 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	TextureTypePlaySound_api,
 	CreateWeaponBox_api,
 	SpawnGrenade_api,
+
+	IsInsideSmokeCloud_api,
+	IsLineBlockedBySmoke_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
