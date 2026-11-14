@@ -341,6 +341,8 @@ GAMEHOOK_REGISTRY(CBasePlayer_TakeDamageImpulse);
 
 GAMEHOOK_REGISTRY(SendSayMessage);
 
+GAMEHOOK_REGISTRY(CBasePlayer_HandleSignals);
+
 int CReGameApi::GetMajorVersion() {
 	return REGAMEDLL_API_VERSION_MAJOR;
 }

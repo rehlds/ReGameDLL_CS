@@ -640,6 +640,10 @@ typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, fl
 typedef IHookChain<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHook_SendSayMessage;
 typedef IHookChainRegistry<void, CBasePlayer *, const char *, BOOL, const char*, const char*, const char*, bool, const char*, bool> IReGameHookRegistry_SendSayMessage;
 
+// CBasePlayer::HandleSignals hook
+typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_HandleSignals;
+typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBasePlayer_HandleSignals;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -807,6 +811,8 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
 
 	virtual IReGameHookRegistry_SendSayMessage *SendSayMessage() = 0;
+
+	virtual IReGameHookRegistry_CBasePlayer_HandleSignals *CBasePlayer_HandleSignals() = 0;
 };
 
 struct ReGameFuncs_t {
