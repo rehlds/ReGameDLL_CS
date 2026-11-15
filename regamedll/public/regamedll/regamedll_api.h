@@ -38,7 +38,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 30
+#define REGAMEDLL_API_VERSION_MINOR 35
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -833,6 +833,35 @@ struct ReGameFuncs_t {
 	void (*TextureTypePlaySound)(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType);
 	class CWeaponBox *(*CreateWeaponBox)(CBasePlayerItem *pItem, CBasePlayer *pPlayerOwner, const char *modelName, Vector &origin, Vector &angles, Vector &velocity, float lifeTime, bool packAmmo);
 	class CGrenade *(*SpawnGrenade)(WeaponIdType weaponId, entvars_t *pevOwner, Vector &vecSrc, Vector &vecThrow, float time, int iTeam, unsigned short usEvent);
+
+	// Extended API (5.31)
+	int (*GetPlayerAccount)(CBasePlayer *pPlayer);
+	void (*SetPlayerAccount)(CBasePlayer *pPlayer, int amount);
+	CBasePlayer *(*UTIL_PlayerByIndex)(int playerIndex);
+	void (*UTIL_ClientPrintAll)(int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4);
+
+	// Extended API (5.32)
+	void (*SetPlayerHealth)(CBasePlayer *pPlayer, float health);
+	void (*SetPlayerArmor)(CBasePlayer *pPlayer, float armor, float armorType);
+	void (*UTIL_ShowMessageAll)(const char *pString, bool isHint);
+	bool (*BotAdd)(TeamName team);
+	bool (*BotKick)(TeamName team);
+
+	// Extended API (5.33)
+	void (*UTIL_ShowMessage)(const char *pString, CBaseEntity *pEntity, bool isHint);
+	void (*UTIL_ScreenFade)(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
+	void (*UTIL_ScreenShake)(const Vector &center, float amplitude, float frequency, float duration, float radius);
+
+	// Extended API (5.34)
+	void (*UTIL_SayTextAll)(const char *pText, CBaseEntity *pEntity);
+	void (*SetPlayerFrags)(CBasePlayer *pPlayer, float frags);
+	void (*SetPlayerDeaths)(CBasePlayer *pPlayer, int deaths);
+
+	// Extended API (5.35)
+	float (*GetPlayerHealth)(CBasePlayer *pPlayer);
+	float (*GetPlayerArmor)(CBasePlayer *pPlayer);
+	TeamName (*GetPlayerTeam)(CBasePlayer *pPlayer);
+	bool (*IsPlayerAlive)(CBasePlayer *pPlayer);
 };
 
 class IReGameApi {

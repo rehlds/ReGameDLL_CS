@@ -143,6 +143,149 @@ CGrenade *EXT_FUNC SpawnGrenade_api(WeaponIdType weaponId, entvars_t *pevOwner, 
 	return nullptr;
 }
 
+int EXT_FUNC GetPlayerAccount_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0;
+
+	return pPlayer->m_iAccount;
+}
+
+void EXT_FUNC SetPlayerAccount_api(CBasePlayer *pPlayer, int amount)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->m_iAccount = amount;
+}
+
+CBasePlayer *EXT_FUNC UTIL_PlayerByIndex_api(int playerIndex)
+{
+	return ::UTIL_PlayerByIndex(playerIndex);
+}
+
+void EXT_FUNC UTIL_ClientPrintAll_api(int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4)
+{
+	::UTIL_ClientPrintAll(msg_dest, msg_name, param1, param2, param3, param4);
+}
+
+void EXT_FUNC SetPlayerHealth_api(CBasePlayer *pPlayer, float health)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->health = health;
+}
+
+void EXT_FUNC SetPlayerArmor_api(CBasePlayer *pPlayer, float armor, float armorType)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->armorvalue = armor;
+	pPlayer->pev->armortype = armorType;
+}
+
+void EXT_FUNC UTIL_ShowMessageAll_api(const char *pString, bool isHint)
+{
+	::UTIL_ShowMessageAll(pString, isHint);
+}
+
+bool EXT_FUNC BotAdd_api(TeamName team)
+{
+	if (!TheBots)
+		return false;
+
+	BotProfileTeamType botTeam;
+	switch (team)
+	{
+		case TERRORIST:
+			botTeam = BOT_TEAM_T;
+			break;
+		case CT:
+			botTeam = BOT_TEAM_CT;
+			break;
+		default:
+			botTeam = BOT_TEAM_ANY;
+			break;
+	}
+
+	return TheCSBots()->BotAddCommand(botTeam, false);
+}
+
+bool EXT_FUNC BotKick_api(TeamName team)
+{
+	return UTIL_KickBotFromTeam(team);
+}
+
+void EXT_FUNC UTIL_ShowMessage_api(const char *pString, CBaseEntity *pEntity, bool isHint)
+{
+	::UTIL_ShowMessage(pString, pEntity, isHint);
+}
+
+void EXT_FUNC UTIL_ScreenFade_api(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
+{
+	::UTIL_ScreenFade(pEntity, color, fadeTime, fadeHold, alpha, flags);
+}
+
+void EXT_FUNC UTIL_ScreenShake_api(const Vector &center, float amplitude, float frequency, float duration, float radius)
+{
+	::UTIL_ScreenShake(center, amplitude, frequency, duration, radius);
+}
+
+void EXT_FUNC UTIL_SayTextAll_api(const char *pText, CBaseEntity *pEntity)
+{
+	::UTIL_SayTextAll(pText, pEntity);
+}
+
+void EXT_FUNC SetPlayerFrags_api(CBasePlayer *pPlayer, float frags)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->pev->frags = frags;
+}
+
+void EXT_FUNC SetPlayerDeaths_api(CBasePlayer *pPlayer, int deaths)
+{
+	if (!pPlayer)
+		return;
+
+	pPlayer->m_iDeaths = deaths;
+}
+
+float EXT_FUNC GetPlayerHealth_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0.0f;
+
+	return pPlayer->pev->health;
+}
+
+float EXT_FUNC GetPlayerArmor_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return 0.0f;
+
+	return pPlayer->pev->armorvalue;
+}
+
+TeamName EXT_FUNC GetPlayerTeam_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return UNASSIGNED;
+
+	return pPlayer->m_iTeam;
+}
+
+bool EXT_FUNC IsPlayerAlive_api(CBasePlayer *pPlayer)
+{
+	if (!pPlayer)
+		return false;
+
+	return pPlayer->IsAlive() != FALSE;
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -176,6 +319,30 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	TextureTypePlaySound_api,
 	CreateWeaponBox_api,
 	SpawnGrenade_api,
+
+	GetPlayerAccount_api,
+	SetPlayerAccount_api,
+	UTIL_PlayerByIndex_api,
+	UTIL_ClientPrintAll_api,
+
+	SetPlayerHealth_api,
+	SetPlayerArmor_api,
+	UTIL_ShowMessageAll_api,
+	BotAdd_api,
+	BotKick_api,
+
+	UTIL_ShowMessage_api,
+	UTIL_ScreenFade_api,
+	UTIL_ScreenShake_api,
+
+	UTIL_SayTextAll_api,
+	SetPlayerFrags_api,
+	SetPlayerDeaths_api,
+
+	GetPlayerHealth_api,
+	GetPlayerArmor_api,
+	GetPlayerTeam_api,
+	IsPlayerAlive_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
