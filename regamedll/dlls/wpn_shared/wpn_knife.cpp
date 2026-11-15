@@ -390,17 +390,18 @@ BOOL CKnife::Swing(BOOL fFirst)
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev,
-			KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
-			gpGlobals->v_forward,
-			&tr,
-			(DMG_NEVERGIB | DMG_BULLET));
+		if (pEntity)
+		{
+			pEntity->TraceAttack(m_pPlayer->pev,
+				KnifeSwingDamage(m_flNextPrimaryAttack + 0.4f < UTIL_WeaponTimeBase()),
+				gpGlobals->v_forward,
+				&tr,
+				(DMG_NEVERGIB | DMG_BULLET));
+		}
 
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
-#ifndef REGAMEDLL_FIXES
 		if (pEntity)	// -V595
-#endif
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE
 #ifdef REGAMEDLL_FIXES
