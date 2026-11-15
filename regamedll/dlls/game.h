@@ -225,6 +225,9 @@ extern cvar_t show_bomb_timer;
 
 #endif
 
+extern cvar_t point_servercommand_whitelist;
+extern cvar_t point_command_cooldown;
+
 extern cvar_t scoreboard_showmoney;
 extern cvar_t scoreboard_showhealth;
 extern cvar_t scoreboard_showdefkit;

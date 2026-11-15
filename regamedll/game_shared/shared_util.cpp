@@ -41,13 +41,17 @@ char *SharedVarArgs(char *format, ...)
 char *BufPrintf(char *buf, int &len, const char *fmt, ...)
 {
 	va_list argptr;
-	if (len > 0)
+	if (len > 0 && buf != nullptr)
 	{
+		const int startLen = Q_strlen(buf);
+
 		va_start(argptr, fmt);
 		Q_vsnprintf(buf, len, fmt, argptr);
 		va_end(argptr);
 
-		len -= Q_strlen(buf);
+		// Subtract only the characters actually written, not the whole buffer length
+		const int written = Q_strlen(buf) - startLen;
+		len -= written;
 		return buf + Q_strlen(buf);
 	}
 
@@ -56,16 +60,20 @@ char *BufPrintf(char *buf, int &len, const char *fmt, ...)
 
 wchar_t *BufWPrintf(wchar_t *buf, int &len, const wchar_t *fmt, ...)
 {
-	if (len <= 0)
+	if (len <= 0 || buf == nullptr)
 		return nullptr;
 
 	va_list argptr;
+
+	const int startLen = wcslen(buf);
 
 	va_start(argptr, fmt);
 	Q_vsnwprintf(buf, len, fmt, argptr);
 	va_end(argptr);
 
-	len -= wcslen(buf);
+	// Subtract only the characters actually written, not the whole buffer length
+	const int written = wcslen(buf) - startLen;
+	len -= written;
 	return buf + wcslen(buf);
 }
 
