@@ -4944,6 +4944,36 @@ void EXT_FUNC RegisterEncoders()
 	DELTA_ADDENCODER("Player_Encode", Player_Encode);
 }
 
+#ifdef REGAMEDLL_FIXES
+// Client weapon prediction only knows the default clip sizes: 0 is empty, the default size is full
+// and a shotgun at the default size - 1 is full after one more shell. Map a custom iMaxClip onto
+// those values; any other clip is capped at the default size - 2, so low clips stay exact.
+static int GetClientPredictionClip(int iClip, int iMaxClip, int iWeaponId)
+{
+	if (iClip <= 0 || iMaxClip <= 0)
+		return iClip;
+
+	const WeaponInfoStruct *wpnInfo = GetDefaultWeaponInfo(iWeaponId);
+	if (!wpnInfo)
+		return iClip;
+
+	const int iDefaultMaxClip = wpnInfo->gunClipSize;
+
+	// the default size - 2 must stay above 0, which the client would read as empty
+	if (iDefaultMaxClip <= 2 || iMaxClip == iDefaultMaxClip)
+		return iClip;
+
+	if (iClip == iMaxClip)
+		return iDefaultMaxClip;
+
+	// keep a clip of 1 as is, so the last shot is predicted
+	if (iClip == iMaxClip - 1 && iClip > 1)
+		return iDefaultMaxClip - 1;
+
+	return Q_min(iClip, iDefaultMaxClip - 2);
+}
+#endif
+
 int EXT_FUNC GetWeaponData(edict_t *pEdict, struct weapon_data_s *info)
 {
 #ifdef CLIENT_WEAPONS
@@ -4995,13 +5025,7 @@ int EXT_FUNC GetWeaponData(edict_t *pEdict, struct weapon_data_s *info)
 					item->iuser1 = weapon->m_iSwing;
 
 #ifdef REGAMEDLL_FIXES
-					if (pPlayerItem == pPlayer->m_pActiveItem && !weapon->m_fInReload && weapon->m_iClip == II.iMaxClip)
-					{
-						const WeaponInfoStruct *wpnInfo = GetDefaultWeaponInfo(II.iId);
-
-						if (wpnInfo && wpnInfo->gunClipSize != II.iMaxClip)
-							item->m_iClip = wpnInfo->gunClipSize;
-					}
+					item->m_iClip = GetClientPredictionClip(weapon->m_iClip, II.iMaxClip, II.iId);
 #endif
 				}
 			}
