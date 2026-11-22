@@ -11,7 +11,7 @@ clientdata_t none
 	DEFINE_DELTA( velocity[0], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
 	DEFINE_DELTA( velocity[1], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
 
-	DEFINE_DELTA( m_flNextAttack, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
+	DEFINE_DELTA( m_flNextAttack, DT_INTEGER, 32, 1.0 ),
 
 	DEFINE_DELTA( origin[2], DT_SIGNED | DT_FLOAT, 24, 1024.0 ),
 	DEFINE_DELTA( velocity[2], DT_SIGNED | DT_FLOAT, 16, 8.0 ),
@@ -224,10 +224,10 @@ usercmd_t none
 weapon_data_t none
 {
 	DEFINE_DELTA( m_flTimeWeaponIdle, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
-	DEFINE_DELTA( m_flNextPrimaryAttack, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
+	DEFINE_DELTA( m_flNextPrimaryAttack, DT_INTEGER, 32, 1.0 ),
 	DEFINE_DELTA( m_flNextReload, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
 	DEFINE_DELTA( m_fNextAimBonus, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
-	DEFINE_DELTA( m_flNextSecondaryAttack, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
+	DEFINE_DELTA( m_flNextSecondaryAttack, DT_INTEGER, 32, 1.0 ),
 	DEFINE_DELTA( m_iClip, DT_SIGNED | DT_INTEGER, 10, 1.0 ),
 	DEFINE_DELTA( m_flPumpTime, DT_FLOAT | DT_SIGNED, 22, 1000.0 ),
 	DEFINE_DELTA( m_fInSpecialReload, DT_INTEGER, 2, 1.0 ),
