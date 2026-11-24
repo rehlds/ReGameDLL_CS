@@ -176,6 +176,11 @@ void CNavArea::Initialize()
 
 	m_prevHash = nullptr;
 	m_nextHash = nullptr;
+
+	// 0 is not a live generation: m_masterMarker starts at 1 and MakeNewMarker() skips 0.
+	m_nextOpen = nullptr;
+	m_prevOpen = nullptr;
+	m_openMarker = 0;
 }
 
 // Constructor used during normal runtime
