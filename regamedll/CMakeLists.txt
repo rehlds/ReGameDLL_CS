@@ -345,6 +345,7 @@ set(UNITTESTS_SRCS
 	"unittests/animation_tests.cpp"
 	"unittests/shared_util_tests.cpp"
 	"unittests/struct_offsets_tests.cpp"
+	"unittests/nav_openlist_tests.cpp"
 	"unittests/TestRunner.cpp"
 )
 
