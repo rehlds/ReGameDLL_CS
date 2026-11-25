@@ -254,7 +254,7 @@ enum KillRarity
 	KILLRARITY_DOMINATION_BEGAN = 0x040, // Killer player began dominating the victim (NOTE: this flag is set once)
 	KILLRARITY_DOMINATION       = 0x080, // Continues domination by the killer
 	KILLRARITY_REVENGE          = 0x100, // Revenge by the killer
-	KILLRARITY_INAIR            = 0x200  // Killer was in the air (skill to deal with high inaccuracy)
+	KILLRARITY_INAIR            = 0x200,  // Killer was in the air (skill to deal with high inaccuracy)
 	KILLRARITY_LAST_BULLET      = 0x400  // It was a lucky kill with the last remaining bullet
 };
 
