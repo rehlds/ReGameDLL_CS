@@ -5336,6 +5336,14 @@ int CHalfLifeMultiplay::GetRarityOfKill(CBaseEntity *pKiller, CBasePlayer *pVict
 			// The killer player kills the victim while in air
 			if (!(pKillerPlayer->pev->flags & FL_ONGROUND))
 				iRarity |= KILLRARITY_INAIR;
+
+			// It was a lucky kill with the last remaining bullet
+			if (pKillerPlayer->m_pActiveItem)
+			{
+				CBasePlayerWeapon *pWeapon = static_cast<CBasePlayerWeapon *>(pKillerPlayer->m_pActiveItem);
+				if (pWeapon->m_iShotsFired > 1 && pWeapon->m_iClip <= 0)
+					iRarity |= KILLRARITY_LAST_BULLET;
+			}
 		}
 
 		// Calculate # of unanswered kills between killer & victim
