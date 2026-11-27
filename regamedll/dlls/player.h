@@ -858,6 +858,13 @@ public:
 	CBasePlayerItem *m_rgpPlayerItems[MAX_ITEM_TYPES];
 	CBasePlayerItem *m_pActiveItem;
 	CBasePlayerItem *m_pClientActiveItem;
+
+	// Returns true if the player has a valid active item. Guards against the
+	// -1 sentinel that plugins can write through the ReAPI (set_member with -1).
+	bool HasActiveItem() const
+	{
+		return m_pActiveItem != nullptr && m_pActiveItem != reinterpret_cast<CBasePlayerItem *>(-1);
+	}
 	CBasePlayerItem *m_pLastItem;
 	int m_rgAmmo[MAX_AMMO_SLOTS];
 	int m_rgAmmoLast[MAX_AMMO_SLOTS];

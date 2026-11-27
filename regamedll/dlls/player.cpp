@@ -7425,7 +7425,7 @@ void CBasePlayer::ItemPreFrame()
 		return;
 #endif
 
-	if (!m_pActiveItem)
+	if (!HasActiveItem())
 		return;
 
 	m_pActiveItem->ItemPreFrame();
@@ -7440,7 +7440,7 @@ void CBasePlayer::ItemPostFrame()
 	if (m_pTank)
 		return;
 
-	if (m_pActiveItem)
+	if (HasActiveItem())
 	{
 		if (HasShield() && IsReloading())
 		{

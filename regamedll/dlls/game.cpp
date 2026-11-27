@@ -177,7 +177,7 @@ cvar_t freezetime_jump                   = { "mp_freezetime_jump", "1", 0, 1.0f,
 cvar_t jump_height                       = { "mp_jump_height", "45", FCVAR_SERVER, 45.0f, nullptr };
 cvar_t longjump_cooldown                 = { "mp_longjump_cooldown", "0.0", 0, 0.0f, nullptr };
 
-cvar_t hostages_rescued_ratio  = { "mp_hostages_rescued_ratio", "1.0", 0, 1.0f, nullptr };
+cvar_t hostages_rescued_ratio  = { "mp_hostages_rescued_ratio", "0.5", 0, 0.5f, nullptr };
 
 cvar_t legacy_vehicle_block    = { "mp_legacy_vehicle_block", "1", 0, 0.0f, nullptr };
 
@@ -205,6 +205,7 @@ cvar_t playerid_field          = { "mp_playerid_field", "3", 0, 3.0f, nullptr };
 cvar_t knockback               = { "mp_knockback", "170", 0, 170.0f, nullptr };
 
 cvar_t knife_wall_sparks       = { "mp_knife_wall_sparks", "0", 0, 0.0f, nullptr };
+cvar_t knife_hit_detection     = { "mp_knife_hit_detection", "0", 0, 0.0f, nullptr };
 cvar_t show_bomb_timer         = { "mp_show_bomb_timer", "0", 0, 0.0f, nullptr };
 
 void GameDLL_Version_f()
@@ -499,6 +500,7 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&knockback);
 
 	CVAR_REGISTER(&knife_wall_sparks);
+	CVAR_REGISTER(&knife_hit_detection);
 	CVAR_REGISTER(&show_bomb_timer);
 
 	// print version

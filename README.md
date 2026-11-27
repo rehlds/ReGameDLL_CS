@@ -123,7 +123,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | sv_enablebunnyhopping              | 0       | 0   | 1            | Allow player speed to exceed maximum running speed.<br/>`0` disabled <br/>`1` enabled |
 | mp_plant_c4_anywhere               | 0       | 0   | 1            | When set, players can plant anywhere, not only in bombsites.<br/>`0` disabled <br/>`1` enabled |
 | mp_give_c4_frags                   | 3       | -   | -            | How many bonuses (frags) will get the player who defused or exploded the bomb. |
-| mp_hostages_rescued_ratio          | 1.0     | 0.0 | 1.0          | Ratio of hostages rescued to win the round. |
+| mp_hostages_rescued_ratio          | 0.5     | 0.0 | 1.0          | Ratio of hostages rescued to win the round. |
 | mp_legacy_vehicle_block            | 1       | 0   | 1            | Legacy func_vehicle behavior when blocked by another entity.<br/>`0` New behavior <br/>`1` Legacy behavior |
 | mp_dying_time                      | 3.0     | 0.0 | -            | Time for switch to free observing after death.<br/>`0` - disable spectating around death.<br/>`>0.00001` - time delay to start spectate.<br/>`NOTE`: The countdown starts when the player’s death animation is finished. |
 | mp_deathmsg_flags                  | abc     | 0   | -            | Sets a flags for extra information in the player's death message.<br/>`0` disabled<br/>`a` position where the victim died<br/>`b` index of the assistant who helped the attacker kill the victim<br/>`c` rarity classification bits, e.g., `blinkill`, `noscope`, `penetrated`, etc. |
@@ -149,10 +149,6 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
 | mp_knockback                       | 170     | -   | -            | Knockback force applied to the victim when damaged by strong weapons (e.g. `AWP`, `AK47`).<br/>Works only if not crouching, and not hit in the legs.<br/>Set to `0` to disable. |
 | mp_knife_wall_sparks               | 0       | 0   | 1            | Show a spark effect at the point of impact when a knife hits a wall.<br/>`0` disabled<br/>`1` enabled |
-| bot_mimic                          | 0       | 0   | -            | Bot repeats all movements of the specified player by client index.<br/>Only alive human players can be mimicked, bots and dead players are ignored<br/>`0` disabled<br/>`>0` client index of the player to mimic |
-| bot_mimic_yaw_offset               | 0       | -   | -            | Yaw offset applied to view angles when bot mimics player movements. (in degrees) |
-| hostage_debug                      | 0       | 0   | -            | Debug output for hostages with improved AI. `NOTE`: Requires `hostage_ai_enable 1` in `game_init.cfg` |
-| hostage_stop                       | 0       | 0   | 1            | Stops movement of the hostages with improved AI. `NOTE`: Requires `hostage_ai_enable 1` in `game_init.cfg`<br/>`0` disabled<br/>`1` enabled |
 
 </details>
 
