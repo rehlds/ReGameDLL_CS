@@ -34,9 +34,11 @@ CSysModule *g_pFileSystemModule = nullptr;
 bool FileSystem_Init()
 {
 	g_pFileSystemModule = Sys_LoadModule(STDIO_FILESYSTEM_LIB);
+
+	// The game cannot run without it, and would only fault later on a null interface
 	if (!g_pFileSystemModule)
 	{
-		return false;
+		Sys_Error("Unable to find the filesystem module '" STDIO_FILESYSTEM_LIB "'.");
 	}
 
 	// Get FileSystem interface

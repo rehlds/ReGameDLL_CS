@@ -39,6 +39,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | give                                | Give weapon command.<br/> Args:<br/><weapon_name><br/>Usage:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 255                         | Give all weapons.<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 200                         | Noclip with air acceleration.<br/><br/>NOTE: `sv_cheats 1` required. |
+| god                                 | Toggle godmode (ignore all damage).<br/> Args: none — call again to disable.<br/><br/>NOTE: `sv_cheats 1` required. `kill` still works while godmode is on. |
 
 ## Configuration (cvars)
 <details>
@@ -131,6 +132,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_freezetime_jump                 | 1       | 0   | 1            | Allow players to jump during freezetime.<br/> `0` disabled<br/>`1` enabled |
 | mp_defuser_allocation              | 0       | 0   | 2            | Give defuser on player spawn.<br/> `0` disabled<br/>`1` Random players. <br/>`2` All players. |
 | mp_location_area_info              | 0       | 0   | 3            | Enable location area info.<br/> `0` disabled<br/>`1` show location below HUD radar.<br/>`2` show location in HUD chat. `NOT RECOMMENDED!` [:speech_balloon:](## "Not all client builds are compatible")<br/>`3` both displayed. `NOT RECOMMENDED!` [:speech_balloon:](## "Not all client builds are compatible")<br/><br/>`NOTE`: Navigation `maps/.nav` file required and should contain place names<br/>`NOTE`: If option `2` or `3` is enabled, be sure to enable `mp_chat_loc_fallback 1` |
+| mp_chat_loc_fallback               | 1       | 0   | 1            | Send pre-formatted colored text with location name in HUD chat and radio messages, instead of localized string tokens (`#Cstrike_Chat_CT_Loc`, `#Game_radio_location`).<br/>Used for compatibility with old client builds that do not know these tokens.<br/>Works in conjunction with `mp_location_area_info 2` or `3`<br/>`0` disabled<br/>`1` enabled |
 | mp_item_respawn_time               | 30      | 0.0 | -            | The respawn time for items (such as health packs, armor, etc.). |
 | mp_weapon_respawn_time             | 20      | 0.0 | -            | The respawn time for weapons. |
 | mp_ammo_respawn_time               | 20      | 0.0 | -            | The respawn time for ammunition. |
@@ -147,7 +149,6 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | mp_playerid_field                  | 3       | 0   | 3            | Player ID field display mode.<br/>`0` don't show additional information<br/>`1` show team name<br/>`2` show health percentage<br/>`3` show both team name and health percentage |
 | mp_knockback                       | 170     | -   | -            | Knockback force applied to the victim when damaged by strong weapons (e.g. `AWP`, `AK47`).<br/>Works only if not crouching, and not hit in the legs.<br/>Set to `0` to disable. |
 | mp_knife_wall_sparks               | 0       | 0   | 1            | Show a spark effect at the point of impact when a knife hits a wall.<br/>`0` disabled<br/>`1` enabled |
-| mp_knife_hit_detection             | 0       | 0   | 3            | Improved knife hit detection (bit flags, sum to combine).<br/>`0` vanilla behavior<br/>`+1` reject hits landing too far off the crosshair<br/>`+2` allow hitting a target right below the attacker |
 
 </details>
 

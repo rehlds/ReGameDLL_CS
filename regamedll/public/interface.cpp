@@ -133,6 +133,13 @@ CSysModule *Sys_LoadModule(const char *pModuleName)
 	char szAbsoluteModuleName[1024];
 	if (pModuleName[0] != '/')
 	{
+		// As LoadLibrary on Windows: the name goes to the search of the system, which finds
+		// a module the process has loaded already, wherever the launcher keeps it
+		hDLL = dlopen(pModuleName, RTLD_NOW);
+	}
+
+	if (!hDLL && pModuleName[0] != '/')
+	{
 		char szCwd[1024];
 		getcwd(szCwd, sizeof(szCwd));
 		if (szCwd[strlen(szCwd) - 1] == '/')
