@@ -592,47 +592,128 @@ void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, 
 	UTIL_ScreenFadeWrite(fade, pEntity);
 }
 
+CHudMessageQueue g_HudQueue;
+
+CHudMessageQueue::CHudMessageQueue() {
+	Reset();
+}
+
+void CHudMessageQueue::Reset() {
+	for (int i = 0; i < 33; i++) {
+		for (int j = 0; j < NUM_HUD_CHANNELS; j++) {
+			m_players[i].channelFreeTime[j] = 0.0f;
+		}
+		for (int j = 0; j < MAX_HUD_QUEUE; j++) {
+			m_players[i].messages[j].inUse = false;
+		}
+	}
+}
+
+void CHudMessageQueue::QueueMessage(int client, const hudtextparms_t &textparms, const char *pMessage) {
+	if (client < 1 || client >= 33) return;
+
+	int freeSlot = -1;
+	for (int i = 0; i < MAX_HUD_QUEUE; i++) {
+		if (!m_players[client].messages[i].inUse) {
+			freeSlot = i;
+			break;
+		}
+	}
+
+	if (freeSlot == -1) {
+		return;
+	}
+
+	m_players[client].messages[freeSlot].textparms = textparms;
+	Q_strlcpy(m_players[client].messages[freeSlot].message, pMessage, sizeof(m_players[client].messages[freeSlot].message));
+	m_players[client].messages[freeSlot].inUse = true;
+}
+
+void CHudMessageQueue::Think() {
+	float currentTime = gpGlobals->time;
+	
+	for (int i = 1; i <= gpGlobals->maxClients; i++) {
+		CBaseEntity *pPlayer = UTIL_PlayerByIndex(i);
+		if (!pPlayer || !pPlayer->IsNetClient())
+			continue;
+
+		for (int j = 0; j < MAX_HUD_QUEUE; j++) {
+			if (!m_players[i].messages[j].inUse)
+				continue;
+			
+			hudtextparms_t parms = m_players[i].messages[j].textparms;
+			
+			int targetChannel = parms.channel - 1; 
+			if (parms.channel <= 0 || parms.channel > NUM_HUD_CHANNELS) {
+				int bestChannel = 0;
+				float oldestTime = m_players[i].channelFreeTime[0];
+				for (int c = 1; c < NUM_HUD_CHANNELS; c++) {
+					if (m_players[i].channelFreeTime[c] < oldestTime) {
+						oldestTime = m_players[i].channelFreeTime[c];
+						bestChannel = c;
+					}
+				}
+				targetChannel = bestChannel;
+				parms.channel = bestChannel + 1;
+			}
+			
+			if (currentTime >= m_players[i].channelFreeTime[targetChannel]) {
+				UTIL_HudMessage(pPlayer, parms, m_players[i].messages[j].message);
+				m_players[i].channelFreeTime[targetChannel] = currentTime + parms.fadeinTime + parms.holdTime + parms.fadeoutTime + 0.2f;
+				
+				m_players[i].messages[j].inUse = false;
+			}
+		}
+	}
+}
+
 void UTIL_HudMessage(CBaseEntity *pEntity, const hudtextparms_t &textparms, const char *pMessage)
 {
 	if (!pEntity || !pEntity->IsNetClient())
 		return;
 
 	MESSAGE_BEGIN(MSG_ONE, SVC_TEMPENTITY, nullptr, pEntity->edict());
-		WRITE_BYTE(TE_TEXTMESSAGE);
-		WRITE_BYTE(textparms.channel & 0xFF);
-		WRITE_SHORT(FixedSigned16(textparms.x, (1<<13)));
-		WRITE_SHORT(FixedSigned16(textparms.y, (1<<13)));
-		WRITE_BYTE(textparms.effect);
-		WRITE_BYTE(textparms.r1);
-		WRITE_BYTE(textparms.g1);
-		WRITE_BYTE(textparms.b1);
-		WRITE_BYTE(textparms.a1);
-		WRITE_BYTE(textparms.r2);
-		WRITE_BYTE(textparms.g2);
-		WRITE_BYTE(textparms.b2);
-		WRITE_BYTE(textparms.a2);
-		WRITE_SHORT(FixedUnsigned16(textparms.fadeinTime, (1<<8)));
-		WRITE_SHORT(FixedUnsigned16(textparms.fadeoutTime, (1<<8)));
-		WRITE_SHORT(FixedUnsigned16(textparms.holdTime, (1<<8)));
+	WRITE_BYTE(TE_TEXTMESSAGE);
+	WRITE_BYTE(textparms.channel & 0xFF);
 
-		if (textparms.effect == 2)
-			WRITE_SHORT(FixedUnsigned16(textparms.fxTime, (1<<8)));
+	WRITE_SHORT(FixedSigned16(textparms.x, 1 << 13));
+	WRITE_SHORT(FixedSigned16(textparms.y, 1 << 13));
+	WRITE_BYTE(textparms.effect);
 
-		if (!pMessage)
-			WRITE_STRING(" ");
+	WRITE_BYTE(textparms.r1);
+	WRITE_BYTE(textparms.g1);
+	WRITE_BYTE(textparms.b1);
+	WRITE_BYTE(textparms.a1);
+
+	WRITE_BYTE(textparms.r2);
+	WRITE_BYTE(textparms.g2);
+	WRITE_BYTE(textparms.b2);
+	WRITE_BYTE(textparms.a2);
+
+	WRITE_SHORT(FixedUnsigned16(textparms.fadeinTime, 1 << 8));
+	WRITE_SHORT(FixedUnsigned16(textparms.fadeoutTime, 1 << 8));
+	WRITE_SHORT(FixedUnsigned16(textparms.holdTime, 1 << 8));
+
+	if (textparms.effect == 2)
+		WRITE_SHORT(FixedUnsigned16(textparms.fxTime, 1 << 8));
+
+	if (!pMessage)
+	{
+		WRITE_STRING(" ");
+	}
+	else
+	{
+		if (Q_strlen(pMessage) >= 512)
+		{
+			char tmp[512];
+			Q_strlcpy(tmp, pMessage);
+			WRITE_STRING(tmp);
+		}
 		else
 		{
-			if (Q_strlen(pMessage) >= 512)
-			{
-				char tmp[512];
-				Q_strlcpy(tmp, pMessage);
-				WRITE_STRING(tmp);
-			}
-			else
-			{
-				WRITE_STRING(pMessage);
-			}
+			WRITE_STRING(pMessage);
 		}
+	}
 	MESSAGE_END();
 }
 
